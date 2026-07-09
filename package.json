@@ -1,0 +1,13 @@
+{
+  "name": "social-challenge-arena",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Mobile-first social challenge MVP for one-link friend competition.",
+  "scripts": {
+    "test": "node --test"
+  },
+  "devDependencies": {},
+  "engines": {
+    "node": ">=20"
+  }
+}
