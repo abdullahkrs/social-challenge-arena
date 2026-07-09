@@ -1,5 +1,85 @@
 # Task Log
 
+## Cycle 2
+
+Date/time: 2026-07-09 23:59 Europe/Istanbul
+
+### Task
+
+Build the first mobile-first landing page with one CTA to start a sample challenge.
+
+### Why this task now?
+
+Cycle 1 selected the product direction and roadmap. ROADMAP.md identified the next task as a mobile-first landing page that explains the product promise in one screen and moves users toward a sample challenge.
+
+### How it serves the viral loop
+
+The page supports the start of the loop:
+
+Discover → Play/Create Challenge
+
+It explains Play → Score → Share → Compare and prepares the next cycle to replace the placeholder CTA target with a playable challenge.
+
+### Expected files changed
+
+- index.html
+- package.json
+- tests/landing-page.test.js
+- README.md
+- CHANGELOG.md
+- TASK_LOG.md
+
+### What was intentionally not changed
+
+- No login.
+- No payment.
+- No database.
+- No multiple challenge templates.
+- No social integrations.
+- No redesign of strategy documents.
+
+### What was completed
+
+- Added `index.html` as a static mobile-first landing page.
+- Added one primary CTA: `Start a sample challenge`.
+- Added a visible MVP loop: Play, Score, Share, Compare.
+- Added `package.json` with `npm test`.
+- Added smoke tests in `tests/landing-page.test.js`.
+- Updated README run/test instructions.
+- Updated CHANGELOG.
+
+### Validation / tests
+
+A smoke test file was added, but the connected GitHub tool does not provide a runtime shell to execute `npm test` against the repository.
+
+Manual code validation performed:
+
+- Landing page has mobile viewport metadata.
+- Landing page has one main CTA.
+- Landing page keeps the no-login promise.
+- Tests assert the social challenge promise, MVP loop, and no-login constraint.
+- No secrets or API keys were added.
+
+### Result
+
+Completed with tooling limitation: commits were created through file-level GitHub actions, not one combined local commit. The task itself remained scoped to a single product goal.
+
+### Commit
+
+Primary feature commit:
+
+feat: add mobile-first landing page
+
+Commit SHA:
+
+31043786e817c2c473afe35c04073344f4d69db5
+
+### Next suggested task
+
+Turn the landing page CTA into the first playable score-based sample challenge.
+
+---
+
 ## Cycle 1
 
 Date/time: 2026-07-09 23:50 Europe/Istanbul
