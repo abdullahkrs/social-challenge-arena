@@ -43,6 +43,12 @@ The MVP must include:
 - Basic comparison between creator score and friend score.
 - Copy/share prompt that works across WhatsApp, Instagram, TikTok bio/link, and X.
 
+## Current Implementation
+
+The repository currently includes a static mobile-first landing page in `index.html`.
+
+The page explains the product promise, shows the MVP loop as Play → Score → Share → Compare, and includes one CTA: `Start a sample challenge`.
+
 ## Out of Scope for MVP
 
 - User accounts.
@@ -55,14 +61,18 @@ The MVP must include:
 - Complex real-time multiplayer.
 - AI challenge generation.
 
-## Repository Status
-
-Cycle 1 initialized product strategy, decision records, roadmap, backlog, experiments, metrics, and project hygiene files.
-
 ## Running
 
-No application stack has been added yet. The first development cycles intentionally focus on product direction and MVP guardrails before code.
+Open `index.html` directly in a browser.
+
+No build system is required for the current static landing page.
 
 ## Testing
 
-Cycle 1 validation is documentation and scope validation only. Code tests will be introduced when the first executable MVP flow is added.
+Install/use Node.js 20+ and run:
+
+```bash
+npm test
+```
+
+The current tests are smoke tests that verify the landing page communicates the social challenge promise, preserves the MVP loop, and remains no-login.
