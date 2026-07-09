@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.1.0 — 2026-07-09
+
+### Added
+
+- Added a static mobile-first landing page in `index.html`.
+- Added one clear CTA: `Start a sample challenge`.
+- Added Node smoke tests for the landing page promise, MVP loop, and no-login constraint.
+- Added `package.json` test script.
+
+### Notes
+
+The landing page is not yet a playable challenge. The next cycle should turn the CTA into the first playable score-based challenge.
+
 ## 0.0.0 — 2026-07-09
 
 ### Added
