@@ -25,9 +25,11 @@ test('page includes the playable challenge controls', () => {
   assert.match(html, /id="tap-button"/i);
 });
 
-test('page includes a focused share-ready result state without a share button', () => {
+test('page includes a focused result state with share and replay actions', () => {
   assert.match(html, /id="result-screen"/i);
   assert.match(html, /Challenge complete/i);
   assert.match(html, /id="result-message"/i);
-  assert.doesNotMatch(html, /id="share-|id="copy-link/i);
+  assert.match(html, /id="share-result"/i);
+  assert.match(html, /id="share-status"/i);
+  assert.match(html, /id="play-again"/i);
 });
