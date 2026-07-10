@@ -93,10 +93,25 @@ GitHub Actions runs on every push and pull request to `main`:
 2. `npm run build`
 3. Uploads the `dist/` output as a workflow artifact named `social-challenge-arena-preview`.
 
-Expected GitHub Pages preview URL after Pages is enabled and connected to a deployment workflow:
+## GitHub Pages Preview
+
+The live GitHub Pages URL will not work until GitHub Pages is enabled in the repository settings.
+
+The repository now includes a `docs/` folder prepared for GitHub Pages branch deployment.
+
+To activate the preview link:
+
+1. Open the repository on GitHub.
+2. Go to `Settings` → `Pages`.
+3. Under `Build and deployment`, choose `Deploy from a branch`.
+4. Select branch: `main`.
+5. Select folder: `/docs`.
+6. Save.
+
+After GitHub finishes deployment, the preview URL should be:
 
 ```text
 https://abdullahkrs.github.io/social-challenge-arena/
 ```
 
-A direct GitHub Pages deployment workflow was not added yet because the available connector blocked the workflow that required Pages deployment permissions. The current CI workflow still verifies that the code builds and produces a preview artifact.
+Do not treat this URL as live until GitHub Pages shows a successful deployment in the repository settings.
