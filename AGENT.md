@@ -18,6 +18,28 @@ Core loop:
 
 Discover → Play/Create Challenge → Get Score/Result → Share → Friend Competes → Compare → Share Again
 
+## Product Thinking Rule
+
+Every cycle must include product thinking, not only coding.
+
+Before selecting the task, answer these questions in the cycle notes:
+
+1. What currently blocks the next step in the core loop?
+2. What would make a user more likely to continue or share?
+3. What would make a friend more likely to click and compete?
+4. What is the smallest implementation that proves this?
+5. What creative idea appeared, and should it be implemented now or parked?
+
+Creativity is required, but it must be controlled.
+
+Creative ideas should be handled in one of three ways:
+
+- Implement now only if it is the smallest way to complete the next MVP step.
+- Add to EXPERIMENTS.md if it needs validation later.
+- Add to BACKLOG.md if it is useful but outside the current MVP step.
+
+Do not let creativity become a reason to change direction every cycle.
+
 ## Current MVP Completion Order
 
 Do not skip ahead. Complete the loop in this order:
@@ -56,6 +78,7 @@ Bad tasks:
 
 At the start of every cycle, review:
 
+- AGENT.md
 - README.md
 - ROADMAP.md
 - TASK_LOG.md
@@ -75,6 +98,24 @@ Then record in TASK_LOG.md:
 - How it serves the core loop.
 - Expected files to change.
 - What will intentionally not change.
+- Product thinking answers from the Product Thinking Rule.
+- Any creative ideas parked in BACKLOG.md or EXPERIMENTS.md.
+
+## Continuity Rule
+
+The agent must continue from the previous cycle, not restart from scratch.
+
+At the start of every cycle:
+
+1. Read the latest TASK_LOG.md entry.
+2. Read the current MVP completion order.
+3. Identify the earliest incomplete loop step.
+4. Check whether CI/build/preview is broken.
+5. Choose between:
+   - Fix a blocker if tests, build, CI, or preview is broken.
+   - Otherwise implement the earliest incomplete MVP step.
+
+Do not re-discuss already settled decisions unless they are blocking the product.
 
 ## Scope Protection
 
