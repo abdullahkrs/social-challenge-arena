@@ -1,35 +1,48 @@
 # Task Log
 
-## Cycle 5
+## Cycle 6
 
-Date/time: 2026-07-10 18:08 Europe/Istanbul
+Date/time: 2026-07-10 12:20 Europe/Istanbul
 
 ### Goal
 
-Turn the inline score into a focused, share-ready result screen without implementing sharing yet.
+Add a share/copy challenge link from the focused result screen, without implementing friend landing behavior or comparison yet.
 
 ### Why this task now?
 
-The landing page, playable challenge, test/build gate, and preview structure are present. The earliest incomplete MVP step is the score/result screen: the score currently appears inline beneath the same gameplay context and lacks a clear competitive result state.
+Cycle 5 completed the focused score/result screen. According to AGENT.md and ROADMAP.md, the earliest incomplete MVP step is now the share/copy result link. This is the smallest next step that moves the product from `Get Score/Result` to `Share` in the core loop.
 
 ### How it serves the core loop
 
-This cycle completes the focused result step:
+This cycle advances:
 
-Discover → Play Challenge → Get a clear Score/Result
+Discover → Play Challenge → Get Score/Result → Share
 
-The result now contains the exact score and a competitive prompt that the next cycle can carry into a share link.
+It creates a shareable link that carries only minimal state for the next cycle: supported challenge ID and the original player's bounded score.
 
-### Expected files to change
+### Acceptance criteria
 
+- Result state has one obvious primary share action.
+- Replay remains secondary.
+- URL is built with `URL` APIs, not string concatenation.
+- URL carries only minimal state: `challenge=tap-10s` and bounded `score`.
+- Web Share API is used when available.
+- Clipboard copy fallback is available when native share is unavailable.
+- Success is shown only after native share/copy succeeds.
+- Cancellation and failure do not show false success.
+- No login, backend, dependency, storage service, friend attempt, or comparison is added.
+- Root and `docs/` Pages files stay synchronized.
+- `npm test` and `npm run build` pass.
+
+### Expected files changed
+
+- package.json
 - index.html
 - app.js
-- package.json
 - tests/challenge.test.js
 - tests/landing-page.test.js
 - docs/index.html
 - docs/app.js
-- AGENT.md
 - README.md
 - ROADMAP.md
 - CHANGELOG.md
@@ -37,359 +50,84 @@ The result now contains the exact score and a competitive prompt that the next c
 
 ### What will intentionally not change
 
-- No share or copy-link action.
-- No URL score state or friend attempt.
-- No creator/friend comparison.
-- No login, database, payment, dashboard, or additional challenge type.
-- No CI or build workflow changes.
+- No friend-specific landing behavior.
+- No friend attempt.
+- No comparison screen.
+- No share-again prompt.
+- No metrics.
+- No login, database, dashboard, payment, or additional challenge type.
+- No CI/deployment workflow changes.
 
 ### Product thinking
 
-1. **What blocks the next loop step?** The score is technically visible but not presented as a distinct outcome worth sharing.
-2. **What makes the user continue or share?** A clear score hierarchy, a playful performance title, a direct competitive message, and replay.
-3. **What makes a friend click and compete?** Copy framed as “I scored X taps in 10 seconds. Can you beat me?” creates a specific target.
-4. **What is the smallest proof?** Replace gameplay controls with one focused result state when time expires.
-5. **What creative idea appeared?** Deterministic performance titles and beat-my-score copy already exist as Experiments 1 and 3, so they were implemented as part of this result step. No new idea was added to backlog or experiments.
+1. **What blocks the next loop step?** The result is share-ready, but there is no actual share/copy action.
+2. **What makes the original player more likely to continue or share?** A single primary button labeled `Share challenge link` with immediate success/failure feedback.
+3. **What makes a friend more likely to open and compete?** A link carrying a clear target score and challenge ID, plus message text: “I scored X taps in 10 seconds. Can you beat me?”
+4. **What is the smallest implementation that proves this step?** Generate a canonical URL with score state, use native share when possible, and otherwise copy the message/link.
+5. **Did a useful creative idea appear?** No new idea was needed. Existing beat-my-score and WhatsApp-first copy experiments support this implementation.
 
 ### What was completed
 
-- Added a dedicated result state that replaces the gameplay controls after completion.
-- Added a prominent score card with score unit, performance title, and competitive result message.
-- Added deterministic score titles: Fast Starter, Rapid Tapper, Tap Machine, and Lightning Hands.
-- Preserved replay and keyboard focus behavior.
-- Kept the GitHub Pages files synchronized with the root app.
-- Marked the result-screen step complete in AGENT.md and advanced the next task to share/copy link.
-- Updated tests and product documentation.
+- Added `Share challenge link` as the primary result action.
+- Added `share-status` feedback for preparing, success, cancellation, and failure.
+- Added bounded score normalization for shared state.
+- Added canonical share URL generation using `URL` APIs.
+- Added Web Share API support when available.
+- Added clipboard fallback when native share is unavailable.
+- Added tests for URL state, share data, native share, copy fallback, unavailable copy, and result controls.
+- Kept replay as the secondary action.
+- Synchronized root files and GitHub Pages `docs/` files.
+- Updated README, ROADMAP, and CHANGELOG.
 
 ### Validation / tests
 
-- Ran `npm test`: 10 passed, 0 failed.
-- Ran `npm run build`: passed; `index.html` and `app.js` copied to `dist/`.
+- Ran `npm test` locally in a reconstructed repository workspace: 16 passed, 0 failed.
+- Ran `npm run build` locally: passed; `index.html` and `app.js` copied to `dist/`.
 - Secret-like string scan: no findings.
-- Scope review: no sharing, friend state, accounts, or unrelated features were added.
-- GitHub Actions before commit: the connector returned no workflow runs or status checks for the previous documentation-only head.
-- Preview before commit: the user previously confirmed the Pages URL works, but automated live fetch was rejected by the web tool; this change was therefore not claimed as live-verified.
+- Scope review: no friend attempt, comparison, accounts, backend, or unrelated feature was added.
+- GitHub Actions status after commits was not yet available through the connector at report time.
+- Preview was not re-verified after deployment propagation; root and `docs/` files were synchronized for GitHub Pages.
 
 ### Result
 
-Completed. The score/result screen is now a distinct mobile-first state ready for the next share/copy-link cycle.
+Completed with tooling limitation: the GitHub connector created multiple file-level commits instead of one combined commit. The selected task itself remained narrow and completed.
 
 ### Commit
 
-`feat: add focused challenge result screen`
+Primary commit message used across the feature updates:
 
-The commit SHA is available in Git history and the cycle email because a commit cannot contain its own SHA.
+`feat: add shareable result link`
+
+Primary commit SHA:
+
+`c77f158f3ff7ca57e57ebea331066cabaa6fef31`
+
+Additional file-level commits were created for synchronized source, tests, docs, and deployment mirror updates due connector limitations.
 
 ### Next suggested task
 
-Add a share/copy challenge link from the focused result screen, without implementing friend comparison yet.
+Open a shared link with the original score preserved and let the friend start an independent attempt, without implementing comparison yet.
 
 ---
 
-## Cycle 4
+## Previous cycles summary
 
-Date/time: 2026-07-10 00:00 Asia/Muscat
+### Cycle 5 — Focused result screen
 
-### Goal
+Completed the focused score/result screen. Added prominent score, deterministic performance title, competitive message, replay, tests, and Pages synchronization. Result step is complete; sharing was intentionally deferred.
 
-Add automated build validation and a preview artifact workflow so future cycles can verify that the system has no obvious build errors before reporting completion.
+### Cycle 4 — Build and preview workflow
 
-### Why this task now?
+Added `npm run build`, `scripts/build.js`, and GitHub Actions CI for tests/build/artifact. Direct Pages deploy workflow was not added due connector safety limitations.
 
-The MVP now has a landing page and a first playable challenge. Before adding sharing and friend-comparison features, the project needs an automated quality gate that runs tests and build validation on every push or pull request.
+### Cycle 3 — First playable challenge
 
-### How it serves the viral loop
+Added the playable 10-second tap challenge with countdown, local scoring, final result, replay, and tests.
 
-This does not add a new user-facing loop step directly, but it protects the existing loop progress:
+### Cycle 2 — Mobile-first landing page
 
-Discover → Play Challenge → Get Score/Result
+Added the initial mobile-first landing page with one CTA to start the sample challenge.
 
-Future changes to sharing, friend attempts, and comparison should not be reported as complete unless the code can build.
+### Cycle 1 — Product strategy and repository initialization
 
-### Expected files changed
-
-- package.json
-- scripts/build.js
-- .github/workflows/ci.yml
-- README.md
-- CHANGELOG.md
-- TASK_LOG.md
-
-### What was intentionally not changed
-
-- No login.
-- No payment.
-- No dashboard.
-- No new challenge type.
-- No share-link implementation.
-- No friend comparison implementation.
-- No broad UI redesign.
-
-### What was completed
-
-- Added `npm run build`.
-- Added `scripts/build.js` to validate required static preview files and copy them into `dist/`.
-- Added GitHub Actions workflow `.github/workflows/ci.yml`.
-- The workflow runs `npm test`, then `npm run build`, then uploads `dist/` as artifact `social-challenge-arena-preview`.
-- Updated README with build and CI/preview artifact instructions.
-- Updated CHANGELOG.
-
-### Validation / tests
-
-- Static review of `scripts/build.js`: verifies `index.html` and `app.js` exist before writing `dist/`.
-- Static review of CI workflow: confirms it checks out code, uses Node 20, runs tests, runs build, and uploads the artifact.
-- The connected tool does not provide a shell runtime for executing `npm test` or `npm run build` locally in this repository.
-- GitHub Actions should execute the workflow after push.
-
-### Result
-
-Completed with limitation: a direct GitHub Pages deploy workflow was attempted, but the connector safety checks blocked the workflow that used Pages deployment permissions. A safer CI workflow was added instead. It produces a build artifact that can be used for preview. The expected Pages URL is documented, but live Pages deployment is not yet verified.
-
-### Commit
-
-Primary CI commit:
-
-`ci: add test and build workflow`
-
-Commit SHA:
-
-`1e24708b1fa084b527e210a06bae8e6c60050f32`
-
-### Next suggested task
-
-Enable GitHub Pages deployment from the successful build artifact, or manually configure Pages and then add a deploy workflow once permissions are allowed.
-
----
-
-## Cycle 3
-
-Date/time: 2026-07-10 05:56 Europe/Istanbul
-
-### Goal
-
-Turn the landing-page CTA into the first playable score-based challenge.
-
-### Why this task now?
-
-The mobile-first product shell was complete, but its only CTA still ended at a placeholder. A playable interaction is the smallest next proof of the MVP path and removes the current blocker between discovery and obtaining a result.
-
-### How it serves the viral loop
-
-This cycle advances:
-
-Discover → Play Challenge → Get Score/Result
-
-It gives later sharing and friend-comparison work a real score to carry through the rest of the loop.
-
-### Expected files changed
-
-- index.html
-- app.js
-- package.json
-- tests/challenge.test.js
-- tests/landing-page.test.js
-- README.md
-- ROADMAP.md
-- CHANGELOG.md
-- TASK_LOG.md
-
-### What was intentionally not changed
-
-- No login, database, payments, or profiles.
-- No share/copy link yet.
-- No friend attempt or comparison.
-- No additional challenge types.
-- No analytics or advanced social integrations.
-
-### What was completed
-
-- Replaced the placeholder CTA target with a playable 10-second tap challenge.
-- Added local scoring that accepts taps only before the deadline.
-- Added a visible countdown, live score, final score, and replay control.
-- Kept the experience mobile-first and no-login.
-- Added deterministic unit tests for scoring, expiry, and replay reset.
-- Updated landing-page smoke coverage and project documentation.
-
-### Validation / tests
-
-- Ran `npm test` with Node's built-in test runner.
-- Result: 7 passed, 0 failed.
-- Performed a static secret scan; no secret-like strings were found.
-- Reviewed scope against the MVP loop; sharing and comparison remain deferred.
-
-### Result
-
-Completed. The first challenge is playable end-to-end on one device and produces a local score.
-
-### Commit
-
-`feat: add first playable tap challenge`
-
-The commit SHA is available in Git history and the cycle email; a commit cannot contain its own SHA.
-
-### Next suggested task
-
-Turn the inline tap score into a focused result screen that is ready for the later share/copy-link step.
-
----
-
-## Cycle 2
-
-Date/time: 2026-07-09 23:59 Europe/Istanbul
-
-### Task
-
-Build the first mobile-first landing page with one CTA to start a sample challenge.
-
-### Why this task now?
-
-Cycle 1 selected the product direction and roadmap. ROADMAP.md identified the next task as a mobile-first landing page that explains the product promise in one screen and moves users toward a sample challenge.
-
-### How it serves the viral loop
-
-The page supports the start of the loop:
-
-Discover → Play/Create Challenge
-
-It explains Play → Score → Share → Compare and prepares the next cycle to replace the placeholder CTA target with a playable challenge.
-
-### Expected files changed
-
-- index.html
-- package.json
-- tests/landing-page.test.js
-- README.md
-- CHANGELOG.md
-- TASK_LOG.md
-
-### What was intentionally not changed
-
-- No login.
-- No payment.
-- No database.
-- No multiple challenge templates.
-- No social integrations.
-- No redesign of strategy documents.
-
-### What was completed
-
-- Added `index.html` as a static mobile-first landing page.
-- Added one primary CTA: `Start a sample challenge`.
-- Added a visible MVP loop: Play, Score, Share, Compare.
-- Added `package.json` with `npm test`.
-- Added smoke tests in `tests/landing-page.test.js`.
-- Updated README run/test instructions.
-- Updated CHANGELOG.
-
-### Validation / tests
-
-A smoke test file was added, but the connected GitHub tool does not provide a runtime shell to execute `npm test` against the repository.
-
-Manual code validation performed:
-
-- Landing page has mobile viewport metadata.
-- Landing page has one main CTA.
-- Landing page keeps the no-login promise.
-- Tests assert the social challenge promise, MVP loop, and no-login constraint.
-- No secrets or API keys were added.
-
-### Result
-
-Completed with tooling limitation: commits were created through file-level GitHub actions, not one combined local commit. The task itself remained scoped to a single product goal.
-
-### Commit
-
-Primary feature commit:
-
-feat: add mobile-first landing page
-
-Commit SHA:
-
-31043786e817c2c473afe35c04073344f4d69db5
-
-### Next suggested task
-
-Turn the landing page CTA into the first playable score-based sample challenge.
-
----
-
-## Cycle 1
-
-Date/time: 2026-07-09 23:50 Europe/Istanbul
-
-### Task
-
-Initialize product strategy and repository structure for a mobile-first social challenge product.
-
-### Why this task now?
-
-The idea was intentionally broad. Before building features, the project needed a clear MVP direction, viral loop, scope boundaries, decision records, and project management files to prevent future cycles from drifting into endless redesign, platform expansion, or unrelated improvements.
-
-### How it serves the viral loop
-
-The selected direction, one-link friend challenge templates, directly supports:
-
-Discover → Play/Create Challenge → Get Score/Result → Share → Friend Competes → Compare → Share Again
-
-### What was completed
-
-- Analyzed the initial concept.
-- Performed a short trend review for social sharing and creator-driven challenge behavior.
-- Evaluated five product directions.
-- Selected one-link friend challenge templates.
-- Defined product hypothesis, first target user, viral loop, MVP scope, and out-of-scope boundaries.
-- Created required project files.
-- Created GitHub commits for repository initialization.
-
-### Files modified
-
-- README.md
-- ROADMAP.md
-- TASK_LOG.md
-- DECISIONS.md
-- BACKLOG.md
-- CHANGELOG.md
-- EXPERIMENTS.md
-- METRICS.md
-- .gitignore
-- .env.example
-- LICENSE
-
-### What was intentionally avoided
-
-- No application framework yet.
-- No login.
-- No payment.
-- No multiple challenges.
-- No UI redesign work.
-- No creator dashboard.
-- No platform-specific social integration.
-
-### Validation / tests
-
-Documentation validation only:
-
-- Required file list checked.
-- MVP loop checked against every decision.
-- Scope creep moved to backlog or experiments.
-- No secrets included.
-
-No code tests were run because no executable application code exists yet.
-
-### Result
-
-Completed with a tooling limitation: the empty repository could not be initialized with all files in one Git tree through the available connector. README.md was created first, then the remaining files were added with separate file commits.
-
-### Commit
-
-Initial commit title requested:
-
-chore: initialize social challenge product strategy and repo structure
-
-First commit SHA:
-
-c3475c5867f5206d2b6809e2dac66ae562a5fd5f
-
-### Next suggested task
-
-Build the first mobile-first landing page with one CTA to play a sample challenge.
+Initialized the repository, product strategy, roadmap, decisions, backlog, experiments, metrics, changelog, and hygiene files.
