@@ -31,7 +31,20 @@ class TapChallenge {
   }
 }
 
-if (typeof module !== 'undefined') module.exports = { TapChallenge };
+function getResultTitle(score) {
+  if (score >= 80) return 'Lightning Hands';
+  if (score >= 55) return 'Tap Machine';
+  if (score >= 30) return 'Rapid Tapper';
+  return 'Fast Starter';
+}
+
+function buildResultMessage(score) {
+  return `I scored ${score} taps in 10 seconds. Can you beat me?`;
+}
+
+if (typeof module !== 'undefined') {
+  module.exports = { TapChallenge, getResultTitle, buildResultMessage };
+}
 
 if (typeof document !== 'undefined') {
   const game = new TapChallenge();
@@ -40,21 +53,25 @@ if (typeof document !== 'undefined') {
   const startButton = document.querySelector('#start-game');
   const tapButton = document.querySelector('#tap-button');
   const playAgainButton = document.querySelector('#play-again');
-  const result = document.querySelector('#result');
+  const gameplay = document.querySelector('#gameplay');
+  const resultScreen = document.querySelector('#result-screen');
   const timeLeft = document.querySelector('#time-left');
   const score = document.querySelector('#score');
   const finalScore = document.querySelector('#final-score');
+  const resultTitle = document.querySelector('#result-heading');
+  const resultMessage = document.querySelector('#result-message');
   let timerId;
 
   function resetView() {
     clearInterval(timerId);
     timeLeft.textContent = '10.0';
     score.textContent = '0';
-    result.hidden = true;
-    playAgainButton.hidden = true;
+    gameplay.hidden = false;
+    resultScreen.hidden = true;
     tapButton.hidden = true;
     tapButton.disabled = true;
     startButton.hidden = false;
+    startButton.focus();
   }
 
   function completeGame() {
@@ -62,10 +79,14 @@ if (typeof document !== 'undefined') {
     game.finish();
     timeLeft.textContent = '0.0';
     finalScore.textContent = String(game.score);
+    resultTitle.textContent = getResultTitle(game.score);
+    resultMessage.textContent = buildResultMessage(game.score);
     tapButton.disabled = true;
     tapButton.hidden = true;
-    result.hidden = false;
-    playAgainButton.hidden = false;
+    gameplay.hidden = true;
+    resultScreen.hidden = false;
+    resultScreen.focus();
+    resultScreen.scrollIntoView({ behavior: 'smooth', block: 'center' });
   }
 
   function refreshTimer() {
@@ -82,8 +103,8 @@ if (typeof document !== 'undefined') {
   startButton.addEventListener('click', () => {
     game.start();
     score.textContent = '0';
-    result.hidden = true;
-    playAgainButton.hidden = true;
+    resultScreen.hidden = true;
+    gameplay.hidden = false;
     startButton.hidden = true;
     tapButton.hidden = false;
     tapButton.disabled = false;

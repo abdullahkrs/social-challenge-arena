@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.4.0 — 2026-07-10
+
+### Added
+
+- Added a focused result state that replaces gameplay when the tap challenge ends.
+- Added prominent score presentation, deterministic performance titles, and competitive result copy.
+- Added tests for result titles, result messaging, and the share-ready state.
+- Synchronized the GitHub Pages preview files with the root application.
+
+### Notes
+
+The result is prepared for the next sharing step, but this release intentionally does not create or copy a share link.
+
 ## 0.3.0 — 2026-07-10
 
 ### Added

@@ -46,7 +46,7 @@ Do not skip ahead. Complete the loop in this order:
 
 1. Mobile-first landing page. ✅
 2. First playable challenge. ✅
-3. Score/result screen.
+3. Score/result screen. ✅
 4. Share/copy challenge link.
 5. Friend attempt from shared link.
 6. Creator/friend comparison.
@@ -230,4 +230,4 @@ Stop and report instead of continuing if:
 
 ## Next Recommended Task
 
-Add a focused result screen that turns the current inline score into a share-ready result state, without implementing full sharing yet.
+Add a share/copy challenge link from the focused result screen, without implementing friend comparison yet.

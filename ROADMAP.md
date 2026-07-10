@@ -72,4 +72,4 @@ MVP is complete only when:
 
 ## Next Suggested Task
 
-Turn the inline tap score into a focused result screen that is ready for the later share/copy-link step.
+Add a share/copy challenge link from the focused result screen, without implementing friend comparison yet.

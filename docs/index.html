@@ -25,14 +25,21 @@
       .challenge[hidden] { display:none; }
       .challenge h2 { margin:0 0 .45rem; font-size:1.5rem; }
       .challenge p { margin:.35rem 0; color:var(--muted); line-height:1.5; }
+      .gameplay[hidden], .result-screen[hidden] { display:none; }
       .stats { display:grid; grid-template-columns:1fr 1fr; gap:.75rem; margin:1rem 0; }
       .stat { padding:.8rem; border-radius:1rem; background:rgba(255,255,255,.06); }
       .stat span { display:block; color:var(--muted); font-size:.8rem; text-transform:uppercase; letter-spacing:.08em; }
       .stat strong { display:block; margin-top:.2rem; font-size:1.75rem; }
       .tap-button { width:min(100%,16rem); aspect-ratio:1; border:0; border-radius:50%; background:linear-gradient(145deg,#a78bfa,#06b6d4); color:white; font:inherit; font-size:1.55rem; font-weight:900; box-shadow:0 1rem 2.5rem rgba(6,182,212,.25); cursor:pointer; touch-action:manipulation; user-select:none; }
       .tap-button:disabled { opacity:.45; cursor:not-allowed; }
-      .result { margin:1rem 0; padding:1rem; border-radius:1rem; background:rgba(139,92,246,.16); }
-      .result strong { display:block; font-size:2.4rem; }
+      .result-screen { text-align:center; }
+      .result-eyebrow { display:inline-block; color:var(--accent-strong); font-size:.78rem; font-weight:850; letter-spacing:.12em; text-transform:uppercase; }
+      .result-card { position:relative; overflow:hidden; margin:1rem 0; padding:1.4rem 1rem; border:1px solid rgba(167,139,250,.38); border-radius:1.35rem; background:linear-gradient(155deg,rgba(139,92,246,.24),rgba(6,182,212,.12)); }
+      .result-card::after { content:"⚡"; position:absolute; right:-.25rem; bottom:-1.5rem; font-size:7rem; opacity:.08; transform:rotate(-12deg); }
+      .result-score { display:block; margin:.25rem 0 0; font-size:clamp(4rem,20vw,6rem); line-height:1; letter-spacing:-.06em; }
+      .result-unit { color:var(--muted); font-weight:750; }
+      .result-title { margin:1rem 0 .35rem; font-size:1.45rem; }
+      .result-message { max-width:22rem; margin:.35rem auto 0; color:var(--text) !important; font-size:1.05rem; font-weight:700; }
     </style>
     <script src="app.js" defer></script>
   </head>
@@ -53,18 +60,27 @@
           <p class="share-line">No login. Your score stays on this device for now.</p>
         </div>
         <section class="challenge" id="sample-challenge" aria-labelledby="challenge-title" hidden>
-          <h2 id="challenge-title">10-Second Tap Sprint</h2>
-          <p>Tap as many times as you can before the clock reaches zero.</p>
-          <div class="stats" aria-live="polite">
-            <div class="stat"><span>Time</span><strong id="time-left">10.0</strong></div>
-            <div class="stat"><span>Score</span><strong id="score">0</strong></div>
+          <div class="gameplay" id="gameplay">
+            <h2 id="challenge-title">10-Second Tap Sprint</h2>
+            <p>Tap as many times as you can before the clock reaches zero.</p>
+            <div class="stats" aria-live="polite">
+              <div class="stat"><span>Time</span><strong id="time-left">10.0</strong></div>
+              <div class="stat"><span>Score</span><strong id="score">0</strong></div>
+            </div>
+            <button class="cta" id="start-game" type="button">Start challenge</button>
+            <button class="tap-button" id="tap-button" type="button" disabled hidden>Tap!</button>
           </div>
-          <button class="cta" id="start-game" type="button">Start challenge</button>
-          <button class="tap-button" id="tap-button" type="button" disabled hidden>Tap!</button>
-          <div class="result" id="result" aria-live="assertive" hidden>
-            <span>Your score</span><strong id="final-score">0</strong><span>taps in 10 seconds</span>
-          </div>
-          <button class="cta secondary" id="play-again" type="button" hidden>Play again</button>
+          <section class="result-screen" id="result-screen" aria-labelledby="result-heading" aria-live="assertive" tabindex="-1" hidden>
+            <span class="result-eyebrow">Challenge complete</span>
+            <div class="result-card">
+              <span>10-second Tap Sprint</span>
+              <strong class="result-score" id="final-score">0</strong>
+              <span class="result-unit">taps</span>
+              <h2 class="result-title" id="result-heading">Fast Starter</h2>
+              <p class="result-message" id="result-message">Can your friend beat this score?</p>
+            </div>
+            <button class="cta secondary" id="play-again" type="button">Play again</button>
+          </section>
         </section>
       </section>
     </main>

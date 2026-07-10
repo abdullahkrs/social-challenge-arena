@@ -1,6 +1,6 @@
 const { test } = require('node:test');
 const assert = require('node:assert/strict');
-const { TapChallenge } = require('../app.js');
+const { TapChallenge, buildResultMessage, getResultTitle } = require('../app.js');
 
 test('tap challenge starts at zero and scores valid taps', () => {
   const challenge = new TapChallenge(10000);
@@ -27,4 +27,15 @@ test('starting again resets the score and timer', () => {
   challenge.start(5000);
   assert.equal(challenge.score, 0);
   assert.equal(challenge.remainingMs(5000), 10000);
+});
+
+test('result titles reward higher scores with deterministic tiers', () => {
+  assert.equal(getResultTitle(10), 'Fast Starter');
+  assert.equal(getResultTitle(30), 'Rapid Tapper');
+  assert.equal(getResultTitle(55), 'Tap Machine');
+  assert.equal(getResultTitle(80), 'Lightning Hands');
+});
+
+test('result message is ready for a later sharing action', () => {
+  assert.equal(buildResultMessage(42), 'I scored 42 taps in 10 seconds. Can you beat me?');
 });

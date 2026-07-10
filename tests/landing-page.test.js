@@ -24,3 +24,10 @@ test('page includes the playable challenge controls', () => {
   assert.match(html, /id="start-game"/i);
   assert.match(html, /id="tap-button"/i);
 });
+
+test('page includes a focused share-ready result state without a share button', () => {
+  assert.match(html, /id="result-screen"/i);
+  assert.match(html, /Challenge complete/i);
+  assert.match(html, /id="result-message"/i);
+  assert.doesNotMatch(html, /id="share-|id="copy-link/i);
+});

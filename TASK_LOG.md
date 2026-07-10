@@ -1,5 +1,91 @@
 # Task Log
 
+## Cycle 5
+
+Date/time: 2026-07-10 18:08 Europe/Istanbul
+
+### Goal
+
+Turn the inline score into a focused, share-ready result screen without implementing sharing yet.
+
+### Why this task now?
+
+The landing page, playable challenge, test/build gate, and preview structure are present. The earliest incomplete MVP step is the score/result screen: the score currently appears inline beneath the same gameplay context and lacks a clear competitive result state.
+
+### How it serves the core loop
+
+This cycle completes the focused result step:
+
+Discover → Play Challenge → Get a clear Score/Result
+
+The result now contains the exact score and a competitive prompt that the next cycle can carry into a share link.
+
+### Expected files to change
+
+- index.html
+- app.js
+- package.json
+- tests/challenge.test.js
+- tests/landing-page.test.js
+- docs/index.html
+- docs/app.js
+- AGENT.md
+- README.md
+- ROADMAP.md
+- CHANGELOG.md
+- TASK_LOG.md
+
+### What will intentionally not change
+
+- No share or copy-link action.
+- No URL score state or friend attempt.
+- No creator/friend comparison.
+- No login, database, payment, dashboard, or additional challenge type.
+- No CI or build workflow changes.
+
+### Product thinking
+
+1. **What blocks the next loop step?** The score is technically visible but not presented as a distinct outcome worth sharing.
+2. **What makes the user continue or share?** A clear score hierarchy, a playful performance title, a direct competitive message, and replay.
+3. **What makes a friend click and compete?** Copy framed as “I scored X taps in 10 seconds. Can you beat me?” creates a specific target.
+4. **What is the smallest proof?** Replace gameplay controls with one focused result state when time expires.
+5. **What creative idea appeared?** Deterministic performance titles and beat-my-score copy already exist as Experiments 1 and 3, so they were implemented as part of this result step. No new idea was added to backlog or experiments.
+
+### What was completed
+
+- Added a dedicated result state that replaces the gameplay controls after completion.
+- Added a prominent score card with score unit, performance title, and competitive result message.
+- Added deterministic score titles: Fast Starter, Rapid Tapper, Tap Machine, and Lightning Hands.
+- Preserved replay and keyboard focus behavior.
+- Kept the GitHub Pages files synchronized with the root app.
+- Marked the result-screen step complete in AGENT.md and advanced the next task to share/copy link.
+- Updated tests and product documentation.
+
+### Validation / tests
+
+- Ran `npm test`: 10 passed, 0 failed.
+- Ran `npm run build`: passed; `index.html` and `app.js` copied to `dist/`.
+- Secret-like string scan: no findings.
+- Scope review: no sharing, friend state, accounts, or unrelated features were added.
+- GitHub Actions before commit: the connector returned no workflow runs or status checks for the previous documentation-only head.
+- Preview before commit: the user previously confirmed the Pages URL works, but automated live fetch was rejected by the web tool; this change was therefore not claimed as live-verified.
+
+### Result
+
+Completed. The score/result screen is now a distinct mobile-first state ready for the next share/copy-link cycle.
+
+### Commit
+
+`feat: add focused challenge result screen`
+
+The commit SHA is available in Git history and the cycle email because a commit cannot contain its own SHA.
+
+### Next suggested task
+
+Add a share/copy challenge link from the focused result screen, without implementing friend comparison yet.
+
+---
+
 ## Cycle 4
 
 Date/time: 2026-07-10 00:00 Asia/Muscat

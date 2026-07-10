@@ -45,9 +45,9 @@ The MVP must include:
 
 ## Current Implementation
 
-The repository now includes a static mobile-first landing page and the first playable challenge.
+The repository includes a static mobile-first landing page, a playable 10-second tap challenge, and a focused result screen.
 
-The CTA opens a no-login 10-second tap challenge. The browser counts valid taps locally, stops scoring at the deadline, shows the final score, and lets the player try again. Sharing and friend comparison are not implemented yet.
+After the timer ends, the play controls give way to a share-ready result card with the score, a deterministic performance title, a competitive “Can you beat me?” message, and replay. The screen does not yet create or copy a share link, and friend comparison remains unimplemented.
 
 ## Out of Scope for MVP
 
@@ -73,7 +73,7 @@ Install/use Node.js 20+ and run:
 npm test
 ```
 
-The tests verify the landing-page promise and no-login constraint plus the tap challenge's scoring, deadline, and replay reset behavior.
+The tests verify the landing-page promise and no-login constraint, tap challenge scoring and expiry, deterministic result titles and copy, replay reset behavior, and the focused result state.
 
 ## Build
 
@@ -95,23 +95,10 @@ GitHub Actions runs on every push and pull request to `main`:
 
 ## GitHub Pages Preview
 
-The live GitHub Pages URL will not work until GitHub Pages is enabled in the repository settings.
-
-The repository now includes a `docs/` folder prepared for GitHub Pages branch deployment.
-
-To activate the preview link:
-
-1. Open the repository on GitHub.
-2. Go to `Settings` → `Pages`.
-3. Under `Build and deployment`, choose `Deploy from a branch`.
-4. Select branch: `main`.
-5. Select folder: `/docs`.
-6. Save.
-
-After GitHub finishes deployment, the preview URL should be:
+GitHub Pages is configured to serve the `docs/` folder from `main` at:
 
 ```text
 https://abdullahkrs.github.io/social-challenge-arena/
 ```
 
-Do not treat this URL as live until GitHub Pages shows a successful deployment in the repository settings.
+Until preview generation is consolidated, user-facing changes must keep `docs/index.html` and `docs/app.js` synchronized with their root counterparts.
