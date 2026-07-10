@@ -61,11 +61,9 @@ The CTA opens a no-login 10-second tap challenge. The browser counts valid taps 
 - Complex real-time multiplayer.
 - AI challenge generation.
 
-## Running
+## Running Locally
 
 Open `index.html` directly in a browser.
-
-No build system is required for the current static landing page.
 
 ## Testing
 
@@ -76,3 +74,29 @@ npm test
 ```
 
 The tests verify the landing-page promise and no-login constraint plus the tap challenge's scoring, deadline, and replay reset behavior.
+
+## Build
+
+Run:
+
+```bash
+npm run build
+```
+
+The build copies the static preview files into `dist/` and fails if required files such as `index.html` or `app.js` are missing.
+
+## CI and Preview Artifact
+
+GitHub Actions runs on every push and pull request to `main`:
+
+1. `npm test`
+2. `npm run build`
+3. Uploads the `dist/` output as a workflow artifact named `social-challenge-arena-preview`.
+
+Expected GitHub Pages preview URL after Pages is enabled and connected to a deployment workflow:
+
+```text
+https://abdullahkrs.github.io/social-challenge-arena/
+```
+
+A direct GitHub Pages deployment workflow was not added yet because the available connector blocked the workflow that required Pages deployment permissions. The current CI workflow still verifies that the code builds and produces a preview artifact.
