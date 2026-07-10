@@ -1,5 +1,80 @@
 # Task Log
 
+## Cycle 4
+
+Date/time: 2026-07-10 00:00 Asia/Muscat
+
+### Goal
+
+Add automated build validation and a preview artifact workflow so future cycles can verify that the system has no obvious build errors before reporting completion.
+
+### Why this task now?
+
+The MVP now has a landing page and a first playable challenge. Before adding sharing and friend-comparison features, the project needs an automated quality gate that runs tests and build validation on every push or pull request.
+
+### How it serves the viral loop
+
+This does not add a new user-facing loop step directly, but it protects the existing loop progress:
+
+Discover → Play Challenge → Get Score/Result
+
+Future changes to sharing, friend attempts, and comparison should not be reported as complete unless the code can build.
+
+### Expected files changed
+
+- package.json
+- scripts/build.js
+- .github/workflows/ci.yml
+- README.md
+- CHANGELOG.md
+- TASK_LOG.md
+
+### What was intentionally not changed
+
+- No login.
+- No payment.
+- No dashboard.
+- No new challenge type.
+- No share-link implementation.
+- No friend comparison implementation.
+- No broad UI redesign.
+
+### What was completed
+
+- Added `npm run build`.
+- Added `scripts/build.js` to validate required static preview files and copy them into `dist/`.
+- Added GitHub Actions workflow `.github/workflows/ci.yml`.
+- The workflow runs `npm test`, then `npm run build`, then uploads `dist/` as artifact `social-challenge-arena-preview`.
+- Updated README with build and CI/preview artifact instructions.
+- Updated CHANGELOG.
+
+### Validation / tests
+
+- Static review of `scripts/build.js`: verifies `index.html` and `app.js` exist before writing `dist/`.
+- Static review of CI workflow: confirms it checks out code, uses Node 20, runs tests, runs build, and uploads the artifact.
+- The connected tool does not provide a shell runtime for executing `npm test` or `npm run build` locally in this repository.
+- GitHub Actions should execute the workflow after push.
+
+### Result
+
+Completed with limitation: a direct GitHub Pages deploy workflow was attempted, but the connector safety checks blocked the workflow that used Pages deployment permissions. A safer CI workflow was added instead. It produces a build artifact that can be used for preview. The expected Pages URL is documented, but live Pages deployment is not yet verified.
+
+### Commit
+
+Primary CI commit:
+
+`ci: add test and build workflow`
+
+Commit SHA:
+
+`1e24708b1fa084b527e210a06bae8e6c60050f32`
+
+### Next suggested task
+
+Enable GitHub Pages deployment from the successful build artifact, or manually configure Pages and then add a deploy workflow once permissions are allowed.
+
+---
+
 ## Cycle 3
 
 Date/time: 2026-07-10 05:56 Europe/Istanbul
