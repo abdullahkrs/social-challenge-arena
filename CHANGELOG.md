@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.3.0 — 2026-07-10
+
+### Added
+
+- Added `npm run build` for static preview validation.
+- Added `scripts/build.js` to fail the build when required preview files are missing.
+- Added GitHub Actions CI workflow to run tests, build the static preview, and upload the build artifact.
+- Documented the expected GitHub Pages preview URL and the current Pages deployment limitation.
+
+### Notes
+
+The CI workflow verifies that the system can be built. A direct GitHub Pages deployment workflow was attempted but blocked by connector safety checks around Pages deployment permissions, so the current preview output is available as a GitHub Actions artifact.
+
 ## 0.2.0 — 2026-07-10
 
 ### Added
