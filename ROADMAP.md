@@ -32,25 +32,25 @@ Scale: 1 weak, 5 strong.
 
 ### Phase 1 — Product shell
 
-- Mobile-first landing page.
-- Explain the challenge in one screen.
-- CTA: Play a sample challenge.
+- Mobile-first landing page. ✅
+- Explain the challenge in one screen. ✅
+- CTA: Play a sample challenge. ✅
 
 ### Phase 2 — First playable challenge
 
-- Single challenge template.
-- Local scoring.
-- Result screen.
+- Single challenge template. ✅
+- Local scoring. ✅
+- Result screen. ✅
 
 ### Phase 3 — Sharing loop
 
-- Share/copy result link.
+- Share/copy result link. ✅
 - Friend opens same challenge.
 - Friend attempt is recorded.
 
 ### Phase 4 — Comparison loop
 
-- Compare creator and friend score.
+- Compare original-player and friend score.
 - Prompt loser/winner to share again.
 
 ### Phase 5 — MVP validation
@@ -64,7 +64,7 @@ Scale: 1 weak, 5 strong.
 MVP is complete only when:
 
 - A new user can play from mobile without login.
-- A creator can share a challenge link.
+- An original player can share a challenge link.
 - A friend can open the link and compete.
 - Both users can see a comparison.
 - The result page encourages another share.
@@ -72,4 +72,4 @@ MVP is complete only when:
 
 ## Next Suggested Task
 
-Add a share/copy challenge link from the focused result screen, without implementing friend comparison yet.
+Open a shared link with the original score preserved and let the friend start an independent attempt, without implementing comparison yet.
