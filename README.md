@@ -45,9 +45,9 @@ The MVP must include:
 
 ## Current Implementation
 
-The repository includes a static mobile-first landing page, a playable 10-second tap challenge, and a focused result screen.
+The repository includes a static mobile-first landing page, a playable 10-second tap challenge, a focused result screen, and a share/copy challenge link action.
 
-After the timer ends, the play controls give way to a share-ready result card with the score, a deterministic performance title, a competitive “Can you beat me?” message, and replay. The screen does not yet create or copy a share link, and friend comparison remains unimplemented.
+After the timer ends, the play controls give way to a share-ready result card with the score, a deterministic performance title, a competitive “Can you beat me?” message, and a primary share action. The share action uses the Web Share API when available and falls back to copying the challenge link and message. Friend landing behavior and comparison remain unimplemented.
 
 ## Out of Scope for MVP
 
@@ -73,7 +73,7 @@ Install/use Node.js 20+ and run:
 npm test
 ```
 
-The tests verify the landing-page promise and no-login constraint, tap challenge scoring and expiry, deterministic result titles and copy, replay reset behavior, and the focused result state.
+The tests verify the landing-page promise and no-login constraint, tap challenge scoring and expiry, deterministic result titles and copy, replay reset behavior, focused result state, share URL generation, native share usage, copy fallback, and unavailable-copy handling.
 
 ## Build
 
