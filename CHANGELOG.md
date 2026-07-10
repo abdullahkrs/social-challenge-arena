@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.5.0 — 2026-07-10
+
+### Added
+
+- Added a primary share action to the focused result screen.
+- Added Web Share API support when available.
+- Added clipboard copy fallback for browsers without native sharing.
+- Added bounded, typed, minimal URL state using `challenge=tap-10s` and `score={value}`.
+- Added tests for share URL generation, share data, native share, copy fallback, unavailable copy support, and share controls.
+- Synchronized the GitHub Pages preview files with the root application.
+
+### Notes
+
+The shared URL now carries the original result state needed for the next friend-attempt cycle. This release intentionally does not implement friend landing behavior, friend attempts, comparison, or share-again.
+
 ## 0.4.0 — 2026-07-10
 
 ### Added
