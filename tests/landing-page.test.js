@@ -7,16 +7,20 @@ const html = readFileSync('index.html', 'utf8');
 test('landing page communicates the social challenge promise', () => {
   assert.match(html, /Dare a friend in seconds/i);
   assert.match(html, /one link/i);
-  assert.match(html, /Start a sample challenge/i);
+  assert.match(html, /Start the 10-second tap challenge/i);
 });
 
 test('landing page preserves the MVP viral loop steps', () => {
-  for (const step of ['Play', 'Score', 'Share', 'Compare']) {
-    assert.match(html, new RegExp(step, 'i'));
-  }
+  for (const step of ['Play', 'Score', 'Share', 'Compare']) assert.match(html, new RegExp(step, 'i'));
 });
 
 test('landing page remains no-login for the MVP', () => {
   assert.match(html, /No login/i);
   assert.doesNotMatch(html, /sign in|required account|create account/i);
+});
+
+test('page includes the playable challenge controls', () => {
+  assert.match(html, /10-Second Tap Sprint/i);
+  assert.match(html, /id="start-game"/i);
+  assert.match(html, /id="tap-button"/i);
 });

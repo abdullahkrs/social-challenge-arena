@@ -1,5 +1,77 @@
 # Task Log
 
+## Cycle 3
+
+Date/time: 2026-07-10 05:56 Europe/Istanbul
+
+### Goal
+
+Turn the landing-page CTA into the first playable score-based challenge.
+
+### Why this task now?
+
+The mobile-first product shell was complete, but its only CTA still ended at a placeholder. A playable interaction is the smallest next proof of the MVP path and removes the current blocker between discovery and obtaining a result.
+
+### How it serves the viral loop
+
+This cycle advances:
+
+Discover → Play Challenge → Get Score/Result
+
+It gives later sharing and friend-comparison work a real score to carry through the rest of the loop.
+
+### Expected files changed
+
+- index.html
+- app.js
+- package.json
+- tests/challenge.test.js
+- tests/landing-page.test.js
+- README.md
+- ROADMAP.md
+- CHANGELOG.md
+- TASK_LOG.md
+
+### What was intentionally not changed
+
+- No login, database, payments, or profiles.
+- No share/copy link yet.
+- No friend attempt or comparison.
+- No additional challenge types.
+- No analytics or advanced social integrations.
+
+### What was completed
+
+- Replaced the placeholder CTA target with a playable 10-second tap challenge.
+- Added local scoring that accepts taps only before the deadline.
+- Added a visible countdown, live score, final score, and replay control.
+- Kept the experience mobile-first and no-login.
+- Added deterministic unit tests for scoring, expiry, and replay reset.
+- Updated landing-page smoke coverage and project documentation.
+
+### Validation / tests
+
+- Ran `npm test` with Node's built-in test runner.
+- Result: 7 passed, 0 failed.
+- Performed a static secret scan; no secret-like strings were found.
+- Reviewed scope against the MVP loop; sharing and comparison remain deferred.
+
+### Result
+
+Completed. The first challenge is playable end-to-end on one device and produces a local score.
+
+### Commit
+
+`feat: add first playable tap challenge`
+
+The commit SHA is available in Git history and the cycle email; a commit cannot contain its own SHA.
+
+### Next suggested task
+
+Turn the inline tap score into a focused result screen that is ready for the later share/copy-link step.
+
+---
+
 ## Cycle 2
 
 Date/time: 2026-07-09 23:59 Europe/Istanbul

@@ -72,4 +72,4 @@ MVP is complete only when:
 
 ## Next Suggested Task
 
-Build the first mobile-first landing page with a clear product promise and a single CTA to start a sample challenge.
+Turn the inline tap score into a focused result screen that is ready for the later share/copy-link step.

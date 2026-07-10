@@ -45,9 +45,9 @@ The MVP must include:
 
 ## Current Implementation
 
-The repository currently includes a static mobile-first landing page in `index.html`.
+The repository now includes a static mobile-first landing page and the first playable challenge.
 
-The page explains the product promise, shows the MVP loop as Play → Score → Share → Compare, and includes one CTA: `Start a sample challenge`.
+The CTA opens a no-login 10-second tap challenge. The browser counts valid taps locally, stops scoring at the deadline, shows the final score, and lets the player try again. Sharing and friend comparison are not implemented yet.
 
 ## Out of Scope for MVP
 
@@ -75,4 +75,4 @@ Install/use Node.js 20+ and run:
 npm test
 ```
 
-The current tests are smoke tests that verify the landing page communicates the social challenge promise, preserves the MVP loop, and remains no-login.
+The tests verify the landing-page promise and no-login constraint plus the tap challenge's scoring, deadline, and replay reset behavior.

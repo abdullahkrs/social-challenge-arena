@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.2.0 — 2026-07-10
+
+### Added
+
+- Added the first playable challenge: a mobile-first 10-second tap sprint.
+- Added local countdown, scoring, deadline enforcement, final result, and replay.
+- Added unit tests for challenge scoring, expiry, and reset behavior.
+
+### Notes
+
+The score is local only. Share links, friend attempts, and comparison remain intentionally deferred.
+
 ## 0.1.0 — 2026-07-09
 
 ### Added
