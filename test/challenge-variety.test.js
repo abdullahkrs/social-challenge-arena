@@ -78,7 +78,7 @@ test('discovery exposes a compact selectable catalog and one primary play action
   const css = readFileSync('styles.css', 'utf8');
   const app = readFileSync('app.js', 'utf8');
 
-  assert.match(html, /id="challenge-list"[^>]*aria-label="Choose a challenge"/);
+  assert.match(html, /id="challenge-list"[^>]*role="group"[^>]*aria-label="Choose a challenge"/);
   assert.match(html, /id="selected-title">Tap Sprint</);
   assert.match(html, /id="start-challenge"[^>]*>Play Tap Sprint</);
   assert.match(css, /\.challenge-grid[\s\S]*grid-template-columns: repeat\(2, minmax\(0, 1fr\)\)/);
