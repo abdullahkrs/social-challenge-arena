@@ -1,5 +1,16 @@
 # Changelog
 
+## Unreleased
+
+### Changed
+
+- Corrected the product-state classification: the six curated entries are six definitions but only one timed tap-count gameplay mechanic.
+- Reopened curated challenge variety until the catalog contains at least four genuinely different mechanics while preserving the shared social competition loop.
+
+### Scope
+
+- No playable mechanic, animation, preview asset, dependency, shared-link schema, metric, or private-creation behavior changed in this documentation-only correction.
+
 ## 0.11.0 — 2026-07-11
 
 ### Added
