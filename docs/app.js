@@ -1183,6 +1183,7 @@ if (typeof document !== 'undefined') {
           }
           @media (prefers-reduced-motion: reduce) {
             .signal-echo-pad { transition: none; }
+            .signal-echo-pad[data-active="true"] { transform: none !important; }
             .timing-board[data-mode="signal-echo"] .signal-echo-pad { animation: none !important; }
           }
         `;
@@ -1342,8 +1343,11 @@ if (typeof document !== 'undefined') {
           }
 
           if (state.status === 'playback') {
+            const signalNames = ['North', 'East', 'West', 'South'];
             timingReadout.textContent = `Watch round ${state.round}: ${state.sequenceLength} signals.`;
-            gameStatus.textContent = 'Watch the pattern';
+            gameStatus.textContent = state.activePad === null
+              ? 'Watch the pattern'
+              : `${signalNames[state.activePad]} signal`;
           } else if (state.status === 'input') {
             timingReadout.textContent = `Your turn. Signal ${state.inputIndex + 1} of ${state.sequenceLength}.`;
             gameStatus.textContent = 'Repeat the pattern';
