@@ -430,13 +430,14 @@ Implement the friend-attempt entry state for a valid shared Tap Sprint link: pre
 ## Cycle 6
 
 - **Date/time:** 2026-07-11T15:05:02+03:00
-- **Status:** in progress
+- **Completed at:** 2026-07-11T15:30:13+03:00
+- **Status:** completed
 - **Selected task:** Add a friend-attempt entry state for a valid shared Tap Sprint link.
 - **Goal:** Present the sharer's validated target clearly and let a friend start the same 20-second challenge without implementing post-attempt comparison.
-- **Why selected:** Cycle 5 is complete on `main`, no continuity pull request is open, and friend attempt from a shared link is the earliest incomplete roadmap stage.
-- **Viral-loop impact:** Advances Friend Competes by converting a validated shared result link into a clear challenge invitation and playable attempt.
+- **Why selected:** Cycle 5 was complete on `main`, no continuity pull request was open, and friend attempt from a shared link was the earliest incomplete roadmap stage.
+- **Viral-loop impact:** Completes the Friend Competes entry step by converting a validated shared result link into a clear challenge invitation and playable attempt.
 
-### Acceptance criteria
+### Acceptance criteria completed
 
 - A valid shared result hash opens a dedicated friend-entry view instead of ordinary discovery.
 - The view shows only the validated Tap Sprint identity, target score, and duration using safe DOM text properties.
@@ -445,10 +446,27 @@ Implement the friend-attempt entry state for a valid shared Tap Sprint link: pre
 - Invalid shared state continues to be removed without rendering or execution.
 - Completing the friend attempt still opens the existing result state; comparison wording, win/loss logic, and share-again behavior remain deferred.
 - Keyboard focus, live announcements, 48px controls, and mobile layout remain usable at 320px and 390px without horizontal overflow.
-- Focused tests cover friend-entry model validation, valid shared-entry structure and behavior boundaries, dismissal cleanup, and unchanged strict hash parsing.
-- Source and generated `docs/` preview files remain synchronized.
+- Focused tests cover friend-entry model validation, valid shared-entry structure and behavior boundaries, safe fragment cleanup, and unchanged strict hash parsing.
+- Source and generated `docs/` preview files are synchronized.
 
-### Expected files
+### Completed work
+
+- Added a dedicated hidden friend invitation view that is shown only after strict shared-state parsing succeeds.
+- Added a frozen friend-invitation model with exact shape, version, challenge, score, and duration validation.
+- Added validated challenge title, target score, duration, accessible announcement, and focus transfer to the primary action.
+- Wired `Try to beat it` to the existing Tap Sprint attempt while retaining target context in memory.
+- Wired dismissal and ordinary return actions to clear friend context and remove the fragment safely.
+- Hardened fragment cleanup against scheme-relative paths and browser history failures.
+- Added focused friend-attempt tests and updated landing structure coverage.
+- Updated README, roadmap, changelog, and generated repository preview files.
+
+### Intentional non-goals preserved
+
+- No original-player versus friend comparison, beat/tie/loss messaging, or comparison screen.
+- No share-again action, analytics, storage, login, backend, challenge variety, or challenge creation.
+- No dependency, framework, workflow restoration, architecture migration, broad redesign, or personalized identity.
+
+### Files changed
 
 - `index.html`
 - `styles.css`
@@ -463,24 +481,63 @@ Implement the friend-attempt entry state for a valid shared Tap Sprint link: pre
 - `CHANGELOG.md`
 - `TASK_LOG.md`
 
-### Explicit non-goals
+### Verification
 
-- No original-player versus friend comparison, beat/tie/loss messaging, or comparison screen.
-- No share-again action, analytics, storage, login, backend, challenge variety, or challenge creation.
-- No dependency, framework, workflow restoration, architecture migration, broad redesign, or personalized identity.
+- `npm test`: passed using Node.js `v22.16.0`; 18 tests passed, 0 failed.
+- `npm run build`: passed; 3 files copied to `dist/` and `docs/`.
+- `node --check app.js`: passed.
+- Committed blob hashes were `f1cd29eb1e3f49442d63bccfd1d8a941ae9e8b7e` for `index.html`, `0e289d11ef8e6a0777a67eed3053356c0fba71d2` for `styles.css`, `b473d0c63c3d9e36f17d70dec6324bd81a4da015` for `app.js`, `c6314157f97264e7c3bb68d3789bebd0a8e529ca` for `test/friend-attempt.test.js`, and `7f9d392251a3b90c888dee118d16122b2db2e3fa` for `test/landing.test.js`.
+- Source/output comparison: `index.html`, `styles.css`, and `app.js` matched their generated `docs/` blobs exactly.
+- Static mobile review: 320px body minimum, fluid `min(100%, 30rem)` shell, full-width 48px actions, bounded card content, and `overflow-wrap: anywhere` for the target score at 320px and 390px.
+- Accessibility review: labelled invitation section, keyboard-native controls, visible focus, focus transfer to the friend-start action, polite invitation announcement after reveal, and no hidden live-region announcement.
+- Security/privacy review: the existing strict parser remains the entry gate; the invitation model revalidates exact bounded state; dynamic values use `textContent`; cleanup rejects scheme-relative paths and catches history errors; no untrusted HTML, executable state, storage, secrets, tokens, analytics, personal data, or backend was added.
+- GitHub Actions/status checks: no workflow runs or commit statuses existed because the owner removed the workflow; no automated CI success was claimed.
+- **Preview status:** repository preview output verified for the merged friend-entry content; live deployed and interactive browser preview were unavailable in the execution environment.
+
+### Review findings and resolution
+
+- Reviewed the complete 12-file pull-request diff, including source, focused tests, generated preview files, and documentation.
+- Found and fixed one blocking fragment-cleanup issue during self-review: a scheme-relative pathname or rejected `history.replaceState` call could throw instead of returning safely.
+- Added regression coverage for scheme-relative paths and history failures, then re-ran all 18 tests, build, syntax, and source/preview comparisons.
+- Re-reviewed the final diff for one-task scope, acceptance criteria, state handling, accessibility, mobile layout, security, privacy, base branch, dependency order, and mergeability.
+- No blocking or non-blocking findings remained; no external requested changes, unresolved review threads, merge conflicts, workflow runs, or commit statuses existed.
+- Recorded a factual self-review comment and did not claim independent approval.
+
+### Git and merge outcome
+
+- Product branch: `agent/cycle-6-friend-attempt-main`.
+- Product branch head SHA: `ea59818914b1a55821dd3a1fd27fde41119a1c3e`.
+- Pull request: #19 — `feat(friend): add shared challenge entry`.
+- Base branch: `main` at `a99bc547a2c815c43423f1a183bb70fc0bff2f0c`.
+- Merge method: squash using the expected head SHA.
+- Merge outcome: successfully merged on 2026-07-11T15:30:13+03:00.
+- Merge SHA: `1048404d49dea5fe9b1c69cfd30d8c8286f2e7e7`.
+- Cycle-close branch: `agent/cycle-6-close-friend-attempt`.
+
+### Decision
+
+No new product or architecture decision. The static HTML, CSS, and JavaScript architecture plus bounded URL-fragment state remain sufficient for the next comparison cycle.
 
 ### Strategic review
 
-- The current direction remains aligned with the north star through Discover → Play → Result → Share → Friend Competes.
-- The largest product bottleneck is that a valid shared link is parsed but not yet presented as an invitation a friend can act on.
-- The largest delivery risk remains unavailable automated CI and interactive deployed-preview verification; repository scripts and source/preview comparison remain available.
-- No evidence invalidates the bounded fragment model or static architecture.
-- A dedicated friend-entry state is the highest-impact small task and does not require comparison logic.
+- The direction remains aligned through Discover → Play → Result → Share → Friend Competes.
+- The friend can now act on a shared target; the largest product bottleneck is the missing original-player versus friend comparison after completion.
+- Unavailable automated CI and interactive deployed-preview verification remain the largest delivery risk.
+- No new evidence invalidated the static architecture, existing gameplay state machine, or bounded shared-state model.
+- A focused comparison state is now the highest-impact narrow task.
 
 ### Product thinking
 
-1. The next core-loop step is blocked because valid incoming target state is retained but invisible and unactionable.
-2. A concise invitation with a visible target makes the original player's shared result meaningful.
-3. A single `Try to beat it` action and no login reduce friction for the friend.
-4. The smallest proof is one validated invitation view that starts the existing challenge while preserving target context.
-5. Parked idea: show a subtle target reminder during gameplay only if later usability evidence shows friends forget the goal; do not add it in this cycle.
+1. The invisible incoming target was the blocker and is now presented as an actionable invitation.
+2. The original player's shared score now gives the friend a clear reason to begin the same challenge.
+3. One primary action and no login keep friend-entry friction low.
+4. The minimum proof was one validated invitation view, safe dismissal, and reuse of the existing game without comparison logic.
+5. Parked idea remains a subtle target reminder during gameplay only if later usability evidence shows friends forget the goal.
+
+### Remaining limitation
+
+Live deployed-preview verification, interactive browser exercise, and automated GitHub Actions validation remain unavailable. Friend results intentionally do not show beat/tie/loss comparison or share-again behavior yet.
+
+### Next suggested task
+
+Implement a focused original-player versus friend comparison after the friend attempt completes. Use the retained validated target, cover beat/tie/loss deterministically, and do not add share-again until comparison is complete.
