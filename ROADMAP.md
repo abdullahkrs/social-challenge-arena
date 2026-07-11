@@ -15,8 +15,8 @@ Active MVP development.
 7. Original-player and friend comparison — complete.
 8. Share-again action from the comparison — complete.
 9. Basic privacy-safe MVP event instrumentation — complete.
-10. Curated challenge variety — next.
-11. Lightweight private challenge creation.
+10. Curated challenge variety — complete.
+11. Lightweight private challenge creation — next.
 
 ## Completed stage evidence
 
@@ -61,9 +61,9 @@ Active MVP development.
 
 ### Stage 6
 
-- A valid shared Tap Sprint result opens a dedicated mobile-first friend invitation.
+- A valid shared result opens a dedicated mobile-first friend invitation.
 - The validated challenge title, target score, and duration are rendered through safe DOM text properties.
-- One primary action starts the same 20-second challenge while retaining the target context in memory.
+- One primary action starts the same curated challenge while retaining the target context in memory.
 - Dismissing or leaving the invitation removes the shared fragment and returns to ordinary discovery.
 - Completing the friend attempt reuses the existing gameplay state while retaining comparison context.
 
@@ -78,7 +78,7 @@ Active MVP development.
 ### Stage 8
 
 - Comparison exposes one primary `Share your score` action.
-- The friend's validated completed score becomes the next bounded Tap Sprint target.
+- The friend's validated completed score becomes the next bounded target for the same curated challenge.
 - Share-again reuses the canonical versioned fragment codec, Web Share, clipboard, and visible-link fallback.
 - Cancelled sharing keeps the fallback hidden; unavailable APIs reveal only the validated HTTP(S) link.
 - Replay remains secondary and retains the original target; returning to challenges clears shared context.
@@ -92,3 +92,12 @@ Active MVP development.
 - Existing result, comparison, share, and share-again transitions are observed without altering product behavior.
 - Share completion is counted only after successful Web Share or clipboard copy feedback.
 - No payloads, scores, URLs, timestamps, identities, cookies, persistence, network requests, or third-party analytics were added.
+
+### Stage 10
+
+- Six frozen data-driven curated definitions cover Speed, Rhythm, and Endurance.
+- Each category includes Easy and Hard entries with unique allowlisted IDs and bounded durations.
+- A compact keyboard-accessible selector preserves one primary play action on discovery.
+- All entries reuse the validated timed tap engine and complete the existing result and social loop.
+- Shared links preserve the selected challenge and exact duration while rejecting unknown IDs and mismatches.
+- Source and GitHub Pages preview files remain synchronized without dependencies, login, storage, or backend changes.

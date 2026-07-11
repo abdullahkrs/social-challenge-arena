@@ -1,5 +1,24 @@
 # Changelog
 
+## 0.10.0 — 2026-07-11
+
+### Added
+
+- Six playable curated challenges across Speed, Rhythm, and Endurance.
+- Easy and Hard choices backed by frozen data-driven definitions.
+- A compact keyboard-accessible challenge selector with one primary play action.
+- Focused catalog, challenge-link round-trip, and duration-mismatch tests.
+
+### Changed
+
+- Gameplay, result, sharing, friend entry, comparison, and share-again now preserve the selected curated challenge.
+- Shared-link validation now accepts only allowlisted challenge IDs with their exact configured duration.
+- The GitHub Pages preview now includes the synchronized multi-challenge catalog.
+
+### Privacy and scope
+
+- No login, identity, storage, backend, external analytics destination, custom challenge input, dependency, framework, or new scoring mechanic was added.
+
 ## 0.9.0 — 2026-07-11
 
 ### Added

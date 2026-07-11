@@ -39,27 +39,25 @@
       <header class="hero">
         <p class="eyebrow">Social Challenge Arena</p>
         <h1 id="page-title">Pick. Play. Compete.</h1>
-        <p class="intro">Quick challenges made for friendly competition.</p>
+        <p class="intro">Six quick challenges. One score to beat.</p>
       </header>
 
-      <article class="challenge-card" aria-labelledby="challenge-title">
-        <div class="challenge-meta">
-          <span class="tag">Speed</span>
-          <span>Easy · 20 sec</span>
-        </div>
-        <h2 id="challenge-title">Tap Sprint</h2>
-        <p>Tap as many times as you can before time runs out.</p>
-        <button class="primary-action" id="start-challenge" type="button">
-          Play now
-        </button>
-      </article>
+      <div class="challenge-grid" id="challenge-list" role="group" aria-label="Choose a challenge"></div>
+
+      <div class="selected-challenge" aria-live="polite">
+        <span class="tag" id="selected-category">Speed</span>
+        <strong id="selected-title">Tap Sprint</strong>
+        <span id="selected-meta">Easy · 20 sec</span>
+      </div>
+
+      <button class="primary-action" id="start-challenge" type="button">Play Tap Sprint</button>
     </section>
 
     <section class="view game-view" id="challenge-view" aria-labelledby="game-title" hidden>
       <header class="game-header">
-        <p class="eyebrow">Speed challenge</p>
+        <p class="eyebrow" id="game-eyebrow">Speed challenge</p>
         <h1 id="game-title">Tap Sprint</h1>
-        <p class="game-instruction">Tap fast until time runs out.</p>
+        <p class="game-instruction" id="game-instruction">Tap fast until time runs out.</p>
       </header>
 
       <div class="scoreboard" aria-label="Challenge status">
@@ -83,7 +81,7 @@
 
     <section class="view result-view" id="result-view" aria-labelledby="result-title" hidden>
       <header class="result-header">
-        <p class="eyebrow">Tap Sprint complete</p>
+        <p class="eyebrow" id="result-eyebrow">Tap Sprint complete</p>
         <h1 id="result-title">Your score</h1>
       </header>
 
@@ -108,12 +106,12 @@
 
     <section class="view comparison-view" id="comparison-view" aria-labelledby="comparison-title" hidden>
       <header class="comparison-header">
-        <p class="eyebrow">Friend attempt complete</p>
+        <p class="eyebrow" id="comparison-eyebrow">Friend attempt complete</p>
         <h1 id="comparison-title">Score comparison</h1>
       </header>
 
       <div class="comparison-card">
-        <div class="comparison-scores" aria-label="Tap Sprint score comparison">
+        <div class="comparison-scores" id="comparison-scores" aria-label="Tap Sprint score comparison">
           <p class="comparison-score">
             <span>Target</span>
             <strong id="comparison-target-score">0</strong>

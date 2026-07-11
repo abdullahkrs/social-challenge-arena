@@ -1,15 +1,73 @@
-const featuredChallenge = Object.freeze({
-  id: 'tap-sprint',
-  title: 'Tap Sprint',
-  category: 'Speed',
-  difficulty: 'Easy',
-  durationSeconds: 20,
-  description: 'Tap as many times as you can before time runs out.',
-  goal: 'Get the highest tap count in 20 seconds.'
-});
+const curatedChallenges = Object.freeze([
+  Object.freeze({
+    id: 'tap-sprint',
+    title: 'Tap Sprint',
+    category: 'Speed',
+    difficulty: 'Easy',
+    durationSeconds: 20,
+    description: 'Tap as many times as you can before time runs out.',
+    goal: 'Get the highest tap count in 20 seconds.',
+    instruction: 'Tap fast until time runs out.'
+  }),
+  Object.freeze({
+    id: 'turbo-tap',
+    title: 'Turbo Tap',
+    category: 'Speed',
+    difficulty: 'Hard',
+    durationSeconds: 10,
+    description: 'A short burst where every tap matters.',
+    goal: 'Get the highest tap count in 10 seconds.',
+    instruction: 'Go all out for 10 seconds.'
+  }),
+  Object.freeze({
+    id: 'rhythm-rush',
+    title: 'Rhythm Rush',
+    category: 'Rhythm',
+    difficulty: 'Easy',
+    durationSeconds: 25,
+    description: 'Find a steady rhythm and keep it moving.',
+    goal: 'Build the highest steady tap count in 25 seconds.',
+    instruction: 'Find your rhythm and keep tapping.'
+  }),
+  Object.freeze({
+    id: 'tempo-storm',
+    title: 'Tempo Storm',
+    category: 'Rhythm',
+    difficulty: 'Hard',
+    durationSeconds: 15,
+    description: 'Hold a fast rhythm through a compact round.',
+    goal: 'Set the highest tap count in 15 seconds.',
+    instruction: 'Hold a fast rhythm to the finish.'
+  }),
+  Object.freeze({
+    id: 'tap-marathon',
+    title: 'Tap Marathon',
+    category: 'Endurance',
+    difficulty: 'Easy',
+    durationSeconds: 30,
+    description: 'Keep a comfortable pace through a longer round.',
+    goal: 'Get the highest tap count in 30 seconds.',
+    instruction: 'Stay steady through the longer round.'
+  }),
+  Object.freeze({
+    id: 'endurance-blitz',
+    title: 'Endurance Blitz',
+    category: 'Endurance',
+    difficulty: 'Hard',
+    durationSeconds: 45,
+    description: 'Keep tapping through the longest curated round.',
+    goal: 'Get the highest tap count in 45 seconds.',
+    instruction: 'Keep your pace until the final second.'
+  })
+]);
 
+const featuredChallenge = curatedChallenges[0];
 const sharedResultVersion = 1;
 const maxSharedScore = 1000000;
+
+function getChallengeById(challengeId) {
+  return curatedChallenges.find(challenge => challenge.id === challengeId) || null;
+}
 
 function createTapSprintGame(options = {}) {
   const durationSeconds = Number.isInteger(options.durationSeconds)
@@ -109,19 +167,29 @@ function createResultSummary(taps, durationSeconds = featuredChallenge.durationS
   return Object.freeze({ taps, durationSeconds, message });
 }
 
-function validateSharedResult(taps, durationSeconds) {
+function validateSharedResult(taps, durationSeconds, challenge = featuredChallenge) {
   const result = createResultSummary(taps, durationSeconds);
+  if (!challenge || !getChallengeById(challenge.id)) {
+    throw new TypeError('Shared challenge is unsupported.');
+  }
   if (result.taps > maxSharedScore) {
     throw new TypeError(`Tap score must not exceed ${maxSharedScore}.`);
   }
-  if (result.durationSeconds !== featuredChallenge.durationSeconds) {
-    throw new TypeError('Shared duration must match the featured challenge.');
+  if (result.durationSeconds !== challenge.durationSeconds) {
+    throw new TypeError('Shared duration must match the selected challenge.');
   }
   return result;
 }
 
-function createSharedResultUrl(taps, durationSeconds, baseUrl) {
-  const result = validateSharedResult(taps, durationSeconds);
+function createSharedResultUrl(
+  taps,
+  durationSeconds,
+  baseUrl,
+  challengeId = featuredChallenge.id
+) {
+  const challenge = getChallengeById(challengeId);
+  if (!challenge) throw new TypeError('Shared challenge is unsupported.');
+  const result = validateSharedResult(taps, durationSeconds, challenge);
   const url = new URL(baseUrl);
   if (url.protocol !== 'https:' && url.protocol !== 'http:') {
     throw new TypeError('Share URL must use HTTP or HTTPS.');
@@ -130,7 +198,7 @@ function createSharedResultUrl(taps, durationSeconds, baseUrl) {
   url.search = '';
   url.hash = new URLSearchParams({
     v: String(sharedResultVersion),
-    challenge: featuredChallenge.id,
+    challenge: challenge.id,
     score: String(result.taps),
     duration: String(result.durationSeconds)
   }).toString();
@@ -147,7 +215,9 @@ function parseSharedResultHash(hash) {
   if (expectedKeys.some(key => params.getAll(key).length !== 1)) return null;
   if (keys.some(key => !expectedKeys.includes(key))) return null;
   if (params.get('v') !== String(sharedResultVersion)) return null;
-  if (params.get('challenge') !== featuredChallenge.id) return null;
+
+  const challenge = getChallengeById(params.get('challenge'));
+  if (!challenge) return null;
 
   const scoreText = params.get('score');
   const durationText = params.get('duration');
@@ -158,14 +228,14 @@ function parseSharedResultHash(hash) {
   const durationSeconds = Number(durationText);
 
   try {
-    validateSharedResult(taps, durationSeconds);
+    validateSharedResult(taps, durationSeconds, challenge);
   } catch {
     return null;
   }
 
   return Object.freeze({
     version: sharedResultVersion,
-    challengeId: featuredChallenge.id,
+    challengeId: challenge.id,
     taps,
     durationSeconds
   });
@@ -184,14 +254,18 @@ function createFriendAttemptInvitation(sharedResult) {
   if (sharedResult.version !== sharedResultVersion) {
     throw new TypeError('Shared result version is unsupported.');
   }
-  if (sharedResult.challengeId !== featuredChallenge.id) {
-    throw new TypeError('Shared challenge is unsupported.');
-  }
 
-  const validated = validateSharedResult(sharedResult.taps, sharedResult.durationSeconds);
+  const challenge = getChallengeById(sharedResult.challengeId);
+  if (!challenge) throw new TypeError('Shared challenge is unsupported.');
+
+  const validated = validateSharedResult(
+    sharedResult.taps,
+    sharedResult.durationSeconds,
+    challenge
+  );
   return Object.freeze({
-    challengeId: featuredChallenge.id,
-    challengeTitle: featuredChallenge.title,
+    challengeId: challenge.id,
+    challengeTitle: challenge.title,
     targetTaps: validated.taps,
     durationSeconds: validated.durationSeconds
   });
@@ -207,15 +281,18 @@ function createComparisonSummary(friendTaps, invitation) {
   if (keys.length !== expectedKeys.length || keys.some(key => !expectedKeys.includes(key))) {
     throw new TypeError('Friend invitation has an invalid shape.');
   }
-  if (
-    invitation.challengeId !== featuredChallenge.id
-    || invitation.challengeTitle !== featuredChallenge.title
-  ) {
+
+  const challenge = getChallengeById(invitation.challengeId);
+  if (!challenge || invitation.challengeTitle !== challenge.title) {
     throw new TypeError('Friend invitation challenge is unsupported.');
   }
 
-  const target = validateSharedResult(invitation.targetTaps, invitation.durationSeconds);
-  const friend = validateSharedResult(friendTaps, invitation.durationSeconds);
+  const target = validateSharedResult(
+    invitation.targetTaps,
+    invitation.durationSeconds,
+    challenge
+  );
+  const friend = validateSharedResult(friendTaps, invitation.durationSeconds, challenge);
   const difference = friend.taps - target.taps;
 
   let outcome = 'tie';
@@ -234,8 +311,8 @@ function createComparisonSummary(friendTaps, invitation) {
   }
 
   return Object.freeze({
-    challengeId: featuredChallenge.id,
-    challengeTitle: featuredChallenge.title,
+    challengeId: challenge.id,
+    challengeTitle: challenge.title,
     targetTaps: target.taps,
     friendTaps: friend.taps,
     durationSeconds: friend.durationSeconds,
@@ -278,7 +355,12 @@ function createComparisonShareUrl(comparison, baseUrl) {
     throw new TypeError('Completed comparison is inconsistent.');
   }
 
-  return createSharedResultUrl(validated.friendTaps, validated.durationSeconds, baseUrl);
+  return createSharedResultUrl(
+    validated.friendTaps,
+    validated.durationSeconds,
+    baseUrl,
+    validated.challengeId
+  );
 }
 
 function clearSharedResultHash(locationObject, historyObject) {
@@ -316,8 +398,8 @@ async function shareResultLink(url, options = {}) {
   const navigatorObject = options.navigatorObject
     || (typeof navigator !== 'undefined' ? navigator : null);
   const payload = {
-    title: featuredChallenge.title,
-    text: options.text || 'Can you beat my Tap Sprint score?',
+    title: options.title || featuredChallenge.title,
+    text: options.text || 'Can you beat my challenge score?',
     url: normalizedUrl
   };
 
@@ -344,7 +426,9 @@ async function shareResultLink(url, options = {}) {
 
 if (typeof module !== 'undefined') {
   module.exports = {
+    curatedChallenges,
     featuredChallenge,
+    getChallengeById,
     createTapSprintGame,
     createResultSummary,
     createSharedResultUrl,
@@ -363,6 +447,10 @@ if (typeof document !== 'undefined') {
   const challengeView = document.querySelector('#challenge-view');
   const resultView = document.querySelector('#result-view');
   const comparisonView = document.querySelector('#comparison-view');
+  const challengeList = document.querySelector('#challenge-list');
+  const selectedCategory = document.querySelector('#selected-category');
+  const selectedTitle = document.querySelector('#selected-title');
+  const selectedMeta = document.querySelector('#selected-meta');
   const friendChallengeName = document.querySelector('#friend-challenge-name');
   const friendDuration = document.querySelector('#friend-duration');
   const friendTargetScore = document.querySelector('#friend-target-score');
@@ -370,11 +458,17 @@ if (typeof document !== 'undefined') {
   const startFriendButton = document.querySelector('#start-friend-attempt');
   const dismissFriendButton = document.querySelector('#dismiss-friend-attempt');
   const startButton = document.querySelector('#start-challenge');
+  const gameEyebrow = document.querySelector('#game-eyebrow');
+  const gameTitle = document.querySelector('#game-title');
+  const gameInstruction = document.querySelector('#game-instruction');
   const tapButton = document.querySelector('#tap-button');
   const backButton = document.querySelector('#back-to-challenges');
+  const resultEyebrow = document.querySelector('#result-eyebrow');
   const shareButton = document.querySelector('#share-result');
   const resultReplayButton = document.querySelector('#result-replay');
   const resultBackButton = document.querySelector('#result-back');
+  const comparisonEyebrow = document.querySelector('#comparison-eyebrow');
+  const comparisonScores = document.querySelector('#comparison-scores');
   const comparisonTargetScore = document.querySelector('#comparison-target-score');
   const comparisonFriendScore = document.querySelector('#comparison-friend-score');
   const comparisonOutcome = document.querySelector('#comparison-outcome');
@@ -401,6 +495,10 @@ if (typeof document !== 'undefined') {
     challengeView,
     resultView,
     comparisonView,
+    challengeList,
+    selectedCategory,
+    selectedTitle,
+    selectedMeta,
     friendChallengeName,
     friendDuration,
     friendTargetScore,
@@ -408,11 +506,17 @@ if (typeof document !== 'undefined') {
     startFriendButton,
     dismissFriendButton,
     startButton,
+    gameEyebrow,
+    gameTitle,
+    gameInstruction,
     tapButton,
     backButton,
+    resultEyebrow,
     shareButton,
     resultReplayButton,
     resultBackButton,
+    comparisonEyebrow,
+    comparisonScores,
     comparisonTargetScore,
     comparisonFriendScore,
     comparisonOutcome,
@@ -435,9 +539,11 @@ if (typeof document !== 'undefined') {
   ];
 
   if (requiredElements.every(Boolean)) {
+    let activeChallenge = featuredChallenge;
     let completedResult = null;
     let completedComparison = null;
     let activeFriendInvitation = null;
+    let game = null;
 
     const incomingShare = parseSharedResultHash(window.location.hash);
     if (window.location.hash && !incomingShare) {
@@ -472,8 +578,62 @@ if (typeof document !== 'undefined') {
       }
     }
 
+    function updateSelectedChallenge() {
+      selectedCategory.textContent = activeChallenge.category;
+      selectedTitle.textContent = activeChallenge.title;
+      selectedMeta.textContent = `${activeChallenge.difficulty} · ${activeChallenge.durationSeconds} sec`;
+      startButton.textContent = `Play ${activeChallenge.title}`;
+
+      for (const option of challengeList.querySelectorAll('[data-challenge-id]')) {
+        const selected = option.dataset.challengeId === activeChallenge.id;
+        option.setAttribute('aria-pressed', selected ? 'true' : 'false');
+      }
+    }
+
+    function selectChallenge(challenge) {
+      if (!challenge) return;
+      activeChallenge = challenge;
+      updateSelectedChallenge();
+    }
+
+    function renderChallengeCatalog() {
+      const fragment = document.createDocumentFragment();
+
+      for (const challenge of curatedChallenges) {
+        const option = document.createElement('button');
+        option.type = 'button';
+        option.className = 'challenge-option';
+        option.dataset.challengeId = challenge.id;
+        option.setAttribute('aria-pressed', 'false');
+        option.setAttribute(
+          'aria-label',
+          `${challenge.title}, ${challenge.category}, ${challenge.difficulty}, ${challenge.durationSeconds} seconds`
+        );
+
+        const category = document.createElement('span');
+        category.className = 'challenge-option-category';
+        category.textContent = challenge.category;
+
+        const title = document.createElement('strong');
+        title.textContent = challenge.title;
+
+        const meta = document.createElement('span');
+        meta.className = 'challenge-option-meta';
+        meta.textContent = `${challenge.difficulty} · ${challenge.durationSeconds}s`;
+
+        option.append(category, title, meta);
+        option.addEventListener('click', () => selectChallenge(challenge));
+        fragment.append(option);
+      }
+
+      challengeList.replaceChildren(fragment);
+      updateSelectedChallenge();
+    }
+
     function showFriendInvitation(invitation) {
       activeFriendInvitation = invitation;
+      activeChallenge = getChallengeById(invitation.challengeId);
+      updateSelectedChallenge();
       friendChallengeName.textContent = invitation.challengeTitle;
       friendDuration.textContent = String(invitation.durationSeconds);
       friendTargetScore.textContent = String(invitation.targetTaps);
@@ -489,6 +649,8 @@ if (typeof document !== 'undefined') {
     function showComparison(comparison) {
       completedComparison = comparison;
       resetShareState(comparisonShareStatus, comparisonShareFallback);
+      comparisonEyebrow.textContent = `${comparison.challengeTitle} complete`;
+      comparisonScores.setAttribute('aria-label', `${comparison.challengeTitle} score comparison`);
       comparisonTargetScore.textContent = String(comparison.targetTaps);
       comparisonFriendScore.textContent = String(comparison.friendTaps);
       comparisonOutcome.textContent = comparison.headline;
@@ -502,34 +664,46 @@ if (typeof document !== 'undefined') {
       comparisonShareButton.focus();
     }
 
-    const game = createTapSprintGame({
-      onUpdate(state) {
-        timeValue.textContent = String(state.remainingSeconds);
-        tapCount.textContent = String(state.taps);
+    function configureGame() {
+      if (game) game.destroy();
 
-        const isRunning = state.status === 'running';
-        tapButton.disabled = !isRunning;
-        tapButton.textContent = isRunning ? 'Tap!' : 'Time!';
-        gameStatus.textContent = isRunning ? 'Go!' : 'Ready';
-      },
-      onComplete(state) {
-        completedResult = createResultSummary(state.taps, state.durationSeconds);
-        challengeView.hidden = true;
+      gameEyebrow.textContent = `${activeChallenge.category} challenge`;
+      gameTitle.textContent = activeChallenge.title;
+      gameInstruction.textContent = activeChallenge.instruction;
+      timeValue.textContent = String(activeChallenge.durationSeconds);
+      tapCount.textContent = '0';
 
-        if (activeFriendInvitation) {
-          showComparison(createComparisonSummary(completedResult.taps, activeFriendInvitation));
-          return;
+      game = createTapSprintGame({
+        durationSeconds: activeChallenge.durationSeconds,
+        onUpdate(state) {
+          timeValue.textContent = String(state.remainingSeconds);
+          tapCount.textContent = String(state.taps);
+
+          const isRunning = state.status === 'running';
+          tapButton.disabled = !isRunning;
+          tapButton.textContent = isRunning ? 'Tap!' : 'Time!';
+          gameStatus.textContent = isRunning ? 'Go!' : 'Ready';
+        },
+        onComplete(state) {
+          completedResult = createResultSummary(state.taps, state.durationSeconds);
+          challengeView.hidden = true;
+
+          if (activeFriendInvitation) {
+            showComparison(createComparisonSummary(completedResult.taps, activeFriendInvitation));
+            return;
+          }
+
+          completedComparison = null;
+          resultEyebrow.textContent = `${activeChallenge.title} complete`;
+          resultScore.textContent = String(completedResult.taps);
+          resultMessage.textContent = completedResult.message;
+          comparisonView.hidden = true;
+          resultView.hidden = false;
+          resultAnnouncement.textContent = `You scored ${completedResult.taps} taps in ${activeChallenge.title}.`;
+          shareButton.focus();
         }
-
-        completedComparison = null;
-        resultScore.textContent = String(completedResult.taps);
-        resultMessage.textContent = completedResult.message;
-        comparisonView.hidden = true;
-        resultView.hidden = false;
-        resultAnnouncement.textContent = `You scored ${completedResult.taps} taps.`;
-        shareButton.focus();
-      }
-    });
+      });
+    }
 
     function startAttempt() {
       completedResult = null;
@@ -543,6 +717,7 @@ if (typeof document !== 'undefined') {
       resultView.hidden = true;
       comparisonView.hidden = true;
       challengeView.hidden = false;
+      configureGame();
       game.start();
       tapButton.focus();
     }
@@ -551,7 +726,7 @@ if (typeof document !== 'undefined') {
       activeFriendInvitation = null;
       completedResult = null;
       completedComparison = null;
-      game.reset();
+      if (game) game.reset();
       friendAnnouncement.textContent = '';
       resultAnnouncement.textContent = '';
       comparisonAnnouncement.textContent = '';
@@ -562,6 +737,7 @@ if (typeof document !== 'undefined') {
       resultView.hidden = true;
       comparisonView.hidden = true;
       discoveryView.hidden = false;
+      updateSelectedChallenge();
       startButton.focus();
     }
 
@@ -571,13 +747,15 @@ if (typeof document !== 'undefined') {
       const shareUrl = createSharedResultUrl(
         completedResult.taps,
         completedResult.durationSeconds,
-        canonicalLink.href
+        canonicalLink.href,
+        activeChallenge.id
       );
       shareFallback.href = shareUrl;
       shareFallback.textContent = shareUrl;
 
       const outcome = await shareResultLink(shareUrl, {
-        text: `I scored ${completedResult.taps} taps in Tap Sprint. Can you beat it?`
+        title: activeChallenge.title,
+        text: `I scored ${completedResult.taps} taps in ${activeChallenge.title}. Can you beat it?`
       });
 
       showShareOutcome(outcome, shareStatus, shareFallback);
@@ -591,16 +769,19 @@ if (typeof document !== 'undefined') {
       comparisonShareFallback.textContent = shareUrl;
 
       const outcome = await shareResultLink(shareUrl, {
-        text: `I scored ${completedComparison.friendTaps} taps in Tap Sprint. Can you beat it?`
+        title: completedComparison.challengeTitle,
+        text: `I scored ${completedComparison.friendTaps} taps in ${completedComparison.challengeTitle}. Can you beat it?`
       });
 
       showShareOutcome(outcome, comparisonShareStatus, comparisonShareFallback);
     }
 
+    renderChallengeCatalog();
+
     startFriendButton.addEventListener('click', startAttempt);
     dismissFriendButton.addEventListener('click', returnToDiscovery);
     startButton.addEventListener('click', startAttempt);
-    tapButton.addEventListener('click', () => game.tap());
+    tapButton.addEventListener('click', () => game?.tap());
     shareButton.addEventListener('click', shareCompletedResult);
     comparisonShareButton.addEventListener('click', shareCompletedComparison);
     resultReplayButton.addEventListener('click', startAttempt);
