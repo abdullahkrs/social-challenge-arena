@@ -337,24 +337,30 @@ For each user-facing change, report exactly one:
 
 Loading only the homepage is not verification; exercise the changed flow. Never claim a test, build, CI run, artifact, deployment, or manual check succeeded without evidence.
 
-## 16. Git rules
+## 16. Git and repository-action rules
 
-1. Follow an explicit user or repository branch policy.
-2. Otherwise prefer `agent/cycle-{cycle_number}-{short-slug}` and a pull request.
-3. Do not push directly to `main` unless explicitly requested or established by repository workflow.
-4. Use Conventional Commits and prefer one commit per cycle.
-5. Use a specific title, for example `feat(share): add result link action`.
-6. Never use vague titles such as `update`, `changes`, `misc`, `final`, or `fix stuff`.
-7. Commit only selected-task files.
-8. Record title, SHA, branch, and PR link when available.
-9. State exact limitations when Git actions are unavailable.
-10. Never claim a commit, push, workflow, or PR exists unless observed or created.
+Git actions are optional and must never block a development cycle.
+
+1. Use only repository and file actions that are actually available.
+2. If files can be edited but branch, commit, push, or pull-request actions are unavailable, complete the selected task by updating or preparing the required files.
+3. Do not stop only because Git operations are unavailable.
+4. Do not require a branch, commit, push, pull request, merge, or tag unless the available tools support that exact action.
+5. When commit capability exists, use Conventional Commits and prefer one focused commit per cycle.
+6. Use a specific title, for example `feat(share): add result link action`.
+7. Never use vague titles such as `update`, `changes`, `misc`, `final`, or `fix stuff`.
+8. Never claim a branch, commit, SHA, push, workflow run, pull request, or merge exists unless it was actually created or observed.
+9. When Git actions are unavailable, report:
+   - Files created or updated.
+   - Whether changes were written to the repository or only prepared as downloadable files.
+   - A suggested Conventional Commit title.
+   - Git actions not performed and the exact limitation.
+10. Do not invent a SHA, branch name, pull-request link, workflow result, or deployment result.
 
 ## 17. Stop conditions
 
 Stop and report rather than broaden the cycle when:
 
-- The repository cannot be read or written.
+- The repository cannot be read and no editable local/file output can be produced.
 - Unrelated working-tree changes conflict with the task.
 - The next implementation changes product direction.
 - The task requires a forbidden pre-MVP feature.
@@ -363,7 +369,7 @@ Stop and report rather than broaden the cycle when:
 - The request is outside MVP and not explicitly approved.
 - Required shared state cannot be handled safely in the selected task.
 
-Gmail unavailability is not a development blocker. Complete the technical cycle and provide a ready-to-send report marked “Not sent.”
+Gmail unavailability is not a development blocker. Git unavailability is also not a blocker when files can still be edited or prepared. Complete the technical cycle and clearly report unavailable actions.
 
 ## 18. End-of-cycle reporting
 
@@ -394,8 +400,8 @@ Give the final user report in concise Arabic with:
 - Build
 - GitHub Actions للـcommit الحالي
 - المعاينة أو الـartifact
-- Commit وSHA
-- Branch وPR
+- Commit وSHA أو «لم يتم الإنشاء»
+- Branch وPR أو «لم يتم الإنشاء»
 - حالة البريد
 - القيود المتبقية
 - المهمة التالية
