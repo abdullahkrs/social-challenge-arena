@@ -5,7 +5,8 @@ Historical completed cycles 1–6 are preserved byte-for-byte in [`TASK_LOG_ARCH
 ## Cycle 9
 
 - **Date/time:** 2026-07-11T18:42:06+03:00
-- **Status:** ready for final pull-request review and merge
+- **Completed at:** 2026-07-11T19:22:21+03:00
+- **Status:** completed
 - **Selected task:** Add basic privacy-safe in-memory event instrumentation for the completed viral loop.
 - **Goal:** Record allowlisted aggregate funnel counts in memory only so the completed loop can be measured without identity, cookies, persistence, personal data, or a third-party destination.
 - **Why selected:** Cycle 8 was complete on `main`, no continuity pull request was open, and privacy-safe instrumentation was the earliest incomplete roadmap stage.
@@ -107,7 +108,7 @@ Historical completed cycles 1–6 are preserved byte-for-byte in [`TASK_LOG_ARCH
 - Accessibility review: product structure, focus order, labels, live regions, and keyboard controls are unchanged; instrumentation only observes existing transitions.
 - Security/privacy review: the allowlist accepts only fixed event names; snapshots contain integers only; no payload, score, URL, fragment, timestamp, identity, device data, personal data, cookie, storage, network API, backend, token, or secret is collected or transmitted.
 - GitHub Actions/status checks remain unavailable because the owner removed the workflow; no automated CI success is claimed.
-- **Preview status:** repository preview output verified for the current instrumentation source blobs.
+- **Preview status:** repository preview output verified for the merged instrumentation source blobs.
 
 ### Review findings and resolution
 
@@ -115,17 +116,23 @@ Historical completed cycles 1–6 are preserved byte-for-byte in [`TASK_LOG_ARCH
 - The task-log rollover preserves the exact prior `TASK_LOG.md` blob `4f59dc986cdc2067e08fb96ac67ad0f16c99bb6b`; no Cycle 7–8 history is lost.
 - Blocking review finding: replay actions were not counted as `challenge_started`, which could make repeat completions exceed starts and distort attempt rates.
 - Resolution: instrumented both result and comparison replay buttons, expanded ordinary and friend-loop tests to cover repeat starts and completions, regenerated `docs/`, and reran all checks successfully.
-- The earlier factual self-review comment was superseded by this review finding; a new final self-review will be recorded after the fix is committed and re-reviewed.
-- PR #25 remains targeted at `main`; comments, reviews, threads, mergeability, conflicts, and current-head statuses will be rechecked before merge.
+- The earlier factual self-review comment was superseded by this review finding; a final factual self-review was recorded at the corrected head without claiming independent approval.
+- Re-reviewed the complete 13-file PR diff at head `4d1bc41095f9c05c5abffb7042a830be51fa34be`, including the replay-count fix and expanded repeat-attempt tests.
+- Confirmed PR #25 targeted `main`, was mergeable, had no conflicts or current-head statuses, and had no unresolved required review threads after the replay-count thread was addressed and resolved.
+- No blocking or non-blocking finding remained before squash merge.
 
 ### Git and merge outcome
 
 - Product branch: `agent/cycle-9-privacy-safe-metrics` created from `main` at `0b8183eab23d6458f1116957c932a4c5aad4696e`.
 - Planning commit: `f5cbb1342ecb0d5506ac16fec3cf44da36961df2`.
 - Implementation commit: `3c70b87dac571601247cde737f25e2f2f4c4a0a8`.
+- Final product branch head SHA: `4d1bc41095f9c05c5abffb7042a830be51fa34be`.
 - Pull request: #25 — `feat(metrics): add privacy-safe loop instrumentation`.
 - Base branch: `main` at `0b8183eab23d6458f1116957c932a4c5aad4696e`.
-- Merge method: squash using the expected final head SHA after this factual log update.
+- Merge method: squash using expected head SHA `4d1bc41095f9c05c5abffb7042a830be51fa34be`.
+- Merge outcome: successfully merged and verified as merged.
+- Merge SHA: `634c2054ddacd53648fd88d1596a060f06a84851`.
+- Cycle-close branch: `agent/cycle-9-close-privacy-safe-metrics`.
 
 ### Decision
 
