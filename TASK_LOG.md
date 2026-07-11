@@ -1,155 +1,46 @@
 # Task Log
 
-Historical completed cycles 1–6 are preserved byte-for-byte in [`TASK_LOG_ARCHIVE_CYCLES_1_6.md`](TASK_LOG_ARCHIVE_CYCLES_1_6.md). Completed cycles 7–8 are preserved byte-for-byte in [`TASK_LOG_ARCHIVE_CYCLES_7_8.md`](TASK_LOG_ARCHIVE_CYCLES_7_8.md). This file remains the active source of truth for the current and subsequent development cycle.
-
-## Cycle 9
-
-- **Date/time:** 2026-07-11T18:42:06+03:00
-- **Verification completed at:** 2026-07-11T19:15:19+03:00
-- **Completed at:** 2026-07-11T19:21:59+03:00
-- **Status:** completed
-- **Selected task:** Add basic privacy-safe in-memory event instrumentation for the completed viral loop.
-- **Goal:** Record allowlisted aggregate funnel counts in memory only so the completed loop can be measured without identity, cookies, persistence, personal data, or a third-party destination.
-- **Why selected:** Cycle 8 was complete on `main`, no continuity pull request was open, and privacy-safe instrumentation was the earliest incomplete roadmap stage.
-- **Viral-loop impact:** Makes Discover → Play → Result → Share → Friend Competes → Compare → Share Again measurable while preserving the no-login, privacy-first MVP.
-
-### Acceptance criteria completed
-
-- Instrumented only the planned allowlisted funnel events: `challenge_viewed`, `challenge_started`, `challenge_completed`, `result_viewed`, `share_attempted`, `share_completed`, `shared_link_opened`, `friend_completed`, `comparison_viewed`, and `share_again_attempted`.
-- Stored only aggregate integer counts in memory; no event payloads, scores, URLs, fragments, timestamps, identities, device data, or personal data are recorded.
-- Added no network request, analytics SDK, cookie, local storage, session storage, backend, or third-party destination.
-- Counted ordinary discovery and validated shared-link entry separately, then counted existing gameplay, result, friend-completion, comparison, share, and share-again transitions.
-- Counted `share_completed` only after the existing UI reports a successful Web Share or clipboard copy; cancellation and unavailable fallbacks do not count as completion.
-- Loaded instrumentation after the existing application script without changing product behavior or the visible interface.
-- Included the instrumentation module in the existing build and synchronized generated `docs/` preview files.
-- Added focused behavior and privacy tests, ran the complete test/build commands, and reviewed the full pull-request diff.
-- Preserved the current mobile layout and primary actions at 320px and 390px because this task introduced no visual element.
-
-### Completed work
-
-- Added a frozen allowlist for the ten planned funnel events and an in-memory aggregate-only counter with immutable snapshots.
-- Added dependency-free DOM instrumentation that distinguishes ordinary discovery from validated shared-link entry and observes existing result, comparison, share, and share-again transitions.
-- Counted successful sharing only when the existing UI status becomes `Shared.` or `Link copied.`; cancellation and unavailable fallback states do not increment completion.
-- Exposed only a non-enumerable, read-only `window.socialChallengeMetrics` aggregate collector for local session inspection.
-- Loaded `metrics.js` after `app.js`, included it in the existing build, and generated synchronized `docs/` preview output.
-- Added focused tests for allowlist enforcement, frozen aggregate snapshots, ordinary and friend loop transitions, successful-share deduplication, script order, and forbidden persistence/network/time/location sinks.
-- Updated README, roadmap, metrics documentation, changelog, and the active task log.
-- Preserved completed Cycles 7–8 byte-for-byte in `TASK_LOG_ARCHIVE_CYCLES_7_8.md` using the exact previous active-log blob.
-
-### Intentional non-goals preserved
-
-- No external analytics destination, network delivery, persistent storage, cookies, identifiers, login, backend, score or URL recording, user-facing metrics panel, challenge variety, challenge creation, dependency, framework, visual redesign, app-state refactor, or unrelated cleanup.
-
-### Files changed
-
-- `metrics.js`
-- `index.html`
-- `scripts/build.js`
-- `test/instrumentation.test.js`
-- `tests/baseline.test.js`
-- `docs/index.html`
-- `docs/metrics.js`
-- `README.md`
-- `ROADMAP.md`
-- `METRICS.md`
-- `CHANGELOG.md`
-- `TASK_LOG.md`
-- `TASK_LOG_ARCHIVE_CYCLES_7_8.md`
-
-`app.js`, `styles.css`, `docs/app.js`, and `docs/styles.css` remain unchanged.
-
-### Verification
-
-- `node --version`: `v22.16.0`.
-- `npm test`: passed in a fresh verification workspace; 29 tests passed, 0 failed.
-- `npm run build`: passed; 4 files copied to `dist/` and `docs/`.
-- `node --check app.js`: passed.
-- `node --check metrics.js`: passed.
-- Product source blobs are `f8a729ae9a3cd571aa188b259da5687f3060ca08` for `index.html`, unchanged `e234c53c78930a106396538c8080fba8b37915bc` for `styles.css`, unchanged `ee38b6e46c31ba0b156fbe2ebf478452065891c2` for `app.js`, and `308e93935636c584dc80b84ecbf5f787673ffa16` for `metrics.js`.
-- Focused test blobs are `4a5c6c2c3a723aae9e48d9b164641984e159d1bc` for `test/instrumentation.test.js` and `d25f5e5a075fe8b528f5d7f6437ae80f61c90cf6` for `tests/baseline.test.js`.
-- Source/output comparison: `index.html`, `styles.css`, `app.js`, and `metrics.js` match their generated `docs/` files byte-for-byte.
-- Static mobile review: no markup or style visible to users changed beyond a deferred script tag; the existing fluid 320px minimum, 390px review width, full-width controls, bounded content, and no-horizontal-overflow behavior remain unchanged.
-- Accessibility review: product structure, focus order, labels, live regions, and keyboard controls are unchanged; instrumentation only observes existing transitions.
-- Security/privacy review: the allowlist accepts only fixed event names; snapshots contain integers only; no payload, score, URL, fragment, timestamp, identity, device data, personal data, cookie, storage, network API, backend, token, or secret is collected or transmitted.
-- GitHub Actions/status checks were unavailable because the owner removed the workflow; no automated CI success is claimed.
-- **Preview status:** repository preview output verified for the merged instrumentation source blobs.
-
-### Review findings and resolution
-
-- Reviewed the complete 13-file implementation pull-request diff for one-task scope, Stage 9 acceptance criteria, event semantics, transition deduplication, successful-share counting, privacy boundaries, security, accessibility, mobile behavior, build inclusion, source/preview synchronization, documentation accuracy, archive preservation, and secret-like strings.
-- Confirmed the task-log rollover preserves the exact prior `TASK_LOG.md` blob `4f59dc986cdc2067e08fb96ac67ad0f16c99bb6b`; no Cycle 7–8 history was lost.
-- Blocking review finding: replay actions were not initially counted as `challenge_started`, which could make repeat completions exceed starts and distort attempt rates.
-- Resolution: instrumented both result and comparison replay buttons, expanded ordinary and friend-loop tests to cover repeat starts and completions, regenerated `docs/`, and reran all checks successfully.
-- The required inline review thread was replied to and resolved.
-- Final factual self-review at head `4d1bc41095f9c05c5abffb7042a830be51fa34be` confirmed no remaining blocking or non-blocking finding; no independent approval was claimed.
-- Final merge gate confirmed the PR targeted `main`, was mergeable, had no unresolved required changes or conflicts, and had no commit statuses because the repository workflow is unavailable.
-- A concurrently prepared duplicate instrumentation PR #26 was closed as superseded after PR #25 reached `main`; it was not merged or consolidated.
-
-### Git and merge outcome
-
-- Product branch: `agent/cycle-9-privacy-safe-metrics`, created from `main` at `0b8183eab23d6458f1116957c932a4c5aad4696e`.
-- Planning commit: `f5cbb1342ecb0d5506ac16fec3cf44da36961df2`.
-- Initial implementation commit: `3c70b87dac571601247cde737f25e2f2f4c4a0a8`.
-- Final reviewed product branch head SHA: `4d1bc41095f9c05c5abffb7042a830be51fa34be`.
-- Pull request: #25 — `feat(metrics): add privacy-safe loop instrumentation`.
-- Base branch: `main` at `0b8183eab23d6458f1116957c932a4c5aad4696e`.
-- Merge method: squash using the expected final head SHA.
-- Merge outcome: successfully merged on 2026-07-11T19:21:59+03:00 and verified as merged.
-- Merge SHA: `634c2054ddacd53648fd88d1596a060f06a84851`.
-- Cycle-close branch: `agent/cycle-9-close-metrics`.
-
-### Decision
-
-No new external-service or architecture decision. A dependency-free in-memory collector implements the already documented privacy-safe metrics plan and does not establish a persistent analytics destination.
-
-### Strategic review
-
-- The product now has a complete measurable session-local Discover → Play → Result → Share → Friend Competes → Compare → Share Again loop.
-- The instrumentation bottleneck is resolved; curated challenge variety is now the earliest incomplete roadmap stage.
-- The largest technical risk remains accidentally expanding collection beyond aggregate counters; unavailable CI and interactive browser verification remain delivery limitations.
-- No evidence invalidates the static architecture, strict fragment state, or browser-sharing fallbacks.
-
-### Product thinking
-
-1. Measurement was the remaining blocker to learning which completed-loop step needs improvement.
-2. The original player experience remains unchanged; invisible aggregate counters add no friction before sharing.
-3. Shared URLs and scores are not copied into analytics or persistent storage, preserving friend trust.
-4. The smallest proof was one dependency-free allowlisted counter attached to existing DOM transitions and share outcomes.
-5. Parked idea: consider an explicit privacy-reviewed analytics destination only after a separate product and architecture decision.
-
-### Remaining limitation
-
-The counters are intentionally session-local and disappear on reload, so they prove event semantics and privacy boundaries but do not yet support cross-session product analysis. Live deployed-preview interaction and automated GitHub Actions validation remain unavailable.
-
-### Next suggested task
-
-Add curated challenge variety using reusable data-driven definitions, with at least six playable challenges across three meaningful categories and two difficulty levels. Keep the completed sharing loop and instrumentation generic; do not add private creation yet.
+Historical completed cycles 1–6 are preserved in [`TASK_LOG_ARCHIVE_CYCLES_1_6.md`](TASK_LOG_ARCHIVE_CYCLES_1_6.md), Cycles 7–8 in [`TASK_LOG_ARCHIVE_CYCLES_7_8.md`](TASK_LOG_ARCHIVE_CYCLES_7_8.md), and Cycle 9 in [`TASK_LOG_ARCHIVE_CYCLE_9.md`](TASK_LOG_ARCHIVE_CYCLE_9.md). This file remains the active source of truth for the current and subsequent cycle.
 
 ## Cycle 10
 
 - **Date/time:** 2026-07-11T19:40:23+03:00
-- **Status:** in progress
+- **Verification completed at:** 2026-07-11T20:18:00+03:00
+- **Status:** ready for final pull-request review and merge
 - **Selected task:** Add a compact curated challenge catalog backed by reusable data-driven definitions.
 - **Goal:** Let a player select and complete any of six safe tap challenges while preserving the existing result, sharing, friend-attempt, comparison, share-again, and privacy-safe metrics loop.
-- **Why selected:** Cycle 9 is complete on `main`, no pull request is open, and curated challenge variety is the earliest incomplete roadmap stage.
+- **Why selected:** Cycle 9 was complete on `main`, no pull request was open, and curated challenge variety was the earliest incomplete roadmap stage.
 - **Viral-loop impact:** Gives sharers more challenge choices without changing the validated no-login link flow, making repeat play and friend competition less repetitive.
 
-### Acceptance criteria
+### Acceptance criteria completed
 
-- Provide at least six playable curated challenges.
-- Cover at least three meaningful categories and both Easy and Hard difficulty levels.
-- Store challenge metadata in frozen reusable data-driven definitions with unique allowlisted IDs and bounded durations.
-- Keep one obvious primary play action on discovery; challenge choices must be keyboard accessible and expose selected state.
-- Run every challenge through the existing tap gameplay, result, share, friend attempt, comparison, share-again, and instrumentation states.
-- Encode the selected challenge ID and its exact allowlisted duration in shared links; reject unknown IDs and mismatched durations.
-- Preserve the no-login, no-storage, no-backend, aggregate-only privacy boundaries.
-- Keep source files and `docs/` preview output synchronized.
-- Add focused catalog and shared-state tests, then run the complete test and build commands.
-- Check the compact catalog statically for 320px and 390px layouts with no fixed-width overflow source.
+- Added six playable curated challenges across Speed, Rhythm, and Endurance.
+- Added Easy and Hard entries in every category.
+- Stored metadata in frozen data-driven definitions with unique allowlisted IDs and durations bounded from 10 to 45 seconds.
+- Added a compact keyboard-accessible button selector with `aria-pressed` state and retained one primary play action.
+- Routed every entry through the existing tap gameplay, focused result, share, friend attempt, comparison, share-again, and metrics states.
+- Shared links now preserve the selected allowlisted challenge ID and exact configured duration; unknown IDs and duration mismatches are rejected.
+- Preserved no-login, no-storage, no-backend, no-third-party-analytics, and aggregate-only instrumentation boundaries.
+- Synchronized `index.html`, `styles.css`, `app.js`, and `metrics.js` with their `docs/` preview copies.
+- Added focused catalog, full challenge-link round-trip, malformed-duration, selector, and generic-loop tests.
+- Completed static mobile review for 320px and 390px constraints with no fixed-width overflow source.
 
-### Expected files
+### Completed work
 
-- `TASK_LOG.md`
+- Added Tap Sprint, Turbo Tap, Rhythm Rush, Tempo Storm, Tap Marathon, and Endurance Blitz.
+- Generalized validated URL creation/parsing, friend invitations, comparison, and share-again around the selected curated challenge.
+- Rendered catalog options with safe DOM creation and `textContent`; no untrusted HTML is accepted.
+- Kept the existing timed tap engine and scoring feedback instead of introducing a second mechanic or architecture.
+- Updated README, roadmap, changelog, tests, active task log, and repository preview files.
+- Archived the completed Cycle 9 record before keeping Cycle 10 as the active log section.
+
+### Intentional non-goals preserved
+
+- No user-created challenge, custom text input, identity, login, cookie, persistent storage, backend, leaderboard, public feed, analytics destination, dependency, framework, architecture migration, unrelated refactor, or broad visual redesign.
+- No new scoring mechanic; all curated entries deliberately reuse the validated tap-count mechanic.
+
+### Files changed
+
 - `app.js`
 - `index.html`
 - `styles.css`
@@ -160,24 +51,63 @@ Add curated challenge variety using reusable data-driven definitions, with at le
 - `README.md`
 - `ROADMAP.md`
 - `CHANGELOG.md`
+- `TASK_LOG.md`
+- `TASK_LOG_ARCHIVE_CYCLE_9.md`
 
-### Explicit non-goals
+`metrics.js`, `docs/metrics.js`, package metadata, build script, dependencies, and prior tests remain unchanged.
 
-- No user-created challenges, custom text input, identity, login, storage, backend, leaderboard, public feed, analytics destination, new dependency, framework, architecture migration, unrelated refactor, or broad visual redesign.
-- No new scoring mechanic in this cycle; all six curated entries intentionally reuse the validated tap-count mechanic with different safe durations and themes.
+### Verification
+
+- `node --version`: `v22.16.0`.
+- `npm test`: passed in a fresh local candidate workspace; 33 tests passed, 0 failed.
+- `npm run build`: passed; 4 files copied to `dist/` and `docs/`.
+- `node --check app.js`: passed.
+- `node --check metrics.js`: passed.
+- Source/output Git blob equality: `app.js` and `docs/app.js` are `b6d0a87e6461b48fcbdd6afddaeefc5b0399c672`; `index.html` and `docs/index.html` are `ec3a42f9d589d53948f680fc5db1fb04802ee368`; `styles.css` and `docs/styles.css` are `fb53bae8ab9689a19e08b9934715e47b7f14dce9`; unchanged `metrics.js` and `docs/metrics.js` remain identical.
+- Focused test blob: `test/challenge-variety.test.js` is `e30bf4119ccb21e359e4857f5591eb70d05cb18e`.
+- Static 320px and 390px review: two `minmax(0, 1fr)` catalog columns, overflow-safe labels, responsive selected summary, full-width 48px primary action, and no horizontal-scroll source.
+- Accessibility review: semantic buttons remain keyboard operable, selected state uses `aria-pressed`, dynamic state is announced, focus continues to move to each primary state action, and visible focus is retained.
+- Security/privacy review: only frozen allowlisted IDs and exact configured durations are accepted; dynamic values use safe DOM text APIs; no executable input, identity, storage, network sink, secret, or personal data was introduced.
+- GitHub Actions/status checks are unavailable because the repository workflow was removed by owner direction; no CI success is claimed.
+- Interactive Chromium screenshots at 320px and 390px could not be completed because the available headless browser process stalled on sandbox DBus/inotify/netlink restrictions.
+- **Preview status:** repository preview output verified for the current source blobs.
+
+### Review findings and resolution
+
+- Candidate review covered one-task scope, all Stage 10 acceptance criteria, catalog uniqueness, challenge-aware state validation, prior-loop compatibility, safe DOM handling, accessibility, mobile layout, privacy, documentation, source/preview synchronization, and secret-like strings.
+- No blocking candidate finding remains before the pull request review.
+- Final PR comments, threads, mergeability, conflicts, and current-head status remain to be checked before squash merge.
+
+### Git and merge outcome
+
+- Branch: `agent/cycle-10-curated-variety`, created from `main` at `4cde43ec4e48a8dec4d6cb81fc2f8559c75e7e97`.
+- Planning commit: `b3de9c558bb0c21fe23dd39d0baa412a5d6db274`.
+- Current implementation branch head before this log update: `1a92fa7eb874e797633f45606df6e4a2d2f54ed9`.
+- Pull request, final reviewed head, merge method, outcome, and merge SHA: pending final review.
+
+### Decision
+
+No new architecture or service decision. Frozen data-driven curated definitions extend the existing static architecture and strict link codec without a dependency or backend.
 
 ### Strategic review
 
-- The direction remains aligned with the north star because the complete loop already works and variety now reduces repeat-play fatigue.
-- The largest product bottleneck is having only one curated challenge after the loop is complete.
-- The largest technical risk is leaving share parsing tied to Tap Sprint and accidentally accepting an arbitrary challenge or duration.
-- No new evidence invalidates the static architecture, existing tap engine, strict fragment codec, or privacy-safe instrumentation.
-- A six-item data-driven catalog that reuses the current mechanic is the highest-impact narrow Stage 10 implementation.
+- The direction remains aligned with the north star because the full social loop now works across a meaningful curated selection.
+- The single-challenge repetition bottleneck is resolved; lightweight private creation is now the earliest incomplete roadmap stage.
+- The main technical risk was arbitrary challenge/duration state; strict allowlist and exact-duration validation address it.
+- No new evidence invalidates the static architecture, tap engine, fragment codec, or privacy-safe instrumentation.
 
 ### Product thinking
 
-1. The missing catalog and challenge-aware shared state block the next core-loop improvement.
-2. A short set of visibly different durations and themes makes the original player more likely to replay and share a preferred challenge.
-3. A friend is more likely to compete when the shared challenge name and duration are preserved exactly.
-4. The smallest proof is six allowlisted definitions, a compact selector, and generic challenge-aware URL validation around the existing tap engine.
-5. Parked idea: add additional validated mechanics only after private creation is complete or evidence shows tap variants are insufficient.
+1. The missing catalog and challenge-aware shared state blocked useful repeat variety.
+2. Six short choices make it easier for the original player to find and share a preferred round.
+3. Preserving the exact title and duration makes a friend more likely to understand and compete fairly.
+4. The smallest proof is frozen definitions, one compact selector, and generic challenge-aware validation around the current loop.
+5. Parked idea: add another validated mechanic only after private creation or evidence that tap variants are insufficient.
+
+### Remaining limitation
+
+All six entries intentionally share one tap-count mechanic. Interactive browser screenshots and automated GitHub Actions checks remain unavailable in this environment.
+
+### Next suggested task
+
+Add lightweight no-login private challenge creation by link using one existing validated mechanic and strictly bounded safe fields. Do not add accounts, public discovery, arbitrary executable rules, or storage.
