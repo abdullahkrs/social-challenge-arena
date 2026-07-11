@@ -6,7 +6,7 @@ Historical completed cycles 1–6 are preserved in [`TASK_LOG_ARCHIVE_CYCLES_1_6
 
 - **Date/time:** 2026-07-11T23:43:29+03:00
 - **Verification completed at:** 2026-07-12T00:15:22+03:00
-- **Status:** implementation and documented self-review complete; squash merge pending
+- **Status:** implementation and pull-request self-review complete; squash merge pending
 - **Selected task:** Add one original short visual-memory sequence challenge named Signal Echo.
 - **Goal:** Add a genuinely different memory mechanic where the player watches and repeats a growing four-round signal sequence, receives a bounded points score, and completes the existing result, sharing, friend-attempt, comparison, metrics, and navigation loop.
 - **Why selected:** No pull request was open. Cycle 13 was merged into `main`, Roadmap Stage 10 was the earliest incomplete stage, and the previous cycle explicitly identified a visual-memory mechanic as the next smallest diversity task.
@@ -95,14 +95,17 @@ Historical completed cycles 1–6 are preserved in [`TASK_LOG_ARCHIVE_CYCLES_1_6
 - Resolution: reduced-motion CSS now explicitly removes active transforms and all memory feedback animation.
 - Blocking lifecycle risk reviewed: queued playback or feedback could survive navigation or replay.
 - Resolution: all state transitions use one centralized timeout handle and focused cleanup tests pass.
-- Complete branch diff was reviewed for one-task scope, correctness, accessibility, mobile layout, motion safety, security, privacy, originality, strict shared-state bounds, and source/preview parity. No unresolved blocking finding remains at this pre-PR stage.
+- Blocking documentation finding reviewed: replacing the Unreleased section would have removed the still-unreleased Center Snap history.
+- Resolution: the Changelog now preserves Center Snap and adds Signal Echo alongside it.
+- Complete pull-request diff, comments, review submissions, review threads, mergeability, one-task scope, correctness, accessibility, mobile layout, motion safety, security, privacy, originality, strict shared-state bounds, and source/preview parity were reviewed. No unresolved blocking finding remains.
 - No independent approval is claimed; this is a documented self-review.
 
 ### Git and merge outcome
 
 - Branch: `agent/cycle-14-signal-echo`, created directly from `main` at `d09e0743c433dee60d0a4912bd66d6751078f079`.
-- Pull request: to be opened directly against `main` after this factual cycle update.
-- Required merge method: squash with the expected final head SHA after PR review.
+- Pull request: #38 — `feat(challenges): add Signal Echo memory mechanic`, targeting `main`.
+- Pull request is mergeable and has no review comment, review submission, unresolved thread, conflict, or status check.
+- Required merge method: squash with the expected final head SHA after this factual log update.
 - The final merge result and merge SHA will be recorded in the pull-request conversation and final cycle report after GitHub performs the merge; they cannot be embedded truthfully in this pre-merge commit.
 
 ### Preview status
