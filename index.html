@@ -3,16 +3,34 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Social Challenge Arena MVP baseline.">
+  <meta name="description" content="Discover quick social challenges and compete with friends.">
   <title>Social Challenge Arena</title>
   <link rel="stylesheet" href="styles.css">
   <script src="app.js" defer></script>
 </head>
 <body>
   <main class="shell" aria-labelledby="page-title">
-    <p class="eyebrow">Social Challenge Arena</p>
-    <h1 id="page-title">MVP baseline ready</h1>
-    <p class="status" id="app-status">Preparing the first challenge experience.</p>
+    <header class="hero">
+      <p class="eyebrow">Social Challenge Arena</p>
+      <h1 id="page-title">Pick. Play. Compete.</h1>
+      <p class="intro">Quick challenges made for friendly competition.</p>
+    </header>
+
+    <section class="challenge-card" aria-labelledby="challenge-title">
+      <div class="challenge-meta">
+        <span class="tag">Speed</span>
+        <span>Easy · 20 sec</span>
+      </div>
+      <h2 id="challenge-title">Tap Sprint</h2>
+      <p>Tap as many times as you can before time runs out.</p>
+      <button class="primary-action" id="discover-challenge" type="button" aria-expanded="false" aria-controls="challenge-details">
+        View challenge
+      </button>
+      <div class="challenge-details" id="challenge-details" hidden>
+        <p><strong>Goal:</strong> Get the highest tap count in 20 seconds.</p>
+        <p class="next-step">Gameplay arrives in the next focused cycle.</p>
+      </div>
+    </section>
   </main>
 </body>
 </html>
