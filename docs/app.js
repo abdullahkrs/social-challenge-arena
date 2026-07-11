@@ -72,6 +72,22 @@ const curatedChallenges = Object.freeze([
     description: 'Stop the moving marker as close to the center as possible.',
     goal: 'Score up to 3,000 points across three precise stops.',
     instruction: 'Stop the marker near the center. You get three tries.'
+  }),
+  Object.freeze({
+    id: 'signal-echo',
+    title: 'Signal Echo',
+    category: 'Memory',
+    difficulty: 'Easy',
+    durationSeconds: 20,
+    rounds: 4,
+    startLength: 2,
+    sequence: Object.freeze([0, 2, 1, 3, 2]),
+    mechanic: 'signal-echo',
+    scoreUnit: 'points',
+    maxScore: 1400,
+    description: 'Watch a short signal pattern, then repeat it from memory.',
+    goal: 'Repeat four growing patterns for up to 1,400 points.',
+    instruction: 'Watch the signals. Repeat the pattern when they stop.'
   })
 ]);
 
@@ -93,6 +109,7 @@ function getChallengeScoreUnit(challenge = featuredChallenge, score = 2) {
 
 function getChallengeFormat(challenge = featuredChallenge) {
   if (challenge.mechanic === 'center-snap') return `${challenge.rounds} stops`;
+  if (challenge.mechanic === 'signal-echo') return `${challenge.rounds} rounds`;
   return `${challenge.durationSeconds} sec`;
 }
 
@@ -337,6 +354,199 @@ function getCenterSnapFeedback(points) {
   return 'Missed';
 }
 
+function createSignalEchoGame(options = {}) {
+  const sourceSequence = Array.isArray(options.sequence) ? options.sequence : [0, 2, 1, 3, 2];
+  const sequence = sourceSequence.every(value => Number.isInteger(value) && value >= 0 && value <= 3)
+    ? [...sourceSequence]
+    : [0, 2, 1, 3, 2];
+  const requestedRounds = Number.isInteger(options.rounds) ? options.rounds : 4;
+  const rounds = requestedRounds >= 1 && requestedRounds <= 6 ? requestedRounds : 4;
+  const requestedStartLength = Number.isInteger(options.startLength) ? options.startLength : 2;
+  const startLength = requestedStartLength >= 1
+    && requestedStartLength + rounds - 1 <= sequence.length
+    ? requestedStartLength
+    : 2;
+  const reducedMotion = options.reducedMotion === true;
+  const onUpdate = typeof options.onUpdate === 'function' ? options.onUpdate : () => {};
+  const onComplete = typeof options.onComplete === 'function' ? options.onComplete : () => {};
+  const setTimeoutFn = options.setTimeoutFn || setTimeout;
+  const clearTimeoutFn = options.clearTimeoutFn || clearTimeout;
+  const playbackOnMs = reducedMotion ? 650 : 320;
+  const playbackGapMs = reducedMotion ? 220 : 120;
+  const feedbackDurationMs = reducedMotion ? 250 : 360;
+  const roundLeadInMs = reducedMotion ? 300 : 180;
+
+  let status = 'idle';
+  let round = 0;
+  let sequenceLength = startLength;
+  let inputIndex = 0;
+  let score = 0;
+  let activePad = null;
+  let lastPad = null;
+  let feedback = null;
+  let playbackIndex = -1;
+  let timerId = null;
+
+  function getState() {
+    return Object.freeze({
+      status,
+      round,
+      rounds,
+      sequenceLength,
+      inputIndex,
+      score,
+      activePad,
+      lastPad,
+      feedback,
+      playbackIndex,
+      reducedMotion
+    });
+  }
+
+  function emitUpdate() {
+    const snapshot = getState();
+    onUpdate(snapshot);
+    return snapshot;
+  }
+
+  function clearTimer() {
+    if (timerId !== null) {
+      clearTimeoutFn(timerId);
+      timerId = null;
+    }
+  }
+
+  function schedule(callback, milliseconds) {
+    clearTimer();
+    timerId = setTimeoutFn(() => {
+      timerId = null;
+      callback();
+    }, milliseconds);
+  }
+
+  function complete() {
+    clearTimer();
+    status = 'complete';
+    activePad = null;
+    feedback = null;
+    playbackIndex = -1;
+    const snapshot = emitUpdate();
+    onComplete(snapshot);
+    return snapshot;
+  }
+
+  function enterInput() {
+    if (status !== 'playback') return getState();
+    status = 'input';
+    activePad = null;
+    feedback = null;
+    playbackIndex = -1;
+    return emitUpdate();
+  }
+
+  function playStep(index) {
+    if (status !== 'playback') return;
+    if (index >= sequenceLength) {
+      schedule(enterInput, playbackGapMs);
+      return;
+    }
+
+    playbackIndex = index;
+    activePad = sequence[index];
+    emitUpdate();
+    schedule(() => {
+      if (status !== 'playback') return;
+      activePad = null;
+      emitUpdate();
+      schedule(() => playStep(index + 1), playbackGapMs);
+    }, playbackOnMs);
+  }
+
+  function beginRound() {
+    clearTimer();
+    round += 1;
+    sequenceLength = startLength + round - 1;
+    inputIndex = 0;
+    activePad = null;
+    lastPad = null;
+    feedback = null;
+    playbackIndex = -1;
+    status = 'playback';
+    const snapshot = emitUpdate();
+    schedule(() => playStep(0), roundLeadInMs);
+    return snapshot;
+  }
+
+  function start() {
+    clearTimer();
+    status = 'idle';
+    round = 0;
+    sequenceLength = startLength;
+    inputIndex = 0;
+    score = 0;
+    activePad = null;
+    lastPad = null;
+    feedback = null;
+    playbackIndex = -1;
+    return beginRound();
+  }
+
+  function choose(pad) {
+    if (status !== 'input' || !Number.isInteger(pad) || pad < 0 || pad > 3) {
+      return getState();
+    }
+
+    const expectedPad = sequence[inputIndex];
+    lastPad = pad;
+    activePad = pad;
+    status = 'feedback';
+
+    if (pad === expectedPad) {
+      inputIndex += 1;
+      score += 100;
+      feedback = 'correct';
+      const snapshot = emitUpdate();
+      schedule(() => {
+        activePad = null;
+        feedback = null;
+        if (inputIndex >= sequenceLength) {
+          if (round >= rounds) complete();
+          else beginRound();
+        } else {
+          status = 'input';
+          emitUpdate();
+        }
+      }, feedbackDurationMs);
+      return snapshot;
+    }
+
+    feedback = 'incorrect';
+    const snapshot = emitUpdate();
+    schedule(complete, feedbackDurationMs);
+    return snapshot;
+  }
+
+  function reset() {
+    clearTimer();
+    status = 'idle';
+    round = 0;
+    sequenceLength = startLength;
+    inputIndex = 0;
+    score = 0;
+    activePad = null;
+    lastPad = null;
+    feedback = null;
+    playbackIndex = -1;
+    return emitUpdate();
+  }
+
+  function destroy() {
+    clearTimer();
+  }
+
+  return Object.freeze({ start, choose, reset, destroy, getState });
+}
+
 function createResultSummary(taps, durationSeconds = featuredChallenge.durationSeconds, challenge = featuredChallenge) {
   if (!Number.isInteger(taps) || taps < 0) {
     throw new TypeError('Tap score must be a non-negative integer.');
@@ -347,7 +557,12 @@ function createResultSummary(taps, durationSeconds = featuredChallenge.durationS
 
   let message = 'Try again and build your rhythm.';
 
-  if (challenge?.mechanic === 'center-snap') {
+  if (challenge?.mechanic === 'signal-echo') {
+    message = 'Watch the pattern once more and build it step by step.';
+    if (taps >= 1400) message = 'Perfect recall. Can a friend match every signal?';
+    else if (taps >= 800) message = 'Strong memory. One longer pattern can raise it.';
+    else if (taps > 0) message = 'Good start. Lock in the order and try again.';
+  } else if (challenge?.mechanic === 'center-snap') {
     message = 'Try again and aim closer to the center.';
     if (taps >= 2700) message = 'Precision finish. Can a friend beat it?';
     else if (taps >= 1800) message = 'Strong timing. One cleaner stop can raise it.';
@@ -630,6 +845,7 @@ if (typeof module !== 'undefined') {
     getChallengeFormat,
     createTapSprintGame,
     createCenterSnapGame,
+    createSignalEchoGame,
     getCenterSnapPositionLabel,
     getCenterSnapFeedback,
     createResultSummary,
@@ -691,6 +907,7 @@ if (typeof document !== 'undefined') {
   const timingBoard = document.querySelector('#timing-board');
   const timingMarker = document.querySelector('#timing-marker');
   const timingReadout = document.querySelector('#timing-readout');
+  const timingTrack = timingBoard?.querySelector('.timing-track');
   const gameStatus = document.querySelector('#game-status');
   const resultScore = document.querySelector('#result-score');
   const resultScoreUnit = document.querySelector('#result-score-unit');
@@ -748,6 +965,7 @@ if (typeof document !== 'undefined') {
     timingBoard,
     timingMarker,
     timingReadout,
+    timingTrack,
     gameStatus,
     resultScore,
     resultScoreUnit,
@@ -764,6 +982,8 @@ if (typeof document !== 'undefined') {
     let completedComparison = null;
     let activeFriendInvitation = null;
     let game = null;
+    let memoryGrid = null;
+    let memoryButtons = [];
 
     const incomingShare = parseSharedResultHash(window.location.hash);
     if (window.location.hash && !incomingShare) {
@@ -917,7 +1137,95 @@ if (typeof document !== 'undefined') {
       shareButton.focus();
     }
 
+    function ensureSignalEchoBoard() {
+      if (memoryGrid) return;
+
+      if (!document.querySelector('#signal-echo-styles')) {
+        const style = document.createElement('style');
+        style.id = 'signal-echo-styles';
+        style.textContent = `
+          .signal-echo-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 0.75rem;
+            margin-block: 0.15rem 0.8rem;
+          }
+          .signal-echo-pad {
+            min-width: 0;
+            min-height: 4rem;
+            border: 2px solid rgba(196, 181, 253, 0.45);
+            border-radius: 1rem;
+            background: rgba(15, 23, 42, 0.82);
+            color: #f8fafc;
+            font-weight: 800;
+            cursor: pointer;
+            transition: transform 160ms ease, background-color 160ms ease, border-color 160ms ease;
+          }
+          .signal-echo-pad:disabled { cursor: default; opacity: 0.82; }
+          .signal-echo-pad[data-active="true"] {
+            transform: scale(1.06);
+            border-color: #f8fafc;
+            background: #4f46e5;
+          }
+          .signal-echo-pad[data-last="true"] { outline: 3px solid rgba(248, 250, 252, 0.78); }
+          .timing-board[data-mode="signal-echo"][data-feedback="correct"] .signal-echo-pad[data-last="true"] {
+            animation: signal-echo-correct 300ms ease;
+            background: #15803d;
+          }
+          .timing-board[data-mode="signal-echo"][data-feedback="incorrect"] .signal-echo-pad[data-last="true"] {
+            animation: signal-echo-incorrect 300ms ease;
+            background: #b91c1c;
+          }
+          @keyframes signal-echo-correct { 50% { transform: scale(1.08); } }
+          @keyframes signal-echo-incorrect {
+            33% { transform: translateX(-0.35rem); }
+            66% { transform: translateX(0.35rem); }
+          }
+          @media (prefers-reduced-motion: reduce) {
+            .signal-echo-pad { transition: none; }
+            .timing-board[data-mode="signal-echo"] .signal-echo-pad { animation: none !important; }
+          }
+        `;
+        document.head.append(style);
+      }
+
+      memoryGrid = document.createElement('div');
+      memoryGrid.className = 'signal-echo-grid';
+      memoryGrid.setAttribute('role', 'group');
+      memoryGrid.setAttribute('aria-label', 'Repeat the signal pattern');
+      const labels = ['North signal', 'East signal', 'West signal', 'South signal'];
+      memoryButtons = labels.map((label, index) => {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'signal-echo-pad';
+        button.dataset.memoryPad = String(index);
+        button.textContent = String(index + 1);
+        button.setAttribute('aria-label', label);
+        button.addEventListener('click', () => {
+          if (game && typeof game.choose === 'function') game.choose(index);
+        });
+        memoryGrid.append(button);
+        return button;
+      });
+      timingBoard.prepend(memoryGrid);
+    }
+
+    function resetMechanicBoard() {
+      timingBoard.removeAttribute('data-mode');
+      timingBoard.removeAttribute('data-feedback');
+      timingBoard.setAttribute('aria-label', 'Center timing meter');
+      timingTrack.hidden = false;
+      if (memoryGrid) memoryGrid.hidden = true;
+      for (const button of memoryButtons) {
+        button.disabled = true;
+        button.removeAttribute('data-active');
+        button.removeAttribute('data-last');
+      }
+      tapButton.hidden = false;
+    }
+
     function configureTapGame() {
+      resetMechanicBoard();
       timingBoard.hidden = true;
       timingBoard.removeAttribute('data-feedback');
       tapButton.classList.remove('timing-action');
@@ -944,6 +1252,7 @@ if (typeof document !== 'undefined') {
     }
 
     function configureCenterSnapGame() {
+      resetMechanicBoard();
       const reducedMotion = typeof window.matchMedia === 'function'
         && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
       timingBoard.hidden = false;
@@ -996,6 +1305,70 @@ if (typeof document !== 'undefined') {
       });
     }
 
+    function configureSignalEchoGame() {
+      const reducedMotion = typeof window.matchMedia === 'function'
+        && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      ensureSignalEchoBoard();
+      resetMechanicBoard();
+      timingBoard.hidden = false;
+      timingBoard.dataset.mode = 'signal-echo';
+      timingBoard.setAttribute('aria-label', 'Signal Echo memory board');
+      timingTrack.hidden = true;
+      memoryGrid.hidden = false;
+      tapButton.hidden = true;
+      timeLabel.textContent = 'rounds';
+      scoreUnit.textContent = 'points';
+      timeValue.textContent = `0/${activeChallenge.rounds}`;
+      tapCount.textContent = '0';
+      timingReadout.textContent = reducedMotion
+        ? 'Reduced motion: signals change in clear, still steps.'
+        : 'Watch the signals, then repeat them.';
+
+      let previousStatus = 'idle';
+      game = createSignalEchoGame({
+        rounds: activeChallenge.rounds,
+        startLength: activeChallenge.startLength,
+        sequence: activeChallenge.sequence,
+        reducedMotion,
+        onUpdate(state) {
+          timeValue.textContent = `${state.round}/${state.rounds}`;
+          tapCount.textContent = String(state.score);
+          timingBoard.removeAttribute('data-feedback');
+
+          for (const [index, button] of memoryButtons.entries()) {
+            button.disabled = state.status !== 'input';
+            button.dataset.active = state.activePad === index ? 'true' : 'false';
+            button.dataset.last = state.lastPad === index ? 'true' : 'false';
+          }
+
+          if (state.status === 'playback') {
+            timingReadout.textContent = `Watch round ${state.round}: ${state.sequenceLength} signals.`;
+            gameStatus.textContent = 'Watch the pattern';
+          } else if (state.status === 'input') {
+            timingReadout.textContent = `Your turn. Signal ${state.inputIndex + 1} of ${state.sequenceLength}.`;
+            gameStatus.textContent = 'Repeat the pattern';
+            if (previousStatus === 'playback') memoryButtons[0].focus();
+          } else if (state.status === 'feedback') {
+            timingBoard.dataset.feedback = state.feedback;
+            timingReadout.textContent = state.feedback === 'correct'
+              ? `Correct. ${state.score} points.`
+              : `Not this one. ${state.score} points.`;
+            gameStatus.textContent = state.feedback === 'correct' ? 'Correct signal' : 'Pattern ended';
+          } else if (state.status === 'complete') {
+            timingReadout.textContent = `Attempt complete. ${state.score} points.`;
+            gameStatus.textContent = 'Memory attempt complete';
+          } else {
+            gameStatus.textContent = 'Ready';
+          }
+
+          previousStatus = state.status;
+        },
+        onComplete(state) {
+          completeAttempt(state.score);
+        }
+      });
+    }
+
     function configureGame() {
       if (game) game.destroy();
 
@@ -1004,6 +1377,7 @@ if (typeof document !== 'undefined') {
       gameInstruction.textContent = activeChallenge.instruction;
 
       if (activeChallenge.mechanic === 'center-snap') configureCenterSnapGame();
+      else if (activeChallenge.mechanic === 'signal-echo') configureSignalEchoGame();
       else configureTapGame();
     }
 
@@ -1021,7 +1395,7 @@ if (typeof document !== 'undefined') {
       challengeView.hidden = false;
       configureGame();
       game.start();
-      tapButton.focus();
+      if (!tapButton.hidden) tapButton.focus();
     }
 
     function returnToDiscovery() {
@@ -1077,14 +1451,13 @@ if (typeof document !== 'undefined') {
         title: completedComparison.challengeTitle,
         text: `I scored ${completedComparison.friendTaps} ${unit} in ${completedComparison.challengeTitle}. Can you beat it?`
       });
-
       showShareOutcome(outcome, comparisonShareStatus, comparisonShareFallback);
     }
 
     function activateGameAction() {
       if (!game) return;
       if (activeChallenge.mechanic === 'center-snap') game.stop();
-      else game.tap();
+      else if (activeChallenge.mechanic !== 'signal-echo') game.tap();
     }
 
     renderChallengeCatalog();
