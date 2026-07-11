@@ -29,10 +29,12 @@ test('result summary rejects malformed score or duration values', () => {
 
 test('result view presents the score with replay and discovery actions', () => {
   const html = readFileSync('index.html', 'utf8');
+  const css = readFileSync('styles.css', 'utf8');
 
   assert.match(html, /id="result-score"/);
   assert.match(html, /id="result-message"/);
   assert.match(html, /id="result-announcement"[^>]*aria-live="polite"/);
   assert.match(html, /id="result-replay"[^>]*>Play again</);
   assert.match(html, /id="result-back"[^>]*>Challenges</);
+  assert.match(css, /\.result-score strong[\s\S]*overflow-wrap: anywhere/);
 });
