@@ -1,0 +1,543 @@
+# Task Log
+
+## Cycle 1
+
+- **Date/time:** 2026-07-11T09:51:30+03:00
+- **Status:** completed with accepted CI limitation
+- **Selected task:** Bootstrap the minimum runnable, testable, buildable, and previewable project baseline.
+- **Outcome:** The runnable baseline, local tests, build, generated preview files, and project documents were completed. GitHub Actions repeatedly failed before allocating a runner and was later removed by the repository owner.
+- **User direction:** On 2026-07-11, the repository owner explicitly accepted GitHub Actions as unavailable and instructed development to focus on the product.
+- **Remaining limitation:** Automated GitHub Actions validation and artifact generation are unavailable until a workflow is intentionally restored in a separate cycle.
+- **Git:** Bootstrap and CI-diagnosis work was merged through PRs #1–#4. The workflow was subsequently removed from `main` by owner commit `087984cf2311e36284fc4c3c439236f663116c55`.
+
+## Cycle 2
+
+- **Date/time:** 2026-07-11T09:51:30+03:00
+- **Status:** completed
+- **Selected task:** Replace the bootstrap shell with the mobile-first landing/discovery state.
+- **Goal:** Let a new visitor immediately understand the product and discover one curated challenge without implementing gameplay.
+- **Why selected:** Cycle 1 was accepted as complete with CI temporarily unavailable, and landing/discovery was the earliest incomplete roadmap stage.
+- **Viral-loop impact:** Establishes the entry point that directs users toward the first playable challenge in the next cycle.
+
+### Acceptance criteria completed
+
+- Replaced the bootstrap status screen with a real mobile-first landing state.
+- Kept product copy concise and understandable within seconds.
+- Added one curated challenge with category, difficulty, duration, description, and goal.
+- Added one working primary action that reveals and hides challenge details.
+- Preserved keyboard access, visible focus, semantic labels, and a 48px primary target.
+- Kept layout fluid from 320px upward with no fixed-width overflow.
+- Added no gameplay, result, sharing, friend attempt, comparison, metrics, or creation behavior.
+- Added focused behavior tests for metadata, landing content, and the discovery action.
+
+### Strategic review
+
+- Direction remains aligned with the discover-to-compete north star.
+- The landing bottleneck is resolved; the next bottleneck is absence of playable challenge behavior.
+- Temporary lack of automated CI remains the largest delivery risk.
+- No evidence invalidates the static HTML/CSS/JavaScript architecture.
+- The first playable curated challenge is now the highest-impact next task.
+
+### Product thinking
+
+1. The bootstrap-only page blocked discovery; this is now resolved.
+2. A visible featured challenge and immediate action make the original player more likely to continue.
+3. Clear challenge identity improves the later shared-link first impression for a friend.
+4. The smallest proof was one concise landing state with one featured challenge and one working discovery action.
+5. No useful new idea this cycle.
+
+### Intentional non-goals preserved
+
+- No playable challenge logic.
+- No score or result state.
+- No sharing, copied links, friend flow, or comparison.
+- No dependencies, framework, backend, login, analytics, or workflow restoration.
+
+### Files changed
+
+- `index.html`
+- `styles.css`
+- `app.js`
+- `test/landing.test.js`
+- `docs/index.html`
+- `docs/styles.css`
+- `docs/app.js`
+- `ROADMAP.md`
+- `CHANGELOG.md`
+- `TASK_LOG.md`
+
+### Verification
+
+- `npm test`: passed using Node.js `v22.16.0`; 3 tests passed, 0 failed.
+- `npm run build`: passed; 3 files copied to `dist/` and `docs/`.
+- Source/output comparison: `index.html`, `styles.css`, and `app.js` matched generated `docs/` files in the verification workspace.
+- Static mobile review: fluid `min(100%, 30rem)` shell, 320px body minimum, wrapping metadata, full-width 48px action, no fixed-width overflow source.
+- Accessibility review: semantic heading structure, labelled section, `aria-expanded`, `aria-controls`, keyboard-native button, visible `:focus-visible` outline.
+- Secret review: no secrets, tokens, environment values, or personal identifiers added.
+- GitHub Actions: unavailable because the workflow was removed by the repository owner; not claimed as passed.
+- Preview: not verified live for this branch because GitHub Pages deployment status for the branch is unavailable and Actions artifacts are disabled.
+
+### Decision
+
+No new product or architecture decision. The owner’s explicit direction is treated as acceptance of temporary CI unavailability, not as a permanent architecture change.
+
+### Git
+
+- Branch: `agent/cycle-2-landing-discovery`
+- Commits: multiple focused connector commits were required because the available GitHub contents API writes one file per commit.
+- Pull request: created after finalizing this cycle log.
+
+### Remaining limitation
+
+Live mobile browser verification and deployed-preview verification are unavailable in the current tool environment. Automated CI is also unavailable until restored intentionally.
+
+### Next suggested task
+
+Implement the first playable curated challenge using the existing Tap Sprint identity and shared landing flow. Do not implement the result screen until gameplay is complete.
+
+## Cycle 3
+
+- **Date/time:** 2026-07-11T12:40:48+03:00
+- **Completed at:** 2026-07-11T12:54:34+03:00
+- **Status:** completed
+- **Selected task:** Turn the featured Tap Sprint challenge into one real 20-second playable attempt.
+- **Goal:** Let a visitor move from discovery into a deterministic tap-counting game with a visible countdown, completion state, replay, and return action.
+- **Why selected:** `main` had completed landing/discovery, no continuity PR was open, and the first playable curated challenge was the earliest incomplete roadmap stage.
+- **Viral-loop impact:** Completes the Play step so the next cycle can introduce a focused result worth sharing.
+
+### Acceptance criteria completed
+
+- The discovery primary action opens Tap Sprint and immediately starts one 20-second attempt.
+- Taps count only while the attempt is running.
+- The countdown reaches zero once, clears its timer, and ignores late taps.
+- Replay starts a clean attempt; Back resets the game and returns to discovery.
+- The gameplay view exposes live time and tap count with concise accessible status text.
+- Controls remain keyboard-native, visibly focusable, and at least 48px high.
+- Static layout review found no horizontal-overflow source or blocked primary action at 320px and 390px.
+- Focused behavior tests cover start, tap counting, completion, late taps, replay, reset, and page structure.
+- Source and `docs/` preview files are synchronized.
+
+### Completed work
+
+- Replaced the placeholder detail toggle with a direct `Play now` action.
+- Added a dependency-free Tap Sprint state machine for idle, running, and complete states.
+- Added live countdown and tap-count rendering, safe completion, replay, and return-to-discovery behavior.
+- Added a mobile-first gameplay view and large touch target without introducing a separate result screen.
+- Added focused lifecycle tests and updated the landing structure test.
+- Updated README, roadmap, changelog, and generated repository preview files.
+
+### Intentional non-goals preserved
+
+- No dedicated score/result screen beyond concise completion feedback.
+- No share or copy-link behavior.
+- No friend attempt, comparison, share-again, analytics, challenge variety, or challenge creation.
+- No dependency, framework, backend, login, workflow restoration, or architecture change.
+
+### Files changed
+
+- `index.html`
+- `styles.css`
+- `app.js`
+- `test/landing.test.js`
+- `test/gameplay.test.js`
+- `docs/index.html`
+- `docs/styles.css`
+- `docs/app.js`
+- `README.md`
+- `ROADMAP.md`
+- `CHANGELOG.md`
+- `TASK_LOG.md`
+
+### Verification
+
+- `npm test`: passed using Node.js `v22.16.0`; 5 tests passed, 0 failed.
+- `npm run build`: passed; 3 files copied to `dist/` and `docs/`.
+- `node --check app.js`: passed.
+- Committed Git blob hashes matched the freshly tested `index.html`, `styles.css`, `app.js`, and both test files.
+- Source/output comparison: `index.html`, `styles.css`, and `app.js` matched their generated `docs/` files byte-for-byte.
+- Static mobile review: 320px body minimum, fluid `min(100%, 30rem)` shell, `minmax(0, 1fr)` score columns, full-width controls, and no fixed-width overflow source at 320px or 390px.
+- Accessibility review: labelled discovery and gameplay sections, keyboard-native buttons, visible `:focus-visible` outlines, 48px minimum controls, focus transfer on state changes, and polite completion status announcement.
+- Security/privacy review: no URL, clipboard, storage, untrusted HTML, secret, token, environment value, analytics, personal data, or executable user content was added.
+- GitHub Actions/status checks: none were available because the owner removed the workflow; no automated status was claimed.
+- **Preview status:** repository preview output verified for the merged gameplay content; live deployed and interactive browser preview were unavailable in the execution environment.
+
+### Review findings and resolution
+
+- Reviewed the complete 12-file PR diff, including source, tests, generated preview files, and documentation.
+- Confirmed one-task scope, acceptance-criteria alignment, source/preview synchronization, base branch, dependency order, mergeability, accessibility, mobile layout, security, privacy, tests, and build evidence.
+- No blocking or non-blocking code findings remained.
+- No external review comments, unresolved review threads, requested changes, merge conflicts, or CI statuses existed.
+- Recorded a factual self-review comment; no independent approval was claimed.
+
+### Git and merge outcome
+
+- Product branch: `agent/cycle-3-tap-sprint-main`.
+- Product branch head SHA: `914eb7305adcd518df5f7adbc51ad6c017af1762`.
+- Pull request: #13 — `feat(gameplay): add playable tap sprint`.
+- Base branch: `main`.
+- Merge method: squash.
+- Merge outcome: successfully merged on 2026-07-11T12:54:34+03:00 using the expected head SHA.
+- Merge SHA: `cc3eaa45c8fc3d1eb46a3090292e5ba291c917c5`.
+
+### Decision
+
+No new product or architecture decision. The existing static HTML, CSS, and JavaScript architecture remains sufficient for the next focused result-state cycle.
+
+### Product thinking
+
+1. The missing Play step was the blocker and is now resolved.
+2. Immediate countdown and tap feedback give the original player a clear reason to finish the attempt.
+3. The short reproducible mechanic creates a score a friend can later attempt from a shared link.
+4. The minimum proof was one start/tap/countdown/complete/reset state machine wired to the existing challenge.
+5. Parked idea remains a subtle three-count start cue only if future usability evidence shows accidental early taps.
+
+### Remaining limitation
+
+Live deployed-preview verification, interactive browser exercise, and automated GitHub Actions validation remain unavailable in the current environment. Repository preview output and focused local behavior were verified instead.
+
+### Next suggested task
+
+Implement the focused score/result state using the validated Tap Sprint completion snapshot. Do not add sharing until the result state is complete.
+
+## Cycle 4
+
+- **Date/time:** 2026-07-11T13:39:57+03:00
+- **Completed at:** 2026-07-11T13:55:46+03:00
+- **Status:** completed
+- **Selected task:** Add a focused Tap Sprint score/result state after a completed attempt.
+- **Goal:** Replace the inline completion sentence with a distinct mobile-first result view that makes the validated tap score immediately understandable and offers replay or return to discovery.
+- **Why selected:** Cycles 1–3 were complete on `main`, no continuity pull request was open, and the focused result state was the earliest incomplete roadmap stage.
+- **Viral-loop impact:** Completes the Result step and creates a stable, validated score surface for the next share-link cycle.
+
+### Acceptance criteria completed
+
+- A completed Tap Sprint attempt transitions from gameplay to a dedicated result view.
+- The final validated tap count is the dominant result information and is rendered with safe DOM text APIs.
+- Result feedback is concise, deterministic, and does not fabricate rankings, records, or social proof.
+- The result view has one obvious primary action to play again and a secondary action to return to discovery.
+- Replay starts a clean 20-second attempt; return resets state and restores discovery focus.
+- The result view is keyboard accessible, announces the completed score, and keeps controls at least 48px high.
+- The layout has no fixed-width overflow source or blocked primary action at 320px and 390px.
+- Focused tests cover result-summary validation and the result page structure in addition to existing gameplay lifecycle tests.
+- Source and `docs/` preview files are synchronized.
+
+### Completed work
+
+- Added a dedicated hidden result section that replaces gameplay after the completion snapshot is validated.
+- Added a frozen result-summary model with bounded duration validation and deterministic score feedback.
+- Made the final tap count the dominant content and added replay plus return-to-discovery actions.
+- Added focus transfer and a live-region score announcement after the result view becomes visible.
+- Added long-score wrapping so unusually large validated counts cannot force horizontal overflow.
+- Added focused result tests and updated landing structure coverage.
+- Updated README, roadmap, changelog, and generated repository preview files.
+
+### Intentional non-goals preserved
+
+- No share, copy-link, URL state, friend attempt, comparison, share-again, analytics, challenge variety, or challenge creation.
+- No dependency, framework, backend, login, workflow restoration, architecture migration, or broad visual redesign.
+- No fabricated benchmark, percentile, leaderboard, record, popularity claim, or personal-best persistence.
+
+### Files changed
+
+- `index.html`
+- `styles.css`
+- `app.js`
+- `test/landing.test.js`
+- `test/result.test.js`
+- `docs/index.html`
+- `docs/styles.css`
+- `docs/app.js`
+- `README.md`
+- `ROADMAP.md`
+- `CHANGELOG.md`
+- `TASK_LOG.md`
+
+### Verification
+
+- `npm test`: passed using Node.js `v22.16.0`; 8 tests passed, 0 failed.
+- `npm run build`: passed; 3 files copied to `dist/` and `docs/`.
+- `node --check app.js`: passed.
+- Committed source blob hashes matched the freshly tested local files; `index.html` was `6de2d10dec38cd14c940933350599fb08e26f1df`, `styles.css` was `b48f94f41e610d9cb1e45e523ca1941c049c2d4e`, `app.js` was `60a006c6a2fd1f461b3281449c93b3e3555a0c9e`, and `test/result.test.js` was `b198955ab68d19ab4f217f3946c7d8f2c5b197ad`.
+- Source/output comparison: `index.html`, `styles.css`, and `app.js` matched their generated `docs/` files byte-for-byte.
+- Static mobile review: 320px body minimum, fluid `min(100%, 30rem)` shell, full-width 48px actions, bounded card content, and `overflow-wrap: anywhere` on the dominant score at 320px and 390px.
+- Accessibility review: labelled result section, semantic heading, keyboard-native controls, visible focus, focus transfer to replay, and score announcement after revealing the live region.
+- Security/privacy review: result values use `textContent`; no URL, clipboard, storage, untrusted HTML, secret, token, environment value, analytics, personal data, or executable user content was added.
+- GitHub Actions/status checks: none were available because the owner removed the workflow; no automated status was claimed.
+- **Preview status:** repository preview output verified for the merged result content; live deployed and interactive browser preview were unavailable in the execution environment.
+
+### Review findings and resolution
+
+- Reviewed the complete 12-file PR diff, including source, tests, generated preview files, and documentation.
+- Found and fixed two blocking issues during self-review: the live-region text was initially set while its parent view was hidden, and an unusually long score could overflow on narrow screens.
+- Re-ran all tests, build, syntax, and source/preview comparisons after both fixes, then re-reviewed the final diff.
+- Confirmed one-task scope, acceptance-criteria alignment, safe state handling, accessibility, mobile layout, security, privacy, base branch, dependency order, and mergeability.
+- No blocking or non-blocking findings remained; no external requested changes, unresolved review threads, merge conflicts, or CI statuses existed.
+- Recorded a factual self-review comment and did not claim independent approval.
+
+### Git and merge outcome
+
+- Product branch: `agent/cycle-4-focused-result-main`.
+- Product branch head SHA: `8cb693339e1ef418ec1502f61da7084409c1a6ff`.
+- Pull request: #15 — `feat(result): add focused score state`.
+- Base branch: `main` at `b0a62de19498b419dd32376ee29d163e531cb872`.
+- Merge method: squash with expected head SHA.
+- Merge outcome: successfully merged on 2026-07-11T13:55:46+03:00.
+- Merge SHA: `1f469810c645b956b086b683634123518566b17a`.
+
+### Decision
+
+No new product or architecture decision. The static HTML, CSS, and JavaScript architecture remains sufficient for the next share-link cycle.
+
+### Strategic review
+
+- The direction remained aligned with the Discover → Play → Result sequence of the north star.
+- The completed result state removed the largest product bottleneck; safe share-link state is now the next bottleneck.
+- Unavailable automated CI and interactive deployed-preview verification remain the largest delivery risk.
+- No evidence invalidated the static architecture or the existing Tap Sprint state machine.
+- The share-or-copy link stage is now the highest-impact narrow next task.
+
+### Product thinking
+
+1. The missing dedicated Result step blocked a clear handoff from play to future sharing; it is now resolved.
+2. A large score plus immediate replay gives the original player a clear reason to continue and later share.
+3. A stable validated result model gives a friend a clear target once shared-link behavior exists.
+4. The minimum proof was one result section populated from the completion snapshot, plus replay and discovery actions.
+5. Parked idea: add a personal-best comparison only after safe local persistence is explicitly selected in a later cycle.
+
+### Remaining limitation
+
+Live deployed-preview verification, interactive browser exercise, and automated GitHub Actions validation remain unavailable in the current environment. Repository preview output and focused local behavior were verified instead.
+
+### Next suggested task
+
+Implement one safe share-or-copy challenge/result link from the focused result state. Validate all encoded URL state and do not implement the friend attempt until sharing is complete.
+
+## Cycle 5
+
+- **Date/time:** 2026-07-11T14:40:00+03:00
+- **Completed at:** 2026-07-11T14:59:52+03:00
+- **Status:** completed
+- **Selected task:** Add one safe share-or-copy Tap Sprint result link from the focused result state.
+- **Goal:** Let the original player share a validated result URL with one action while preserving a reliable clipboard or visible-link fallback.
+- **Why selected:** Cycles 1–4 were complete on `main`, no continuity pull request was open, and share/copy was the earliest incomplete roadmap stage.
+- **Viral-loop impact:** Completes the Share handoff so the next cycle can let a friend open the link and compete against the encoded target.
+
+### Acceptance criteria completed
+
+- The result view exposes one obvious primary `Share score` action.
+- A generated canonical HTTP(S) URL encodes only version, challenge ID, validated score, and duration.
+- Shared state parsing rejects malformed numbers, unsupported versions or challenges, duplicate keys, extra keys, mismatched duration, oversized scores, and overlong hashes.
+- The action prefers the Web Share API, falls back to clipboard copy, and exposes a safe visible link when neither succeeds.
+- Share status is announced accessibly and all dynamic text or URLs are assigned through safe DOM properties.
+- Invalid incoming shared hashes are removed without executing or rendering their values; valid state is validated and retained for the next friend-attempt cycle without being presented early.
+- The result layout has no fixed-width overflow source or blocked primary action at 320px and 390px.
+- Focused tests cover URL round-tripping, strict rejection, Web Share, clipboard fallback, cancellation, unavailable browser APIs, visible fallback structure, and page structure.
+- Source and `docs/` preview files are synchronized.
+
+### Completed work
+
+- Added `Share score` as the primary result action while keeping replay and discovery secondary.
+- Added a strict versioned fragment codec carrying only challenge ID, score, and duration.
+- Added bounded score and duration validation, duplicate/extra-key rejection, supported-version and challenge checks, overlong-fragment rejection, and HTTP(S)-only URL creation.
+- Added Web Share support with clipboard fallback, cancellation handling, and a visible validated-link fallback.
+- Added accessible share-status announcements, safe property-based DOM updates, and invalid-fragment cleanup.
+- Added focused share tests and updated landing/result structure coverage.
+- Updated README, roadmap, changelog, and generated repository preview files.
+
+### Intentional non-goals preserved
+
+- No friend attempt, incoming target presentation, result comparison, share-again behavior, analytics, challenge variety, or challenge creation.
+- No backend, login, storage, third-party sharing SDK, dependency, framework, workflow restoration, or architecture change.
+- No generated image card, social preview metadata personalization, leaderboard, ranking, or personal-best persistence.
+
+### Files changed
+
+- `index.html`
+- `styles.css`
+- `app.js`
+- `test/landing.test.js`
+- `test/result.test.js`
+- `test/share.test.js`
+- `docs/index.html`
+- `docs/styles.css`
+- `docs/app.js`
+- `README.md`
+- `ROADMAP.md`
+- `CHANGELOG.md`
+- `TASK_LOG.md`
+
+### Verification
+
+- `npm test`: passed using Node.js `v22.16.0`; 14 tests passed, 0 failed.
+- `npm run build`: passed; 3 files copied to `dist/` and `docs/`.
+- `node --check app.js`: passed.
+- Committed source blob hashes were `f33ed30ef4e2b5455009b310a02115fa61109c7a` for `index.html`, `e363d2d1725a74ef831112bae34ab4efd7be788d` for `styles.css`, and `311d86c559ec23c328f81f5fa0d8141f6bcbb0a2` for `app.js`.
+- Source/output comparison: each source blob matched its corresponding generated `docs/` blob exactly.
+- Static mobile review: 320px body minimum, fluid `min(100%, 30rem)` shell, full-width 48px controls, `max-width: 100%`, and `overflow-wrap: anywhere` for the visible fallback URL at 320px and 390px.
+- Accessibility review: one primary share action, keyboard-native controls, visible focus, focus transfer to share after completion, polite share-status announcements, and a focusable visible-link fallback.
+- Security/privacy review: shared state is confined to a URL fragment; only four bounded keys are accepted; non-HTTP(S) links are rejected; invalid fragments are removed; dynamic values use `textContent`, `href`, and other safe properties; no untrusted HTML, storage, secrets, tokens, analytics, personal data, or executable content was added.
+- GitHub Actions/status checks: no workflow runs or commit statuses existed because the owner removed the workflow; no automated CI success was claimed.
+- **Preview status:** repository preview output verified for the merged share-link content; live deployed and interactive browser preview were unavailable in the execution environment.
+
+### Review findings and resolution
+
+- Reviewed the complete 13-file pull-request diff, including source, tests, generated preview files, and documentation.
+- Found and fixed one blocking security issue before opening the PR: the browser share helper initially accepted non-HTTP(S) URLs.
+- Found and fixed one blocking acceptance-coverage gap during final review: explicit coverage was added for overlong fragments, unavailable browser APIs, and the visible fallback structure.
+- Re-ran all 14 tests, build, syntax, and source/preview comparisons after the fixes, then re-reviewed the complete final diff.
+- Confirmed one-task scope, acceptance-criteria alignment, state handling, accessibility, mobile layout, security, privacy, base branch, dependency order, and mergeability.
+- No blocking or non-blocking findings remained; no external requested changes, unresolved review threads, merge conflicts, workflow runs, or commit statuses existed.
+- Recorded a factual self-review comment and did not claim independent approval.
+
+### Git and merge outcome
+
+- Product branch: `agent/cycle-5-share-link-main`.
+- Product branch head SHA: `3ddbbcc65d1f151d64868fa810cb9ce2529aabe3`.
+- Pull request: #17 — `feat(share): add validated result link`.
+- Base branch: `main` at `0cbfcb8e1cff72319ee3d6bd8eeb8c7c6aa426d8`.
+- Merge method: squash using the expected head SHA.
+- Merge outcome: successfully merged on 2026-07-11T14:59:52+03:00.
+- Merge SHA: `9d5976779f8593fc9ad6ecf47ab18fb3a9e882e4`.
+
+### Decision
+
+No new product or architecture decision. The existing static architecture and bounded URL-fragment transport are sufficient for the next friend-attempt cycle.
+
+### Strategic review
+
+- The direction remains aligned with the Discover → Play → Result → Share sequence.
+- The share handoff is complete; the largest product bottleneck is now opening a validated link as a friend and presenting the target before play.
+- Unavailable automated CI and interactive deployed-preview verification remain the largest delivery risk.
+- No new evidence invalidated the static architecture or the bounded shared-state model.
+- A focused friend-attempt entry state is now the highest-impact narrow task.
+
+### Product thinking
+
+1. The missing Share step blocked the next friend-competition step and is now resolved.
+2. One prominent share action immediately after the score gives the original player a clear continuation path.
+3. A bounded challenge identity and score target make the link suitable for a friend to open and compete in the next cycle.
+4. The minimum proof was a strict URL codec, Web Share and clipboard handling, visible fallback, accessible status, and focused tests.
+5. Parked idea: generate a branded score image only after the text-link loop is measurable and complete.
+
+### Remaining limitation
+
+Live deployed-preview verification, interactive browser exercise, and automated GitHub Actions validation remain unavailable. The valid incoming target is intentionally not presented or used to start a friend attempt until Cycle 6.
+
+### Next suggested task
+
+Implement the friend-attempt entry state for a valid shared Tap Sprint link: present the sharer's validated target, let the friend start the same challenge, and preserve comparison as a later stage.
+
+## Cycle 6
+
+- **Date/time:** 2026-07-11T15:05:02+03:00
+- **Completed at:** 2026-07-11T15:30:13+03:00
+- **Status:** completed
+- **Selected task:** Add a friend-attempt entry state for a valid shared Tap Sprint link.
+- **Goal:** Present the sharer's validated target clearly and let a friend start the same 20-second challenge without implementing post-attempt comparison.
+- **Why selected:** Cycle 5 was complete on `main`, no continuity pull request was open, and friend attempt from a shared link was the earliest incomplete roadmap stage.
+- **Viral-loop impact:** Completes the Friend Competes entry step by converting a validated shared result link into a clear challenge invitation and playable attempt.
+
+### Acceptance criteria completed
+
+- A valid shared result hash opens a dedicated friend-entry view instead of ordinary discovery.
+- The view shows only the validated Tap Sprint identity, target score, and duration using safe DOM text properties.
+- One obvious primary action starts the same 20-second Tap Sprint attempt while preserving the validated target in memory.
+- A secondary action dismisses the shared invitation, removes the fragment, and returns to ordinary discovery.
+- Invalid shared state continues to be removed without rendering or execution.
+- Completing the friend attempt still opens the existing result state; comparison wording, win/loss logic, and share-again behavior remain deferred.
+- Keyboard focus, live announcements, 48px controls, and mobile layout remain usable at 320px and 390px without horizontal overflow.
+- Focused tests cover friend-entry model validation, valid shared-entry structure and behavior boundaries, safe fragment cleanup, and unchanged strict hash parsing.
+- Source and generated `docs/` preview files are synchronized.
+
+### Completed work
+
+- Added a dedicated hidden friend invitation view that is shown only after strict shared-state parsing succeeds.
+- Added a frozen friend-invitation model with exact shape, version, challenge, score, and duration validation.
+- Added validated challenge title, target score, duration, accessible announcement, and focus transfer to the primary action.
+- Wired `Try to beat it` to the existing Tap Sprint attempt while retaining target context in memory.
+- Wired dismissal and ordinary return actions to clear friend context and remove the fragment safely.
+- Hardened fragment cleanup against scheme-relative paths and browser history failures.
+- Added focused friend-attempt tests and updated landing structure coverage.
+- Updated README, roadmap, changelog, and generated repository preview files.
+
+### Intentional non-goals preserved
+
+- No original-player versus friend comparison, beat/tie/loss messaging, or comparison screen.
+- No share-again action, analytics, storage, login, backend, challenge variety, or challenge creation.
+- No dependency, framework, workflow restoration, architecture migration, broad redesign, or personalized identity.
+
+### Files changed
+
+- `index.html`
+- `styles.css`
+- `app.js`
+- `test/friend-attempt.test.js`
+- `test/landing.test.js`
+- `docs/index.html`
+- `docs/styles.css`
+- `docs/app.js`
+- `README.md`
+- `ROADMAP.md`
+- `CHANGELOG.md`
+- `TASK_LOG.md`
+
+### Verification
+
+- `npm test`: passed using Node.js `v22.16.0`; 18 tests passed, 0 failed.
+- `npm run build`: passed; 3 files copied to `dist/` and `docs/`.
+- `node --check app.js`: passed.
+- Committed blob hashes were `f1cd29eb1e3f49442d63bccfd1d8a941ae9e8b7e` for `index.html`, `0e289d11ef8e6a0777a67eed3053356c0fba71d2` for `styles.css`, `b473d0c63c3d9e36f17d70dec6324bd81a4da015` for `app.js`, `c6314157f97264e7c3bb68d3789bebd0a8e529ca` for `test/friend-attempt.test.js`, and `7f9d392251a3b90c888dee118d16122b2db2e3fa` for `test/landing.test.js`.
+- Source/output comparison: `index.html`, `styles.css`, and `app.js` matched their generated `docs/` blobs exactly.
+- Static mobile review: 320px body minimum, fluid `min(100%, 30rem)` shell, full-width 48px actions, bounded card content, and `overflow-wrap: anywhere` for the target score at 320px and 390px.
+- Accessibility review: labelled invitation section, keyboard-native controls, visible focus, focus transfer to the friend-start action, polite invitation announcement after reveal, and no hidden live-region announcement.
+- Security/privacy review: the existing strict parser remains the entry gate; the invitation model revalidates exact bounded state; dynamic values use `textContent`; cleanup rejects scheme-relative paths and catches history errors; no untrusted HTML, executable state, storage, secrets, tokens, analytics, personal data, or backend was added.
+- GitHub Actions/status checks: no workflow runs or commit statuses existed because the owner removed the workflow; no automated CI success was claimed.
+- **Preview status:** repository preview output verified for the merged friend-entry content; live deployed and interactive browser preview were unavailable in the execution environment.
+
+### Review findings and resolution
+
+- Reviewed the complete 12-file pull-request diff, including source, focused tests, generated preview files, and documentation.
+- Found and fixed one blocking fragment-cleanup issue during self-review: a scheme-relative pathname or rejected `history.replaceState` call could throw instead of returning safely.
+- Added regression coverage for scheme-relative paths and history failures, then re-ran all 18 tests, build, syntax, and source/preview comparisons.
+- Re-reviewed the final diff for one-task scope, acceptance criteria, state handling, accessibility, mobile layout, security, privacy, base branch, dependency order, and mergeability.
+- No blocking or non-blocking findings remained; no external requested changes, unresolved review threads, merge conflicts, workflow runs, or commit statuses existed.
+- Recorded a factual self-review comment and did not claim independent approval.
+
+### Git and merge outcome
+
+- Product branch: `agent/cycle-6-friend-attempt-main`.
+- Product branch head SHA: `ea59818914b1a55821dd3a1fd27fde41119a1c3e`.
+- Pull request: #19 — `feat(friend): add shared challenge entry`.
+- Base branch: `main` at `a99bc547a2c815c43423f1a183bb70fc0bff2f0c`.
+- Merge method: squash using the expected head SHA.
+- Merge outcome: successfully merged on 2026-07-11T15:30:13+03:00.
+- Merge SHA: `1048404d49dea5fe9b1c69cfd30d8c8286f2e7e7`.
+- Cycle-close branch: `agent/cycle-6-close-friend-attempt`.
+
+### Decision
+
+No new product or architecture decision. The static HTML, CSS, and JavaScript architecture plus bounded URL-fragment state remain sufficient for the next comparison cycle.
+
+### Strategic review
+
+- The direction remains aligned through Discover → Play → Result → Share → Friend Competes.
+- The friend can now act on a shared target; the largest product bottleneck is the missing original-player versus friend comparison after completion.
+- Unavailable automated CI and interactive deployed-preview verification remain the largest delivery risk.
+- No new evidence invalidated the static architecture, existing gameplay state machine, or bounded shared-state model.
+- A focused comparison state is now the highest-impact narrow task.
+
+### Product thinking
+
+1. The invisible incoming target was the blocker and is now presented as an actionable invitation.
+2. The original player's shared score now gives the friend a clear reason to begin the same challenge.
+3. One primary action and no login keep friend-entry friction low.
+4. The minimum proof was one validated invitation view, safe dismissal, and reuse of the existing game without comparison logic.
+5. Parked idea remains a subtle target reminder during gameplay only if later usability evidence shows friends forget the goal.
+
+### Remaining limitation
+
+Live deployed-preview verification, interactive browser exercise, and automated GitHub Actions validation remain unavailable. Friend results intentionally do not show beat/tie/loss comparison or share-again behavior yet.
+
+### Next suggested task
+
+Implement a focused original-player versus friend comparison after the friend attempt completes. Use the retained validated target, cover beat/tie/loss deterministically, and do not add share-again until comparison is complete.
