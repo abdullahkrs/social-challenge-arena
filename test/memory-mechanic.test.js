@@ -184,13 +184,16 @@ test('Signal Echo reuses strict social-loop state and rejects scores over 1,400'
   );
 });
 
-test('memory UI uses native buttons, purposeful feedback, and reduced-motion CSS', () => {
+test('memory UI uses native buttons, text playback, purposeful feedback, and reduced-motion CSS', () => {
   const app = readFileSync('app.js', 'utf8');
   assert.match(app, /memoryGrid\.setAttribute\('role', 'group'\)/);
   assert.match(app, /button\.type = 'button'/);
   assert.match(app, /button\.addEventListener\('click', \(\) =>/);
+  assert.match(app, /signalNames = \['North', 'East', 'West', 'South'\]/);
+  assert.match(app, /\$\{signalNames\[state\.activePad\]\} signal/);
   assert.match(app, /data-mode="signal-echo"\]\[data-feedback="correct"\]/);
   assert.match(app, /@media \(prefers-reduced-motion: reduce\)/);
+  assert.match(app, /data-active="true"\]\s*\{ transform: none !important; \}/);
   assert.match(app, /if \(game\) game\.destroy\(\)/);
   assert.match(app, /completeAttempt\(state\.score\)/);
 });
