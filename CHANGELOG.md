@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.9.0 — 2026-07-11
+
+### Added
+
+- Strict allowlisted session events for the complete viral-loop milestones.
+- Dependency-free in-memory per-event counts with a fixed non-identifying payload.
+- Focused tests for event validation, payload boundaries, counter behavior, failure isolation, and loop wiring.
+
+### Changed
+
+- Successful result and comparison sharing now emit completion milestones only after Web Share or clipboard succeeds.
+- Project documentation now defines the instrumentation privacy and reliability boundaries.
+
 ## 0.8.0 — 2026-07-11
 
 ### Added
