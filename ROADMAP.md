@@ -2,7 +2,7 @@
 
 ## Current repository state
 
-Active MVP development.
+Active MVP development with the ordered no-login MVP stages complete.
 
 ## MVP stages
 
@@ -16,7 +16,7 @@ Active MVP development.
 8. Share-again action from the comparison — complete.
 9. Basic privacy-safe MVP event instrumentation — complete.
 10. Curated challenge variety — complete.
-11. Lightweight private challenge creation — next.
+11. Lightweight private challenge creation — complete.
 
 ## Completed stage evidence
 
@@ -101,3 +101,13 @@ Active MVP development.
 - All entries reuse the validated timed tap engine and complete the existing result and social loop.
 - Shared links preserve the selected challenge and exact duration while rejecting unknown IDs and mismatches.
 - Source and GitHub Pages preview files remain synchronized without dependencies, login, storage, or backend changes.
+
+### Stage 11
+
+- Discovery includes a secondary private-creation entry without replacing the curated primary action.
+- A compact private page accepts one normalized 3–24 character ASCII title and one allowlisted 10, 20, or 30 second duration.
+- Private rounds reuse the existing timed tap engine and deterministic result feedback.
+- Strict versioned fragments carry only title, score, and duration and reject malformed, duplicate, extra, unsupported, oversized, or inconsistent state.
+- A valid private link opens a friend invitation, preserves the target through play, shows comparison, and promotes the friend's score for sharing again.
+- Custom values use safe DOM text APIs; no executable rules, identity, login, storage, backend, cookie, analytics destination, dependency, or public discovery was added.
+- Source and GitHub Pages preview files remain synchronized.

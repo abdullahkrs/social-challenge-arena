@@ -1,123 +1,121 @@
 # Task Log
 
-Historical completed cycles 1–6 are preserved in [`TASK_LOG_ARCHIVE_CYCLES_1_6.md`](TASK_LOG_ARCHIVE_CYCLES_1_6.md), Cycles 7–8 in [`TASK_LOG_ARCHIVE_CYCLES_7_8.md`](TASK_LOG_ARCHIVE_CYCLES_7_8.md), and Cycle 9 in [`TASK_LOG_ARCHIVE_CYCLE_9.md`](TASK_LOG_ARCHIVE_CYCLE_9.md). This file remains the active source of truth for the current and subsequent cycle.
+Historical completed cycles 1–6 are preserved in [`TASK_LOG_ARCHIVE_CYCLES_1_6.md`](TASK_LOG_ARCHIVE_CYCLES_1_6.md), Cycles 7–8 in [`TASK_LOG_ARCHIVE_CYCLES_7_8.md`](TASK_LOG_ARCHIVE_CYCLES_7_8.md), Cycle 9 in [`TASK_LOG_ARCHIVE_CYCLE_9.md`](TASK_LOG_ARCHIVE_CYCLE_9.md), and Cycle 10 in [`TASK_LOG_ARCHIVE_CYCLE_10.md`](TASK_LOG_ARCHIVE_CYCLE_10.md). This file remains the active source of truth for the current cycle.
 
-## Cycle 10
+## Cycle 11
 
-- **Date/time:** 2026-07-11T19:40:23+03:00
-- **Verification completed at:** 2026-07-11T20:17:30+03:00
-- **Completed at:** 2026-07-11T20:18:59+03:00
-- **Status:** completed
-- **Selected task:** Add a compact curated challenge catalog backed by reusable data-driven definitions.
-- **Goal:** Let a player select and complete any of six safe tap challenges while preserving the existing result, sharing, friend-attempt, comparison, share-again, and privacy-safe metrics loop.
-- **Why selected:** Cycle 9 was complete on `main`, no pull request was open, and curated challenge variety was the earliest incomplete roadmap stage.
-- **Viral-loop impact:** Gives sharers more challenge choices without changing the validated no-login link flow, making repeat play and friend competition less repetitive.
+- **Date/time:** 2026-07-11T20:40:37+03:00
+- **Verification completed at:** 2026-07-11T21:02:50+03:00
+- **Status:** ready for final pull-request review and merge
+- **Selected task:** Add lightweight no-login private tap challenge creation by link.
+- **Goal:** Let a player enter one short safe challenge name, choose one bounded duration, play the existing tap mechanic, and share a validated private result link that a friend can open, compete against, compare, and share again.
+- **Why selected:** Cycle 10 was complete on `main`, no pull request was open, and lightweight private creation was the earliest incomplete roadmap stage.
+- **Viral-loop impact:** Gives a sharer a small sense of authorship while preserving the proven play, result, friend attempt, comparison, and share-again loop.
 
 ### Acceptance criteria completed
 
-- Added six playable curated challenges across Speed, Rhythm, and Endurance.
-- Added Easy and Hard entries in every category.
-- Stored metadata in frozen data-driven definitions with unique allowlisted IDs and durations bounded from 10 to 45 seconds.
-- Added a compact keyboard-accessible button selector with `aria-pressed` state and retained one primary play action.
-- Routed every entry through the existing tap gameplay, focused result, share, friend attempt, comparison, share-again, and metrics states.
-- Shared links now preserve the selected allowlisted challenge ID and exact configured duration; unknown IDs and duration mismatches are rejected.
-- Preserved no-login, no-storage, no-backend, no-third-party-analytics, and aggregate-only instrumentation boundaries.
-- Synchronized `index.html`, `styles.css`, `app.js`, and `metrics.js` with their `docs/` preview copies.
-- Added focused catalog, full challenge-link round-trip, malformed-duration, selector, generic-loop, and source/preview parity tests.
-- Completed static mobile review for 320px and 390px constraints with no fixed-width overflow source.
+- Added a compact secondary private-creation entry from discovery without replacing the curated catalog or its primary play action.
+- Added one private creation page using the existing timed tap mechanic and deterministic result feedback.
+- Restricted normalized titles to 3–24 ASCII letters, numbers, and spaces.
+- Restricted durations to exactly 10, 20, or 30 seconds.
+- Added strict versioned HTTP(S) fragment links containing only title, score, and duration.
+- Rejects malformed, duplicate, extra, oversized, unsupported-duration, invalid-title, excessive-score, and inconsistent comparison state.
+- A valid private link opens a friend invitation, preserves the target through play, shows deterministic comparison, and shares the friend score as the next target.
+- Uses safe DOM `textContent`; added no executable rules, login, identity, storage, backend, cookie, analytics destination, or dependency.
+- Added focused helper, link-codec, malformed-state, comparison, share-again, structure, and source/preview parity tests.
+- Synchronized all seven source assets with their `docs/` preview copies.
+- Completed static 320px and 390px layout review with no fixed-width overflow source.
 
 ### Completed work
 
-- Added Tap Sprint, Turbo Tap, Rhythm Rush, Tempo Storm, Tap Marathon, and Endurance Blitz.
-- Generalized validated URL creation/parsing, friend invitations, comparison, and share-again around the selected curated challenge.
-- Rendered catalog options with safe DOM creation and `textContent`; no untrusted HTML is accepted.
-- Kept the existing timed tap engine and scoring feedback instead of introducing a second mechanic or architecture.
-- Updated README, roadmap, changelog, tests, active task log, and repository preview files.
-- Archived the completed Cycle 9 record before keeping Cycle 10 as the active log section.
+- Added `create.html` with one compact form, one title field, one fixed-duration selector, and one primary create-and-play action.
+- Added `private.js` with strict title, duration, score, URL, shared-state, comparison, and share-again validation.
+- Reused `createTapSprintGame`, `createResultSummary`, `shareResultLink`, and fragment-cleanup behavior from the existing application instead of creating a second engine.
+- Added private invite, play, result, comparison, replay, edit, and share-again states.
+- Added `private.css` for accessible 48px controls, visible focus, overflow-safe fields, and narrow-screen title sizing.
+- Updated the build manifest, discovery link, README, roadmap, changelog, tests, active log, archive, and repository preview output.
 
 ### Intentional non-goals preserved
 
-- No user-created challenge, custom text input, identity, login, cookie, persistent storage, backend, leaderboard, public feed, analytics destination, dependency, framework, architecture migration, unrelated refactor, or broad visual redesign.
-- No new scoring mechanic; all curated entries deliberately reuse the validated tap-count mechanic.
+- No public challenge discovery, accounts, profiles, author identity, moderation system, database, persistent drafts, arbitrary rules, executable text, new gameplay mechanic, analytics expansion, dependency, framework, architecture migration, broad redesign, or unrelated refactor.
 
 ### Files changed
 
-- `app.js`
 - `index.html`
-- `styles.css`
-- `test/challenge-variety.test.js`
+- `create.html`
+- `private.js`
+- `private.css`
+- `scripts/build.js`
+- `test/private-creation.test.js`
 - `test/branch-verification.test.js`
-- `docs/app.js`
 - `docs/index.html`
-- `docs/styles.css`
+- `docs/create.html`
+- `docs/private.js`
+- `docs/private.css`
 - `README.md`
 - `ROADMAP.md`
 - `CHANGELOG.md`
 - `TASK_LOG.md`
-- `TASK_LOG_ARCHIVE_CYCLE_9.md`
+- `TASK_LOG_ARCHIVE_CYCLE_10.md`
 
-`metrics.js`, `docs/metrics.js`, package metadata, build script, dependencies, and prior tests remain unchanged.
+`app.js`, `styles.css`, `metrics.js`, package metadata, dependencies, and prior tests remain unchanged.
 
 ### Verification
 
-- `node --version`: `v22.16.0`.
-- `npm test`: passed in a fresh local candidate workspace; 37 tests passed, 0 failed.
-- `npm run build`: passed; 4 files copied to `dist/` and `docs/`.
-- `node --check app.js`: passed.
-- `node --check metrics.js`: passed.
-- Source/output Git blob equality: `app.js` and `docs/app.js` are `b6d0a87e6461b48fcbdd6afddaeefc5b0399c672`; `index.html` and `docs/index.html` are `eee6ff2eff6f0ba6cae003ac40365a7b4bd93950`; `styles.css` and `docs/styles.css` are `fb53bae8ab9689a19e08b9934715e47b7f14dce9`; unchanged `metrics.js` and `docs/metrics.js` remain identical.
-- Focused catalog test blob: `test/challenge-variety.test.js` is `f7acbfbb6c88610998a0bdbd2b89968e7d12fe0f`.
-- Static 320px and 390px review: two `minmax(0, 1fr)` catalog columns, overflow-safe labels, responsive selected summary, full-width 48px primary action, and no horizontal-scroll source.
-- Accessibility review: semantic challenge buttons are exposed as one labelled group, selected state uses `aria-pressed`, dynamic state is announced, focus continues to move to each primary state action, and visible focus is retained.
-- Security/privacy review: only frozen allowlisted IDs and exact configured durations are accepted; dynamic values use safe DOM text APIs; no executable input, identity, storage, network sink, secret, or personal data was introduced.
-- GitHub Actions/status checks were unavailable because the repository workflow was removed by owner direction; no CI success is claimed.
-- Interactive Chromium screenshots at 320px and 390px could not be completed because the available headless browser process stalled on sandbox DBus/inotify/netlink restrictions.
-- **Preview status:** repository preview output verified for the merged source blobs.
+- Full repository checkout was unavailable because the runtime could not resolve `github.com`; therefore `npm test` and `npm run build` were not executed and no full-suite or build success is claimed.
+- GitHub Actions/status checks remain unavailable because the repository workflow was removed by owner direction.
+- A focused local Node helper harness matching the committed private title, duration, score, fragment, comparison, and share-again logic passed: 4 tests passed, 0 failed.
+- `node --check` passed for the focused private helper module used by that harness.
+- After correcting the title test expectation, a focused runtime check confirmed whitespace normalization and all listed invalid-title cases pass.
+- Static build-manifest review confirmed all seven required source assets are copied to both `dist/` and `docs/`.
+- Repository blob equality confirms `index.html`, `create.html`, `private.js`, and `private.css` exactly match their corresponding `docs/` files; unchanged `app.js`, `styles.css`, and `metrics.js` were already synchronized and remain untouched.
+- Static 320px and 390px review: `min-width: 0` fields, full-width 48px controls, responsive shared score layouts, wrapping link fallback, and no fixed-width horizontal-scroll source.
+- Accessibility review: explicit form labels, visible focus, live validation/status regions, one primary action per state, semantic buttons/links, focus movement, and short state announcements.
+- Security/privacy review: exact key sets, duplicate and extra-key rejection, bounded fragment length, title allowlist, duration allowlist, score cap, HTTP(S)-only sharing, safe text APIs, and no storage, cookie, network sink, executable input, secret, or personal-data collection.
+- Interactive browser screenshots were unavailable in this runtime.
+- **Preview status:** repository preview output verified for the reviewed branch blobs.
 
 ### Review findings and resolution
 
-- Reviewed the complete 13-file PR diff for one-task scope, all Stage 10 acceptance criteria, catalog uniqueness, challenge-aware state validation, prior-loop compatibility, safe DOM handling, accessibility, mobile layout, privacy, documentation, source/preview synchronization, and secret-like strings.
-- Blocking accessibility finding: the challenge buttons were initially direct children of `role="list"` without `listitem` semantics.
-- Resolution: changed the selector container to one labelled `role="group"`, strengthened the focused test, synchronized `docs/index.html`, and reran all 37 tests and build checks successfully.
-- Documentation mismatch finding: the active log still reported 33 tests after adding four preview-parity tests.
-- Resolution: corrected the verified total to 37 and listed the parity test file.
-- Final factual self-review at head `7a188be23c36334ed3f0dd4d2cbf5e8d82eded00` found no remaining blocking or non-blocking issue; no independent approval was claimed.
-- Final merge gate confirmed PR #29 targeted `main`, was mergeable, had no conflicts, comments, submitted reviews, unresolved threads, requested reviewers, or commit statuses.
+- Initial static review found the new discovery link required the private stylesheet on `index.html` to receive action sizing and alignment.
+- Resolution: loaded `private.css` on discovery, expanded `.private-create-link` styling, synchronized `docs/index.html`, and retained the curated play button as the single primary action.
+- Initial preview review found the build manifest had to include all three new private assets.
+- Resolution: added `create.html`, `private.css`, and `private.js` to the required build asset list and added parity tests for all seven preview files.
+- Blocking test finding during complete PR review: the invalid-title list expected `' leading'` to fail even though the specified normalizer intentionally trims surrounding whitespace, so the committed test would fail against the implemented acceptance rule.
+- Resolution: removed the contradictory invalid case, retained the explicit whitespace-normalization assertion, and reran a focused title-validation check successfully.
+- No remaining correctness, security, privacy, accessibility, scope, synchronization, or secret-like-string finding was identified after the fix.
 
 ### Git and merge outcome
 
-- Product branch: `agent/cycle-10-curated-variety`, created from `main` at `4cde43ec4e48a8dec4d6cb81fc2f8559c75e7e97`.
-- Planning commit: `b3de9c558bb0c21fe23dd39d0baa412a5d6db274`.
-- Final reviewed product head SHA: `7a188be23c36334ed3f0dd4d2cbf5e8d82eded00`.
-- Pull request: #29 — `feat(challenges): add curated challenge variety`, targeting `main`.
-- Merge method: squash using the expected final head SHA.
-- Merge outcome: successfully merged and verified on 2026-07-11T20:18:59+03:00.
-- Merge SHA: `e007d83154570f5497026d0fc5cbf2190b881857`.
-- Cycle-close branch: `agent/cycle-10-close-curated-variety`, created from the updated `main` merge SHA solely because the implementation PR necessarily could not contain its own final merge SHA.
+- Product branch: `agent/cycle-11-private-creation`, created from `main` at `675105f51ac007560674ecb09d1d0d9081d8263f`.
+- Planning/archive commits began at `b9bc5cfc5c2a595f01526ef98f3bd3156d325947` and `08f6213cb5b182e4afdc334705cf37f7c747f41b`.
+- Pull request: #31 — `feat(private): add lightweight private challenge creation`, targeting `main`.
+- Reviewed code/test head before this factual log update: `3bff4e8b0aff720292ea307555226ff5f81c182e`.
+- Final PR head, merge method, outcome, and merge SHA: pending final merge gate.
 
 ### Decision
 
-No new architecture or service decision. Frozen data-driven curated definitions extend the existing static architecture and strict link codec without a dependency or backend.
+No new architecture or external service decision. Private creation remains a static, no-login, private-by-link extension of the existing tap mechanic with a separate strict fragment codec.
 
 ### Strategic review
 
-- The direction remains aligned with the north star because the full social loop now works across a meaningful curated selection.
-- The single-challenge repetition bottleneck is resolved; lightweight private creation is now the earliest incomplete roadmap stage.
-- The main technical risk was arbitrary challenge/duration state; strict allowlist and exact-duration validation address it.
-- No new evidence invalidates the static architecture, tap engine, fragment codec, or privacy-safe instrumentation.
+- The current direction remains aligned with the north star: the full curated loop works, and private-by-link creation is the final ordered MVP stage.
+- The personalization bottleneck is addressed without weakening the existing curated path.
+- The largest technical risk was untrusted custom state; strict title, duration, score, shape, protocol, and fragment bounds address it.
+- No new evidence invalidates the static architecture or existing tap mechanic.
 
 ### Product thinking
 
-1. The missing catalog and challenge-aware shared state blocked useful repeat variety.
-2. Six short choices make it easier for the original player to find and share a preferred round.
-3. Preserving the exact title and duration makes a friend more likely to understand and compete fairly.
-4. The smallest proof is frozen definitions, one compact selector, and generic challenge-aware validation around the current loop.
-5. Parked idea: add another validated mechanic only after private creation or evidence that tap variants are insufficient.
+1. The missing safe creation entry blocked the final ordered MVP step.
+2. A short custom title gives the original player ownership and a clearer reason to share.
+3. A friend sees the exact private title, target, and duration before competing.
+4. The smallest proof is one title field, one fixed duration selector, the existing tap engine, and a strict private-result fragment codec.
+5. Parked idea: add additional predefined mechanics only after evidence from real private-link usage; it was not implemented in this cycle.
 
 ### Remaining limitation
 
-All six entries intentionally share one tap-count mechanic. Interactive browser screenshots and automated GitHub Actions checks remain unavailable in this environment.
+Private creation supports only the existing tap-count mechanic and ASCII titles. Full repository commands and interactive browser screenshots could not be executed in this runtime.
 
 ### Next suggested task
 
-Add lightweight no-login private challenge creation by link using one existing validated mechanic and strictly bounded safe fields. Do not add accounts, public discovery, arbitrary executable rules, or storage.
+Do not add another feature without evidence. Validate the completed MVP with real users and use observed drop-off or sharing behavior to select any post-MVP work.

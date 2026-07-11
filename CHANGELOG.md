@@ -1,5 +1,24 @@
 # Changelog
 
+## 0.11.0 — 2026-07-11
+
+### Added
+
+- A compact no-login private challenge creator reached from discovery.
+- Safe 3–24 character challenge names and fixed 10, 20, or 30 second durations.
+- A dedicated private play, result, friend invitation, comparison, and share-again flow using the existing tap mechanic.
+- Strict private-result fragment creation, parsing, comparison validation, and focused tests.
+
+### Changed
+
+- The static build and GitHub Pages preview now include `create.html`, `private.css`, and `private.js`.
+- Discovery keeps curated play as the primary action and exposes private creation as a secondary action.
+
+### Privacy and scope
+
+- Private challenge state exists only in the validated link and current page memory.
+- No login, identity, storage, backend, cookie, analytics destination, arbitrary executable rule, dependency, framework, or public challenge feed was added.
+
 ## 0.10.0 — 2026-07-11
 
 ### Added
