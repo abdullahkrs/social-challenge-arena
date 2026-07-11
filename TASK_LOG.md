@@ -98,25 +98,42 @@ Implement the first playable curated challenge using the existing Tap Sprint ide
 ## Cycle 3
 
 - **Date/time:** 2026-07-11T12:40:48+03:00
-- **Status:** in progress
+- **Completed at:** 2026-07-11T12:54:34+03:00
+- **Status:** completed
 - **Selected task:** Turn the featured Tap Sprint challenge into one real 20-second playable attempt.
 - **Goal:** Let a visitor move from discovery into a deterministic tap-counting game with a visible countdown, completion state, replay, and return action.
-- **Why selected:** `main` has completed landing/discovery, no continuity PR is open, and the first playable curated challenge is the earliest incomplete roadmap stage.
+- **Why selected:** `main` had completed landing/discovery, no continuity PR was open, and the first playable curated challenge was the earliest incomplete roadmap stage.
 - **Viral-loop impact:** Completes the Play step so the next cycle can introduce a focused result worth sharing.
 
-### Acceptance criteria
+### Acceptance criteria completed
 
-- The discovery primary action opens Tap Sprint and starts one 20-second attempt.
+- The discovery primary action opens Tap Sprint and immediately starts one 20-second attempt.
 - Taps count only while the attempt is running.
-- The countdown reaches zero once, cancels its timer, and ignores late taps.
+- The countdown reaches zero once, clears its timer, and ignores late taps.
 - Replay starts a clean attempt; Back resets the game and returns to discovery.
 - The gameplay view exposes live time and tap count with concise accessible status text.
-- Controls remain keyboard accessible, visibly focusable, and at least 44px high.
-- Layout remains usable at 320px and 390px without horizontal overflow or a blocked primary action.
-- Focused behavior tests cover start, tap counting, completion, late taps, replay, reset, and the page structure.
-- Source and `docs/` preview files remain synchronized.
+- Controls remain keyboard-native, visibly focusable, and at least 48px high.
+- Static layout review found no horizontal-overflow source or blocked primary action at 320px and 390px.
+- Focused behavior tests cover start, tap counting, completion, late taps, replay, reset, and page structure.
+- Source and `docs/` preview files are synchronized.
 
-### Expected files
+### Completed work
+
+- Replaced the placeholder detail toggle with a direct `Play now` action.
+- Added a dependency-free Tap Sprint state machine for idle, running, and complete states.
+- Added live countdown and tap-count rendering, safe completion, replay, and return-to-discovery behavior.
+- Added a mobile-first gameplay view and large touch target without introducing a separate result screen.
+- Added focused lifecycle tests and updated the landing structure test.
+- Updated README, roadmap, changelog, and generated repository preview files.
+
+### Intentional non-goals preserved
+
+- No dedicated score/result screen beyond concise completion feedback.
+- No share or copy-link behavior.
+- No friend attempt, comparison, share-again, analytics, challenge variety, or challenge creation.
+- No dependency, framework, backend, login, workflow restoration, or architecture change.
+
+### Files changed
 
 - `index.html`
 - `styles.css`
@@ -131,25 +148,53 @@ Implement the first playable curated challenge using the existing Tap Sprint ide
 - `CHANGELOG.md`
 - `TASK_LOG.md`
 
-### Explicit non-goals
+### Verification
 
-- No dedicated score/result screen beyond concise completion feedback.
-- No share or copy-link behavior.
-- No friend attempt, comparison, share-again, analytics, challenge variety, or challenge creation.
-- No dependency, framework, backend, login, workflow restoration, or architecture change.
+- `npm test`: passed using Node.js `v22.16.0`; 5 tests passed, 0 failed.
+- `npm run build`: passed; 3 files copied to `dist/` and `docs/`.
+- `node --check app.js`: passed.
+- Committed Git blob hashes matched the freshly tested `index.html`, `styles.css`, `app.js`, and both test files.
+- Source/output comparison: `index.html`, `styles.css`, and `app.js` matched their generated `docs/` files byte-for-byte.
+- Static mobile review: 320px body minimum, fluid `min(100%, 30rem)` shell, `minmax(0, 1fr)` score columns, full-width controls, and no fixed-width overflow source at 320px or 390px.
+- Accessibility review: labelled discovery and gameplay sections, keyboard-native buttons, visible `:focus-visible` outlines, 48px minimum controls, focus transfer on state changes, and polite completion status announcement.
+- Security/privacy review: no URL, clipboard, storage, untrusted HTML, secret, token, environment value, analytics, personal data, or executable user content was added.
+- GitHub Actions/status checks: none were available because the owner removed the workflow; no automated status was claimed.
+- **Preview status:** repository preview output verified for the merged gameplay content; live deployed and interactive browser preview were unavailable in the execution environment.
 
-### Strategic review
+### Review findings and resolution
 
-1. The direction remains aligned with Discover → Play → Result → Share.
-2. The largest product bottleneck is the lack of any playable action after discovery.
-3. The largest delivery risk remains unavailable automated CI and live browser tooling.
-4. No new evidence invalidates the static dependency-free architecture.
-5. A single deterministic Tap Sprint attempt is still the highest-impact small task.
+- Reviewed the complete 12-file PR diff, including source, tests, generated preview files, and documentation.
+- Confirmed one-task scope, acceptance-criteria alignment, source/preview synchronization, base branch, dependency order, mergeability, accessibility, mobile layout, security, privacy, tests, and build evidence.
+- No blocking or non-blocking code findings remained.
+- No external review comments, unresolved review threads, requested changes, merge conflicts, or CI statuses existed.
+- Recorded a factual self-review comment; no independent approval was claimed.
+
+### Git and merge outcome
+
+- Product branch: `agent/cycle-3-tap-sprint-main`.
+- Product branch head SHA: `914eb7305adcd518df5f7adbc51ad6c017af1762`.
+- Pull request: #13 — `feat(gameplay): add playable tap sprint`.
+- Base branch: `main`.
+- Merge method: squash.
+- Merge outcome: successfully merged on 2026-07-11T12:54:34+03:00 using the expected head SHA.
+- Merge SHA: `cc3eaa45c8fc3d1eb46a3090292e5ba291c917c5`.
+
+### Decision
+
+No new product or architecture decision. The existing static HTML, CSS, and JavaScript architecture remains sufficient for the next focused result-state cycle.
 
 ### Product thinking
 
-1. The missing Play step blocks every later result and sharing step.
-2. Immediate countdown and tap feedback should make the original player finish the attempt.
-3. A fast, understandable mechanic creates a result a friend can later reproduce.
-4. The smallest proof is one start/tap/countdown/complete/reset state machine wired to the existing challenge.
-5. Parked idea: add a subtle three-count start cue only if later usability evidence shows accidental early taps; do not implement it now.
+1. The missing Play step was the blocker and is now resolved.
+2. Immediate countdown and tap feedback give the original player a clear reason to finish the attempt.
+3. The short reproducible mechanic creates a score a friend can later attempt from a shared link.
+4. The minimum proof was one start/tap/countdown/complete/reset state machine wired to the existing challenge.
+5. Parked idea remains a subtle three-count start cue only if future usability evidence shows accidental early taps.
+
+### Remaining limitation
+
+Live deployed-preview verification, interactive browser exercise, and automated GitHub Actions validation remain unavailable in the current environment. Repository preview output and focused local behavior were verified instead.
+
+### Next suggested task
+
+Implement the focused score/result state using the validated Tap Sprint completion snapshot. Do not add sharing until the result state is complete.
