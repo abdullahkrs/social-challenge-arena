@@ -34,6 +34,7 @@ test('shared result state rejects malformed, duplicated, unsupported, or oversiz
   assert.equal(parseSharedResultHash('#v=1&challenge=tap-sprint&score=10&duration=20&extra=x'), null);
   assert.equal(parseSharedResultHash('#v=1&challenge=tap-sprint&score=1000001&duration=20'), null);
   assert.equal(parseSharedResultHash('#v=1&challenge=tap-sprint&score=10&duration=19'), null);
+  assert.equal(parseSharedResultHash(`#${'x'.repeat(181)}`), null);
   assert.throws(() => createSharedResultUrl(10, 20, 'file:///tmp/index.html'), /HTTP or HTTPS/);
 });
 
@@ -73,6 +74,11 @@ test('share action falls back to clipboard and respects cancellation', async () 
     }
   });
   assert.equal(cancelledOutcome, 'cancelled');
+});
+
+test('share action reports unavailable when browser share and clipboard are absent', async () => {
+  const outcome = await shareResultLink('https://example.com/#score', { navigatorObject: {} });
+  assert.equal(outcome, 'unavailable');
 });
 
 test('share action rejects non-HTTP links before invoking browser APIs', async () => {
