@@ -43,7 +43,9 @@ function attachPrivacySafeInstrumentation(documentObject, options = {}) {
     startFriend: find('start-friend-attempt'),
     start: find('start-challenge'),
     share: find('share-result'),
+    resultReplay: find('result-replay'),
     shareAgain: find('share-again'),
+    comparisonReplay: find('comparison-replay'),
     shareStatus: find('share-status'),
     shareAgainStatus: find('comparison-share-status')
   };
@@ -56,7 +58,9 @@ function attachPrivacySafeInstrumentation(documentObject, options = {}) {
   elements.start.addEventListener('click', () => metrics.track('challenge_started'));
   elements.startFriend.addEventListener('click', () => metrics.track('challenge_started'));
   elements.share.addEventListener('click', () => metrics.track('share_attempted'));
+  elements.resultReplay.addEventListener('click', () => metrics.track('challenge_started'));
   elements.shareAgain.addEventListener('click', () => metrics.track('share_again_attempted'));
+  elements.comparisonReplay.addEventListener('click', () => metrics.track('challenge_started'));
 
   let resultVisible = !elements.resultView.hidden;
   let comparisonVisible = !elements.comparisonView.hidden;

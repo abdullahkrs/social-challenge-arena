@@ -94,14 +94,14 @@ Historical completed cycles 1–6 are preserved byte-for-byte in [`TASK_LOG_ARCH
 
 ### Verification
 
-- **Verification completed at:** 2026-07-11T19:00:09+03:00.
+- **Verification completed at:** 2026-07-11T19:15:19+03:00.
 - `node --version`: `v22.16.0`.
 - `npm test`: passed in a fresh verification workspace; 29 tests passed, 0 failed.
 - `npm run build`: passed; 4 files copied to `dist/` and `docs/`.
 - `node --check app.js`: passed.
 - `node --check metrics.js`: passed.
-- Product source blobs are `f8a729ae9a3cd571aa188b259da5687f3060ca08` for `index.html`, unchanged `e234c53c78930a106396538c8080fba8b37915bc` for `styles.css`, unchanged `ee38b6e46c31ba0b156fbe2ebf478452065891c2` for `app.js`, and `97fa1545400e920ea9bd6806760be366016e4b0f` for `metrics.js`.
-- Focused test blobs are `d06bdf16f3860871421d847fb20930915e7e74c2` for `test/instrumentation.test.js` and `d25f5e5a075fe8b528f5d7f6437ae80f61c90cf6` for `tests/baseline.test.js`.
+- Product source blobs are `f8a729ae9a3cd571aa188b259da5687f3060ca08` for `index.html`, unchanged `e234c53c78930a106396538c8080fba8b37915bc` for `styles.css`, unchanged `ee38b6e46c31ba0b156fbe2ebf478452065891c2` for `app.js`, and `308e93935636c584dc80b84ecbf5f787673ffa16` for `metrics.js`.
+- Focused test blobs are `4a5c6c2c3a723aae9e48d9b164641984e159d1bc` for `test/instrumentation.test.js` and `d25f5e5a075fe8b528f5d7f6437ae80f61c90cf6` for `tests/baseline.test.js`.
 - Source/output comparison: `index.html`, `styles.css`, `app.js`, and `metrics.js` match their generated `docs/` files byte-for-byte.
 - Static mobile review: no markup or style visible to users changed beyond a deferred script tag; the existing fluid 320px minimum, 390px review width, full-width controls, bounded content, and no-horizontal-overflow behavior remain unchanged.
 - Accessibility review: product structure, focus order, labels, live regions, and keyboard controls are unchanged; instrumentation only observes existing transitions.
@@ -113,10 +113,10 @@ Historical completed cycles 1–6 are preserved byte-for-byte in [`TASK_LOG_ARCH
 
 - Reviewed the complete candidate diff for one-task scope, Stage 9 acceptance criteria, event semantics, transition deduplication, successful-share counting, privacy boundaries, security, accessibility, mobile behavior, build inclusion, source/preview synchronization, documentation accuracy, and secret-like strings.
 - The task-log rollover preserves the exact prior `TASK_LOG.md` blob `4f59dc986cdc2067e08fb96ac67ad0f16c99bb6b`; no Cycle 7–8 history is lost.
-- No blocking or non-blocking correctness, security, privacy, accessibility, mobile, test, build, dependency, or scope finding remains in the candidate diff.
-- Reviewed PR #25 as mergeable against `main`; no comments, reviews, unresolved threads, conflicts, workflow runs, or commit statuses exist.
-- No blocking or non-blocking finding remains after the full pull-request review.
-- A factual self-review comment will be recorded before squash merge; no independent approval is claimed.
+- Blocking review finding: replay actions were not counted as `challenge_started`, which could make repeat completions exceed starts and distort attempt rates.
+- Resolution: instrumented both result and comparison replay buttons, expanded ordinary and friend-loop tests to cover repeat starts and completions, regenerated `docs/`, and reran all checks successfully.
+- The earlier factual self-review comment was superseded by this review finding; a new final self-review will be recorded after the fix is committed and re-reviewed.
+- PR #25 remains targeted at `main`; comments, reviews, threads, mergeability, conflicts, and current-head statuses will be rechecked before merge.
 
 ### Git and merge outcome
 

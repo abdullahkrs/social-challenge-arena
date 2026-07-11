@@ -60,7 +60,9 @@ function createFakeDocument({ friendVisible = false } = {}) {
     '#start-friend-attempt': new FakeElement(),
     '#start-challenge': new FakeElement(),
     '#share-result': new FakeElement(),
+    '#result-replay': new FakeElement(),
     '#share-again': new FakeElement(),
+    '#comparison-replay': new FakeElement(),
     '#share-status': new FakeElement(),
     '#comparison-share-status': new FakeElement()
   };
@@ -107,11 +109,17 @@ test('ordinary loop instrumentation counts views, completion, and successful sha
   FakeMutationObserver.notify(elements['#share-status'], 'childList');
   FakeMutationObserver.notify(elements['#share-status'], 'childList');
 
+  elements['#result-view'].hidden = true;
+  FakeMutationObserver.notify(elements['#result-view']);
+  elements['#result-replay'].click();
+  elements['#result-view'].hidden = false;
+  FakeMutationObserver.notify(elements['#result-view']);
+
   assert.deepEqual(metrics.snapshot(), {
     challenge_viewed: 1,
-    challenge_started: 1,
-    challenge_completed: 1,
-    result_viewed: 1,
+    challenge_started: 2,
+    challenge_completed: 2,
+    result_viewed: 2,
     share_attempted: 1,
     share_completed: 1,
     shared_link_opened: 0,
@@ -135,16 +143,22 @@ test('friend loop instrumentation counts shared entry, comparison, and share-aga
   elements['#comparison-share-status'].textContent = 'Shared.';
   FakeMutationObserver.notify(elements['#comparison-share-status'], 'childList');
 
+  elements['#comparison-view'].hidden = true;
+  FakeMutationObserver.notify(elements['#comparison-view']);
+  elements['#comparison-replay'].click();
+  elements['#comparison-view'].hidden = false;
+  FakeMutationObserver.notify(elements['#comparison-view']);
+
   assert.deepEqual(metrics.snapshot(), {
     challenge_viewed: 0,
-    challenge_started: 1,
-    challenge_completed: 1,
+    challenge_started: 2,
+    challenge_completed: 2,
     result_viewed: 0,
     share_attempted: 0,
     share_completed: 1,
     shared_link_opened: 1,
-    friend_completed: 1,
-    comparison_viewed: 1,
+    friend_completed: 2,
+    comparison_viewed: 2,
     share_again_attempted: 1
   });
 });
