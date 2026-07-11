@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.5.0 — 2026-07-11
+
+### Added
+
+- One primary `Share score` action on the Tap Sprint result view.
+- Strict versioned result-link creation and parsing.
+- Web Share, clipboard, and visible-link fallback behavior.
+- Accessible share-status announcements and focused URL/share tests.
+
+### Changed
+
+- Invalid incoming result fragments are removed before they can be consumed.
+- Replay and discovery remain available as secondary result actions.
+
 ## 0.4.0 — 2026-07-11
 
 ### Added
