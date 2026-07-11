@@ -66,6 +66,11 @@ test('shared result cleanup removes only the fragment and preserves a safe path 
   assert.equal(clearSharedResultHash(null, historyObject), false);
   assert.equal(clearSharedResultHash({ pathname: 'javascript:alert(1)', search: 'unsafe=1' }, historyObject), true);
   assert.equal(replacement, '/');
+  assert.equal(clearSharedResultHash({ pathname: '//evil.example', search: '' }, historyObject), true);
+  assert.equal(replacement, '/');
+  assert.equal(clearSharedResultHash({ pathname: '/arena/', search: '' }, {
+    replaceState() { throw new Error('blocked'); }
+  }), false);
 });
 
 test('friend entry is accessible, mobile-safe, and stops before comparison', () => {
