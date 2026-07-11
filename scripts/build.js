@@ -1,7 +1,7 @@
 const { copyFileSync, existsSync, mkdirSync, rmSync } = require('node:fs');
 const { join } = require('node:path');
 
-const requiredFiles = ['index.html', 'styles.css', 'app.js'];
+const requiredFiles = ['index.html', 'styles.css', 'app.js', 'metrics.js'];
 const outputDirectories = ['dist', 'docs'];
 
 for (const file of requiredFiles) {

@@ -1,5 +1,22 @@
 # Changelog
 
+## 0.9.0 — 2026-07-11
+
+### Added
+
+- Dependency-free allowlisted in-memory counters for the completed viral loop.
+- Separate ordinary-discovery and validated shared-link entry counts.
+- Focused tests for event transitions, successful-share counting, and forbidden persistence or network sinks.
+
+### Changed
+
+- The build and GitHub Pages preview now include `metrics.js` after the application script.
+- Stage 9 documentation now defines the implemented privacy boundary and aggregate event meanings.
+
+### Privacy
+
+- No event payload, score, URL, timestamp, identity, device data, cookie, persistent storage, network request, backend, or third-party analytics destination was added.
+
 ## 0.8.0 — 2026-07-11
 
 ### Added

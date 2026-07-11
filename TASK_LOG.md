@@ -58,3 +58,79 @@ Historical completed cycles 1–6 are preserved byte-for-byte in [`TASK_LOG_ARCH
 3. A friend is more likely to trust and compete when the shared URL and score are not copied into analytics or persistent storage.
 4. The smallest proof is one dependency-free allowlisted counter attached to existing DOM transitions and share outcomes.
 5. Parked idea: consider an explicit privacy-reviewed analytics destination only after a separate product and architecture decision.
+
+### Completed work
+
+- Added a frozen allowlist for the ten planned funnel events and an in-memory aggregate-only counter with immutable snapshots.
+- Added dependency-free DOM instrumentation that distinguishes ordinary discovery from validated shared-link entry and observes existing result, comparison, share, and share-again transitions.
+- Counted successful sharing only when the existing UI status becomes `Shared.` or `Link copied.`; cancellation and unavailable fallback states do not increment completion.
+- Exposed only a non-enumerable, read-only `window.socialChallengeMetrics` aggregate collector for local session inspection.
+- Loaded `metrics.js` after `app.js`, included it in the existing build, and generated synchronized `docs/` preview output.
+- Added focused tests for allowlist enforcement, frozen aggregate snapshots, ordinary and friend loop transitions, successful-share deduplication, script order, and forbidden persistence/network/time/location sinks.
+- Updated README, roadmap, metrics documentation, changelog, and the active task log.
+- Preserved completed Cycles 7–8 byte-for-byte in `TASK_LOG_ARCHIVE_CYCLES_7_8.md` using the exact previous active-log blob.
+
+### Intentional non-goals preserved
+
+- No external analytics destination, network delivery, persistent storage, cookies, identifiers, login, backend, score or URL recording, user-facing metrics panel, challenge variety, challenge creation, dependency, framework, visual redesign, app-state refactor, or unrelated cleanup.
+
+### Files changed
+
+- `metrics.js`
+- `index.html`
+- `scripts/build.js`
+- `test/instrumentation.test.js`
+- `tests/baseline.test.js`
+- `docs/index.html`
+- `docs/metrics.js`
+- `README.md`
+- `ROADMAP.md`
+- `METRICS.md`
+- `CHANGELOG.md`
+- `TASK_LOG.md`
+- `TASK_LOG_ARCHIVE_CYCLES_7_8.md`
+
+`app.js`, `styles.css`, `docs/app.js`, and `docs/styles.css` remain unchanged.
+
+### Verification
+
+- **Verification completed at:** 2026-07-11T19:00:09+03:00.
+- `node --version`: `v22.16.0`.
+- `npm test`: passed in a fresh verification workspace; 29 tests passed, 0 failed.
+- `npm run build`: passed; 4 files copied to `dist/` and `docs/`.
+- `node --check app.js`: passed.
+- `node --check metrics.js`: passed.
+- Product source blobs are `f8a729ae9a3cd571aa188b259da5687f3060ca08` for `index.html`, unchanged `e234c53c78930a106396538c8080fba8b37915bc` for `styles.css`, unchanged `ee38b6e46c31ba0b156fbe2ebf478452065891c2` for `app.js`, and `97fa1545400e920ea9bd6806760be366016e4b0f` for `metrics.js`.
+- Focused test blobs are `d06bdf16f3860871421d847fb20930915e7e74c2` for `test/instrumentation.test.js` and `d25f5e5a075fe8b528f5d7f6437ae80f61c90cf6` for `tests/baseline.test.js`.
+- Source/output comparison: `index.html`, `styles.css`, `app.js`, and `metrics.js` match their generated `docs/` files byte-for-byte.
+- Static mobile review: no markup or style visible to users changed beyond a deferred script tag; the existing fluid 320px minimum, 390px review width, full-width controls, bounded content, and no-horizontal-overflow behavior remain unchanged.
+- Accessibility review: product structure, focus order, labels, live regions, and keyboard controls are unchanged; instrumentation only observes existing transitions.
+- Security/privacy review: the allowlist accepts only fixed event names; snapshots contain integers only; no payload, score, URL, fragment, timestamp, identity, device data, personal data, cookie, storage, network API, backend, token, or secret is collected or transmitted.
+- GitHub Actions/status checks remain unavailable because the owner removed the workflow; no automated CI success is claimed.
+- **Preview status:** repository preview output verified for the current instrumentation source blobs.
+
+### Review findings and resolution
+
+- Reviewed the complete candidate diff for one-task scope, Stage 9 acceptance criteria, event semantics, transition deduplication, successful-share counting, privacy boundaries, security, accessibility, mobile behavior, build inclusion, source/preview synchronization, documentation accuracy, and secret-like strings.
+- The task-log rollover preserves the exact prior `TASK_LOG.md` blob `4f59dc986cdc2067e08fb96ac67ad0f16c99bb6b`; no Cycle 7–8 history is lost.
+- No blocking or non-blocking correctness, security, privacy, accessibility, mobile, test, build, dependency, or scope finding remains in the candidate diff.
+- Pull-request comments, review threads, mergeability, conflicts, and final head status remain to be checked before merge.
+
+### Git and merge outcome
+
+- Product branch: `agent/cycle-9-privacy-safe-metrics` created from `main` at `0b8183eab23d6458f1116957c932a4c5aad4696e`.
+- Planning commit: `f5cbb1342ecb0d5506ac16fec3cf44da36961df2`.
+- Pull request: pending creation against `main`.
+- Merge method: squash with expected head SHA when final review is clean.
+
+### Decision
+
+No new external-service or architecture decision. A dependency-free in-memory collector is an implementation of the already documented privacy-safe metrics plan and does not establish a persistent analytics destination.
+
+### Remaining limitation
+
+The counters are intentionally session-local and disappear on reload, so they prove event semantics and privacy boundaries but do not yet support cross-session product analysis. Live deployed-preview interaction and automated GitHub Actions validation remain unavailable.
+
+### Next suggested task
+
+Add curated challenge variety using reusable data-driven definitions, with at least six playable challenges across three meaningful categories and two difficulty levels. Keep the completed sharing loop and instrumentation generic; do not add private creation yet.

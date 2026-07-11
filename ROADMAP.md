@@ -14,8 +14,8 @@ Active MVP development.
 6. Friend attempt opened from the shared link — complete.
 7. Original-player and friend comparison — complete.
 8. Share-again action from the comparison — complete.
-9. Basic privacy-safe MVP event instrumentation — next.
-10. Curated challenge variety.
+9. Basic privacy-safe MVP event instrumentation — complete.
+10. Curated challenge variety — next.
 11. Lightweight private challenge creation.
 
 ## Completed stage evidence
@@ -83,3 +83,12 @@ Active MVP development.
 - Cancelled sharing keeps the fallback hidden; unavailable APIs reveal only the validated HTTP(S) link.
 - Replay remains secondary and retains the original target; returning to challenges clears shared context.
 - No identity, storage, backend, analytics, or shared-link schema expansion was introduced.
+
+### Stage 9
+
+- A strict allowlist covers the ten planned viral-loop events.
+- Only aggregate integer counts are kept in memory for the current page session.
+- Ordinary discovery and validated shared-link entry are counted separately.
+- Existing result, comparison, share, and share-again transitions are observed without altering product behavior.
+- Share completion is counted only after successful Web Share or clipboard copy feedback.
+- No payloads, scores, URLs, timestamps, identities, cookies, persistence, network requests, or third-party analytics were added.
