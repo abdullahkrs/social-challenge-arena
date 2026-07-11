@@ -124,3 +124,60 @@ The counters are intentionally session-local and disappear on reload, so they pr
 ### Next suggested task
 
 Add curated challenge variety using reusable data-driven definitions, with at least six playable challenges across three meaningful categories and two difficulty levels. Keep the completed sharing loop and instrumentation generic; do not add private creation yet.
+
+## Cycle 10
+
+- **Date/time:** 2026-07-11T19:40:23+03:00
+- **Status:** in progress
+- **Selected task:** Add a compact curated challenge catalog backed by reusable data-driven definitions.
+- **Goal:** Let a player select and complete any of six safe tap challenges while preserving the existing result, sharing, friend-attempt, comparison, share-again, and privacy-safe metrics loop.
+- **Why selected:** Cycle 9 is complete on `main`, no pull request is open, and curated challenge variety is the earliest incomplete roadmap stage.
+- **Viral-loop impact:** Gives sharers more challenge choices without changing the validated no-login link flow, making repeat play and friend competition less repetitive.
+
+### Acceptance criteria
+
+- Provide at least six playable curated challenges.
+- Cover at least three meaningful categories and both Easy and Hard difficulty levels.
+- Store challenge metadata in frozen reusable data-driven definitions with unique allowlisted IDs and bounded durations.
+- Keep one obvious primary play action on discovery; challenge choices must be keyboard accessible and expose selected state.
+- Run every challenge through the existing tap gameplay, result, share, friend attempt, comparison, share-again, and instrumentation states.
+- Encode the selected challenge ID and its exact allowlisted duration in shared links; reject unknown IDs and mismatched durations.
+- Preserve the no-login, no-storage, no-backend, aggregate-only privacy boundaries.
+- Keep source files and `docs/` preview output synchronized.
+- Add focused catalog and shared-state tests, then run the complete test and build commands.
+- Check the compact catalog statically for 320px and 390px layouts with no fixed-width overflow source.
+
+### Expected files
+
+- `TASK_LOG.md`
+- `app.js`
+- `index.html`
+- `styles.css`
+- `test/challenge-variety.test.js`
+- `docs/app.js`
+- `docs/index.html`
+- `docs/styles.css`
+- `README.md`
+- `ROADMAP.md`
+- `CHANGELOG.md`
+
+### Explicit non-goals
+
+- No user-created challenges, custom text input, identity, login, storage, backend, leaderboard, public feed, analytics destination, new dependency, framework, architecture migration, unrelated refactor, or broad visual redesign.
+- No new scoring mechanic in this cycle; all six curated entries intentionally reuse the validated tap-count mechanic with different safe durations and themes.
+
+### Strategic review
+
+- The direction remains aligned with the north star because the complete loop already works and variety now reduces repeat-play fatigue.
+- The largest product bottleneck is having only one curated challenge after the loop is complete.
+- The largest technical risk is leaving share parsing tied to Tap Sprint and accidentally accepting an arbitrary challenge or duration.
+- No new evidence invalidates the static architecture, existing tap engine, strict fragment codec, or privacy-safe instrumentation.
+- A six-item data-driven catalog that reuses the current mechanic is the highest-impact narrow Stage 10 implementation.
+
+### Product thinking
+
+1. The missing catalog and challenge-aware shared state block the next core-loop improvement.
+2. A short set of visibly different durations and themes makes the original player more likely to replay and share a preferred challenge.
+3. A friend is more likely to compete when the shared challenge name and duration are preserved exactly.
+4. The smallest proof is six allowlisted definitions, a compact selector, and generic challenge-aware URL validation around the existing tap engine.
+5. Parked idea: add additional validated mechanics only after private creation is complete or evidence shows tap variants are insufficient.
