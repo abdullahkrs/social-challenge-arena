@@ -4,7 +4,7 @@
 
 - **Status:** ready to run manually; no result has been collected.
 - **Purpose:** Find the largest real drop in the complete Discover → Play → Result → Share → Friend Competes → Compare → Share Again loop before adding another feature or analytics destination.
-- **Hypothesis:** In a controlled one-attempt handoff, at least 70% of valid friend-link opens reach comparison, at least 50% of comparisons reach a successful re-share, and no critical core-path blocker appears.
+- **Hypothesis:** In a controlled one-attempt handoff, at least 70% of valid friend-link opens produce a completed friend attempt, at least 50% of re-share attempts complete successfully, at least 40% of ordinary discovery sessions close the end-to-end loop, and no critical core-path blocker appears.
 - **Fixed challenge:** Tap Sprint, 20 seconds. Use one challenge to keep gameplay variance out of the social-handoff test.
 - **Sample:** 10 sequential sharer-and-friend pairs. Continue only when at least 8 pairs produce valid sessions.
 
