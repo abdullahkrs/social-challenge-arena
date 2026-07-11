@@ -6,7 +6,8 @@ Historical completed cycles 1–6 are preserved in [`TASK_LOG_ARCHIVE_CYCLES_1_6
 
 - **Date/time:** 2026-07-12T00:42:31+03:00
 - **Verification completed at:** 2026-07-12T01:20:00+03:00
-- **Status:** implementation complete, reviewed, and ready for squash merge through PR #40
+- **Merge verified at:** 2026-07-12T01:26:11+03:00
+- **Status:** complete; implementation squash-merged into `main`
 - **Selected task:** Add one original three-lane dodge challenge named Lane Guard.
 - **Goal:** Add a genuinely different mechanic where the player chooses among three lanes to avoid six deterministic incoming obstacles, earns bounded points for cleared waves, receives clear collision feedback, and completes the existing result, sharing, friend-attempt, comparison, metrics, and navigation loop.
 - **Why selected:** No pull request was open, Cycle 14 was merged and closed, Roadmap Stage 10 was the earliest incomplete stage, and the previous cycle identified one lane-dodge challenge as the next smallest diversity task.
@@ -70,7 +71,8 @@ Historical completed cycles 1–6 are preserved in [`TASK_LOG_ARCHIVE_CYCLES_1_6
 - Chromium at 320px verified all nine discovery options, native freeze restoration, no horizontal overflow, native lane-button focus, a complete six-wave 600-point result, and a validated shared URL containing `challenge=lane-guard` and `score=600`.
 - Chromium at 400px verified a shared 400-point friend invitation, `6 waves` format, point-aware target wording, no horizontal overflow, and reduced-motion computed styles with transitions and feedback animation disabled.
 - Source/preview parity passed: `index.html` and `docs/index.html` use Git blob `65a2fcdb66fc798235b5108ea8b0fe31ded2baf2`; `catalog-bootstrap.js` and its preview copy use `e1d346ad85cbcf65ed0e5f1ac1f22623877031f2`; `lane-guard.js` and its preview copy use `e5b859878c97a36e51c5003733575d4e42084c2a`; unchanged `app.js` and `docs/app.js` use `e2a6692e864c90c25f3826723ed47a35393456b6`.
-- The branch was created directly from `main` at `5ca82530cc0cf5ad0f368c4ca4673022e4edf341`, remains zero commits behind, and is limited to the 14 expected files.
+- The implementation branch was created directly from `main` at `5ca82530cc0cf5ad0f368c4ca4673022e4edf341`, remained zero commits behind, and was limited to the 14 expected files.
+- Merge closure verification confirmed that PR #40 is closed and merged, its base is `main`, its final reviewed head is `a955e0689ebb77009953bc7f6cfb433344e1e478`, and its squash merge SHA is `3cefdd975fe2a5cb53a3e887fb4e0fa36536de8b`.
 - A complete repository checkout was unavailable because the execution environment could not resolve `github.com`; verification therefore used exact branch content reconstructed through the repository API. No broader checkout claim is made.
 - No lint or type-check command is configured. GitHub Actions and status checks remain absent by repository-owner direction.
 
@@ -105,7 +107,7 @@ Historical completed cycles 1–6 are preserved in [`TASK_LOG_ARCHIVE_CYCLES_1_6
 ### Review findings and resolutions
 
 - Blocking global-state risk reviewed: temporarily intercepting `Object.freeze` could affect unrelated values or remain installed.
-- Resolution: the bootstrap recognizes only the exact eight-item curated catalog signature, restores native freeze before returning the expanded catalog, includes a defensive restore hook, and is covered by unit and Chromium restoration checks.
+- Resolution: the bootstrap recognizes only the exact eight-item curated catalog signature, restores native freeze before returning, has a defensive restore hook, and is covered by unit and Chromium restoration checks.
 - Blocking lifecycle risk reviewed: queued obstacle or feedback callbacks could survive replay, navigation, collision, or completion.
 - Resolution: all transitions use one timeout handle and cleanup tests cover reset and destroy from movement and feedback states.
 - Blocking accessibility risk reviewed: obstacle position and collision could be visual-only.
@@ -114,19 +116,21 @@ Historical completed cycles 1–6 are preserved in [`TASK_LOG_ARCHIVE_CYCLES_1_6
 - Resolution: reduced-motion CSS explicitly removes obstacle transitions and all clear or hit animation; Chromium computed-style checks pass.
 - Blocking social-loop duplication risk reviewed: a separate result or sharing system would broaden scope and fragment validation.
 - Resolution: the adapter maps the dodge score into the existing completion callbacks, strict challenge allowlist, share codec, friend invitation, comparison, metrics, and navigation paths.
-- Complete PR scope, changed filenames, source and preview parity, code paths, tests, documentation, mobile behavior, accessibility, motion safety, security, privacy, originality, strict score bounds, and secrets were reviewed. No unresolved blocking finding remains.
+- Complete PR scope, changed filenames, source and preview parity, code paths, tests, documentation, mobile behavior, accessibility, motion safety, security, privacy, originality, strict score bounds, and secrets were reviewed. No unresolved blocking finding remained at merge.
 - No independent approval is claimed; this is a documented self-review.
 
 ### Git and merge outcome
 
-- Branch: `agent/cycle-15-lane-guard`, created directly from `main` at `5ca82530cc0cf5ad0f368c4ca4673022e4edf341`.
+- Implementation branch: `agent/cycle-15-lane-guard`, created directly from `main` at `5ca82530cc0cf5ad0f368c4ca4673022e4edf341`.
 - Pull request: #40 — `feat(challenges): add Lane Guard dodge mechanic`, targeting `main`.
-- Merge method: squash merge required after the final clean review.
-- The immutable merge result and merge SHA are authoritative in PR #40 metadata because they cannot truthfully be known inside the same implementation PR before GitHub accepts the merge. They are recorded in the final cycle report and PR conversation immediately after merge.
+- Final reviewed head SHA: `a955e0689ebb77009953bc7f6cfb433344e1e478`.
+- Squash merge completed at 2026-07-12T01:25:59+03:00.
+- Merge SHA: `3cefdd975fe2a5cb53a3e887fb4e0fa36536de8b`.
+- GitHub reports PR #40 as closed and merged with no remaining conflict or open review requirement.
 
 ### Preview status
 
-Repository preview output verified for the relevant commit through exact source/`docs/` Git blob parity, a passing build, and focused Chromium checks at 320px and 400px. Live deployed behavior is not claimed.
+Repository preview output verified for the relevant implementation commit through exact source/`docs/` Git blob parity, a passing build, and focused Chromium checks at 320px and 400px. Live deployed behavior is not claimed.
 
 ### Decision
 
