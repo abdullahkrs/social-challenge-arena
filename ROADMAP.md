@@ -10,8 +10,8 @@ Active MVP development.
 2. Mobile-first landing/discovery state — complete.
 3. First playable curated challenge — complete.
 4. Focused score/result state — complete.
-5. Share or copy challenge/result link — next.
-6. Friend attempt opened from the shared link.
+5. Share or copy challenge/result link — complete.
+6. Friend attempt opened from the shared link — next.
 7. Original-player and friend comparison.
 8. Share-again action from the comparison.
 9. Basic privacy-safe MVP event instrumentation.
@@ -50,3 +50,11 @@ Active MVP development.
 - Concise deterministic feedback avoids fabricated rankings or records.
 - Replay begins a clean attempt and the secondary action resets to discovery.
 - Result values are written with safe DOM text APIs and announced accessibly.
+
+### Stage 5
+
+- The focused result view exposes one primary share action.
+- A canonical fragment URL carries only a bounded version, challenge ID, score, and duration.
+- Strict parsing rejects malformed, duplicate, extra, unsupported, mismatched, or oversized state.
+- Web Share is preferred, clipboard is the fallback, and a visible validated link remains available when neither succeeds.
+- Friend-attempt presentation and comparison remain deferred to their roadmap stages.
