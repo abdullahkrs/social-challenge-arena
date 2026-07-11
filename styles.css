@@ -50,7 +50,8 @@ button { font: inherit; }
 .game-instruction,
 .game-status,
 .result-score,
-.result-message { margin: 0; }
+.result-message,
+.share-status { margin: 0; }
 
 .eyebrow {
   color: #c4b5fd;
@@ -75,7 +76,8 @@ h1 {
 .challenge-meta,
 .game-instruction,
 .game-status,
-.result-message {
+.result-message,
+.share-status {
   color: #cbd5e1;
   line-height: 1.5;
 }
@@ -139,7 +141,8 @@ h2 {
 
 .primary-action:focus-visible,
 .secondary-action:focus-visible,
-.tap-action:focus-visible {
+.tap-action:focus-visible,
+.share-fallback:focus-visible {
   outline: 3px solid #c4b5fd;
   outline-offset: 3px;
 }
@@ -229,6 +232,23 @@ h2 {
 .result-message {
   max-width: 26ch;
   font-weight: 700;
+}
+
+.share-status {
+  min-height: 1.5rem;
+  text-align: center;
+  font-weight: 700;
+}
+
+.share-fallback {
+  display: block;
+  max-width: 100%;
+  padding: 0.75rem;
+  border: 1px solid rgba(196, 181, 253, 0.42);
+  border-radius: 0.9rem;
+  color: #ddd6fe;
+  overflow-wrap: anywhere;
+  text-align: center;
 }
 
 .sr-only {
