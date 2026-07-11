@@ -2,14 +2,22 @@
 
 ## Unreleased
 
+### Added
+
+- Center Snap, an original three-stop timing challenge with a moving marker and distance-based scoring up to 3,000 points.
+- Centered, near, and missed feedback plus text announcements for every stop.
+- Focused tests for scoring, reduced motion, timer cancellation, strict shared-state bounds, and source/preview structure.
+
 ### Changed
 
-- Corrected the product-state classification: the six curated entries are six definitions but only one timed tap-count gameplay mechanic.
-- Reopened curated challenge variety until the catalog contains at least four genuinely different mechanics while preserving the shared social competition loop.
+- Curated discovery now contains seven playable entries and two genuinely different gameplay mechanics.
+- Result, friend invitation, comparison, and share copy now use challenge-aware score units and round formats.
+- Reduced-motion users receive slower discrete marker movement with decorative interpolation and feedback animation disabled.
 
-### Scope
+### Privacy and scope
 
-- No playable mechanic, animation, preview asset, dependency, shared-link schema, metric, or private-creation behavior changed in this documentation-only correction.
+- Center Snap reuses the existing strict shared-link codec, result, friend-attempt, comparison, share-again, metrics, and navigation flows.
+- No login, identity, persistence, backend, cookie, analytics destination, dependency, framework, copied game identity, private-creation change, or shared-link schema expansion was added.
 
 ## 0.11.0 — 2026-07-11
 

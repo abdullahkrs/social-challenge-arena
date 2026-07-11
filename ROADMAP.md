@@ -2,7 +2,7 @@
 
 ## Current repository state
 
-Active MVP development. The no-login social loop and lightweight private creation are implemented, but curated challenge variety is reopened because all six curated entries still use one timed tap mechanic.
+Active MVP development. The no-login social loop and lightweight private creation are implemented. Curated challenge variety remains in progress with seven playable entries and two genuinely different mechanics: timed tap count and three-stop center timing.
 
 ## MVP stages
 
@@ -97,17 +97,19 @@ Active MVP development. The no-login social loop and lightweight private creatio
 
 Current implementation evidence:
 
-- Six frozen data-driven curated definitions cover Speed, Rhythm, and Endurance labels.
-- Each category includes Easy and Hard entries with unique allowlisted IDs and bounded durations.
+- Seven frozen data-driven curated definitions cover Speed, Rhythm, Endurance, and Timing labels.
+- The existing six definitions continue to use the timed tap-count engine.
+- Center Snap adds a genuinely different three-stop timing mechanic with a moving marker and distance-based points scoring up to 3,000.
+- Center Snap reuses the existing result, strict shared-link codec, friend invitation, comparison, share-again, metrics, and navigation flows.
+- Marker movement and centered/near/missed feedback provide purposeful state motion; `prefers-reduced-motion` uses slower discrete steps and disables decorative animation.
 - A compact keyboard-accessible selector preserves one primary play action on discovery.
-- Shared links preserve the selected challenge and exact duration while rejecting unknown IDs and mismatches.
+- Shared links preserve the selected challenge and configured format while rejecting unknown IDs, mismatches, and Center Snap scores above 3,000.
 - Source and GitHub Pages preview files remain synchronized without dependencies, login, storage, or backend changes.
 
 Current gap:
 
-- All six entries reuse the same timed tap-count engine.
-- Differences in title, category, duration, difficulty, description, or tap target are cosmetic and do not count as different mechanics.
-- The previous Stage 10 completion claim is therefore invalid under the current product policy.
+- The curated catalog now has two genuinely different mechanics, below the required minimum of four.
+- The six tap definitions remain cosmetic variants of one mechanic despite their different names, labels, and durations.
 
 Completion gate:
 

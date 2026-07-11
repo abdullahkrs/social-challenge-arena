@@ -9,17 +9,21 @@ const {
   createFriendAttemptInvitation
 } = require('../app.js');
 
-test('curated catalog has six frozen challenges across three categories and two difficulties', () => {
-  assert.equal(curatedChallenges.length, 6);
+test('curated catalog keeps at least six frozen challenges and adds genuine mechanic variety', () => {
+  assert.ok(curatedChallenges.length >= 6);
   assert.ok(Object.isFrozen(curatedChallenges));
-  assert.equal(new Set(curatedChallenges.map(challenge => challenge.id)).size, 6);
+  assert.equal(new Set(curatedChallenges.map(challenge => challenge.id)).size, curatedChallenges.length);
   assert.deepEqual(
     [...new Set(curatedChallenges.map(challenge => challenge.category))].sort(),
-    ['Endurance', 'Rhythm', 'Speed']
+    ['Endurance', 'Rhythm', 'Speed', 'Timing']
   );
   assert.deepEqual(
     [...new Set(curatedChallenges.map(challenge => challenge.difficulty))].sort(),
     ['Easy', 'Hard']
+  );
+  assert.deepEqual(
+    [...new Set(curatedChallenges.map(challenge => challenge.mechanic || 'tap'))].sort(),
+    ['center-snap', 'tap']
   );
 
   for (const challenge of curatedChallenges) {

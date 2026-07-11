@@ -17,13 +17,13 @@
       <header class="friend-header">
         <p class="eyebrow">Friend challenge</p>
         <h1 id="friend-title">Beat this score</h1>
-        <p class="friend-meta"><span id="friend-challenge-name">Tap Sprint</span> · <span id="friend-duration">20</span> sec</p>
+        <p class="friend-meta"><span id="friend-challenge-name">Tap Sprint</span> · <span id="friend-duration">20 sec</span></p>
       </header>
 
       <div class="friend-card">
         <p class="friend-target">
           <strong id="friend-target-score">0</strong>
-          <span>taps to beat</span>
+          <span id="friend-score-unit">taps to beat</span>
         </p>
         <p class="friend-message">Same challenge. One attempt.</p>
       </div>
@@ -40,7 +40,7 @@
       <header class="hero">
         <p class="eyebrow">Social Challenge Arena</p>
         <h1 id="page-title">Pick. Play. Compete.</h1>
-        <p class="intro">Six quick challenges. One score to beat.</p>
+        <p class="intro">Quick games. One score to beat.</p>
       </header>
 
       <div class="challenge-grid" id="challenge-list" role="group" aria-label="Choose a challenge"></div>
@@ -65,12 +65,20 @@
       <div class="scoreboard" aria-label="Challenge status">
         <div class="stat">
           <strong id="time-value">20</strong>
-          <span>seconds</span>
+          <span id="time-label">seconds</span>
         </div>
         <div class="stat">
           <strong id="tap-count">0</strong>
-          <span>taps</span>
+          <span id="score-unit">taps</span>
         </div>
+      </div>
+
+      <div class="timing-board" id="timing-board" aria-label="Center timing meter" hidden>
+        <div class="timing-track" aria-hidden="true">
+          <span class="timing-zone"></span>
+          <span class="timing-marker" id="timing-marker"></span>
+        </div>
+        <p class="timing-readout" id="timing-readout">Watch the marker and stop it near the center.</p>
       </div>
 
       <button class="tap-action" id="tap-button" type="button">Tap!</button>
@@ -90,7 +98,7 @@
       <div class="result-card">
         <p class="result-score">
           <strong id="result-score">0</strong>
-          <span>taps</span>
+          <span id="result-score-unit">taps</span>
         </p>
         <p class="result-message" id="result-message">Ready for another run?</p>
       </div>
@@ -115,11 +123,11 @@
       <div class="comparison-card">
         <div class="comparison-scores" id="comparison-scores" aria-label="Tap Sprint score comparison">
           <p class="comparison-score">
-            <span>Target</span>
+            <span id="comparison-target-label">Target</span>
             <strong id="comparison-target-score">0</strong>
           </p>
           <p class="comparison-score">
-            <span>Your score</span>
+            <span id="comparison-friend-label">Your score</span>
             <strong id="comparison-friend-score">0</strong>
           </p>
         </div>

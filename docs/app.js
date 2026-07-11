@@ -58,6 +58,20 @@ const curatedChallenges = Object.freeze([
     description: 'Keep tapping through the longest curated round.',
     goal: 'Get the highest tap count in 45 seconds.',
     instruction: 'Keep your pace until the final second.'
+  }),
+  Object.freeze({
+    id: 'center-snap',
+    title: 'Center Snap',
+    category: 'Timing',
+    difficulty: 'Easy',
+    durationSeconds: 15,
+    rounds: 3,
+    mechanic: 'center-snap',
+    scoreUnit: 'points',
+    maxScore: 3000,
+    description: 'Stop the moving marker as close to the center as possible.',
+    goal: 'Score up to 3,000 points across three precise stops.',
+    instruction: 'Stop the marker near the center. You get three tries.'
   })
 ]);
 
@@ -67,6 +81,19 @@ const maxSharedScore = 1000000;
 
 function getChallengeById(challengeId) {
   return curatedChallenges.find(challenge => challenge.id === challengeId) || null;
+}
+
+function getChallengeScoreUnit(challenge = featuredChallenge, score = 2) {
+  const plural = challenge?.scoreUnit || 'taps';
+  if (score !== 1) return plural;
+  if (plural === 'points') return 'point';
+  if (plural === 'taps') return 'tap';
+  return plural;
+}
+
+function getChallengeFormat(challenge = featuredChallenge) {
+  if (challenge.mechanic === 'center-snap') return `${challenge.rounds} stops`;
+  return `${challenge.durationSeconds} sec`;
 }
 
 function createTapSprintGame(options = {}) {
@@ -149,7 +176,168 @@ function createTapSprintGame(options = {}) {
   return Object.freeze({ start, tap, reset, destroy, getState });
 }
 
-function createResultSummary(taps, durationSeconds = featuredChallenge.durationSeconds) {
+function createCenterSnapGame(options = {}) {
+  const rounds = Number.isInteger(options.rounds) && options.rounds >= 1 && options.rounds <= 10
+    ? options.rounds
+    : 3;
+  const reducedMotion = options.reducedMotion === true;
+  const onUpdate = typeof options.onUpdate === 'function' ? options.onUpdate : () => {};
+  const onComplete = typeof options.onComplete === 'function' ? options.onComplete : () => {};
+  const setIntervalFn = options.setIntervalFn || setInterval;
+  const clearIntervalFn = options.clearIntervalFn || clearInterval;
+  const setTimeoutFn = options.setTimeoutFn || setTimeout;
+  const clearTimeoutFn = options.clearTimeoutFn || clearTimeout;
+  const movementIntervalMs = reducedMotion ? 500 : 40;
+  const movementStep = reducedMotion ? 12.5 : 1.25;
+  const feedbackDurationMs = reducedMotion ? 250 : 500;
+
+  let status = 'idle';
+  let round = 0;
+  let score = 0;
+  let position = 0;
+  let direction = 1;
+  let lastPoints = null;
+  let movementTimerId = null;
+  let feedbackTimerId = null;
+
+  function getState() {
+    return Object.freeze({
+      status,
+      round,
+      rounds,
+      score,
+      position,
+      lastPoints,
+      reducedMotion
+    });
+  }
+
+  function emitUpdate() {
+    const snapshot = getState();
+    onUpdate(snapshot);
+    return snapshot;
+  }
+
+  function stopMovement() {
+    if (movementTimerId !== null) {
+      clearIntervalFn(movementTimerId);
+      movementTimerId = null;
+    }
+  }
+
+  function stopFeedback() {
+    if (feedbackTimerId !== null) {
+      clearTimeoutFn(feedbackTimerId);
+      feedbackTimerId = null;
+    }
+  }
+
+  function stopTimers() {
+    stopMovement();
+    stopFeedback();
+  }
+
+  function complete() {
+    stopTimers();
+    status = 'complete';
+    const snapshot = emitUpdate();
+    onComplete(snapshot);
+    return snapshot;
+  }
+
+  function beginRound() {
+    stopMovement();
+    feedbackTimerId = null;
+    round += 1;
+    status = 'running';
+    position = 0;
+    direction = 1;
+    lastPoints = null;
+    const snapshot = emitUpdate();
+
+    movementTimerId = setIntervalFn(() => {
+      if (status !== 'running') return;
+      position += direction * movementStep;
+
+      if (position >= 100) {
+        position = 100;
+        direction = -1;
+      } else if (position <= 0) {
+        position = 0;
+        direction = 1;
+      }
+
+      emitUpdate();
+    }, movementIntervalMs);
+
+    return snapshot;
+  }
+
+  function start() {
+    stopTimers();
+    status = 'idle';
+    round = 0;
+    score = 0;
+    position = 0;
+    direction = 1;
+    lastPoints = null;
+    return beginRound();
+  }
+
+  function stop() {
+    if (status !== 'running') return getState();
+    stopMovement();
+
+    const distanceFromCenter = Math.abs(position - 50);
+    lastPoints = Math.max(0, Math.round(1000 - (distanceFromCenter * 20)));
+    score += lastPoints;
+    status = 'feedback';
+    const snapshot = emitUpdate();
+
+    feedbackTimerId = setTimeoutFn(() => {
+      feedbackTimerId = null;
+      if (status !== 'feedback') return;
+      if (round >= rounds) complete();
+      else beginRound();
+    }, feedbackDurationMs);
+
+    return snapshot;
+  }
+
+  function reset() {
+    stopTimers();
+    status = 'idle';
+    round = 0;
+    score = 0;
+    position = 0;
+    direction = 1;
+    lastPoints = null;
+    return emitUpdate();
+  }
+
+  function destroy() {
+    stopTimers();
+  }
+
+  return Object.freeze({ start, stop, reset, destroy, getState });
+}
+
+function getCenterSnapPositionLabel(position) {
+  const safePosition = Number(position);
+  if (!Number.isFinite(safePosition)) return 'Marker position unavailable';
+  const distance = Math.abs(safePosition - 50);
+  if (distance <= 5) return 'Marker centered';
+  if (distance <= 18) return safePosition < 50 ? 'Marker near center on the left' : 'Marker near center on the right';
+  return safePosition < 50 ? 'Marker left of center' : 'Marker right of center';
+}
+
+function getCenterSnapFeedback(points) {
+  if (points >= 800) return 'Centered';
+  if (points >= 400) return 'Near';
+  return 'Missed';
+}
+
+function createResultSummary(taps, durationSeconds = featuredChallenge.durationSeconds, challenge = featuredChallenge) {
   if (!Number.isInteger(taps) || taps < 0) {
     throw new TypeError('Tap score must be a non-negative integer.');
   }
@@ -157,23 +345,32 @@ function createResultSummary(taps, durationSeconds = featuredChallenge.durationS
     throw new TypeError('Duration must be an integer from 1 to 300 seconds.');
   }
 
-  const tapsPerSecond = taps / durationSeconds;
   let message = 'Try again and build your rhythm.';
 
-  if (tapsPerSecond >= 4) message = 'Fast finish. Can you beat this score?';
-  else if (tapsPerSecond >= 2) message = 'Strong pace. Try again and push it higher.';
-  else if (taps > 0) message = 'Good start. A steadier rhythm can raise it.';
+  if (challenge?.mechanic === 'center-snap') {
+    message = 'Try again and aim closer to the center.';
+    if (taps >= 2700) message = 'Precision finish. Can a friend beat it?';
+    else if (taps >= 1800) message = 'Strong timing. One cleaner stop can raise it.';
+    else if (taps > 0) message = 'Good start. Watch the center and snap again.';
+  } else {
+    const tapsPerSecond = taps / durationSeconds;
+    if (tapsPerSecond >= 4) message = 'Fast finish. Can you beat this score?';
+    else if (tapsPerSecond >= 2) message = 'Strong pace. Try again and push it higher.';
+    else if (taps > 0) message = 'Good start. A steadier rhythm can raise it.';
+  }
 
   return Object.freeze({ taps, durationSeconds, message });
 }
 
 function validateSharedResult(taps, durationSeconds, challenge = featuredChallenge) {
-  const result = createResultSummary(taps, durationSeconds);
   if (!challenge || !getChallengeById(challenge.id)) {
     throw new TypeError('Shared challenge is unsupported.');
   }
-  if (result.taps > maxSharedScore) {
-    throw new TypeError(`Tap score must not exceed ${maxSharedScore}.`);
+
+  const result = createResultSummary(taps, durationSeconds, challenge);
+  const scoreLimit = Number.isInteger(challenge.maxScore) ? challenge.maxScore : maxSharedScore;
+  if (result.taps > scoreLimit) {
+    throw new TypeError(`Challenge score must not exceed ${scoreLimit}.`);
   }
   if (result.durationSeconds !== challenge.durationSeconds) {
     throw new TypeError('Shared duration must match the selected challenge.');
@@ -297,17 +494,17 @@ function createComparisonSummary(friendTaps, invitation) {
 
   let outcome = 'tie';
   let headline = 'It is a tie';
-  let message = `Both scored ${target.taps} taps.`;
+  let message = `Both scored ${target.taps} ${getChallengeScoreUnit(challenge, target.taps)}.`;
 
   if (difference > 0) {
     outcome = 'beat';
     headline = 'You beat it';
-    message = `${difference} tap${difference === 1 ? '' : 's'} ahead.`;
+    message = `${difference} ${getChallengeScoreUnit(challenge, difference)} ahead.`;
   } else if (difference < 0) {
     const shortBy = Math.abs(difference);
     outcome = 'short';
     headline = 'So close';
-    message = `${shortBy} tap${shortBy === 1 ? '' : 's'} short.`;
+    message = `${shortBy} ${getChallengeScoreUnit(challenge, shortBy)} short.`;
   }
 
   return Object.freeze({
@@ -429,7 +626,12 @@ if (typeof module !== 'undefined') {
     curatedChallenges,
     featuredChallenge,
     getChallengeById,
+    getChallengeScoreUnit,
+    getChallengeFormat,
     createTapSprintGame,
+    createCenterSnapGame,
+    getCenterSnapPositionLabel,
+    getCenterSnapFeedback,
     createResultSummary,
     createSharedResultUrl,
     parseSharedResultHash,
@@ -454,6 +656,7 @@ if (typeof document !== 'undefined') {
   const friendChallengeName = document.querySelector('#friend-challenge-name');
   const friendDuration = document.querySelector('#friend-duration');
   const friendTargetScore = document.querySelector('#friend-target-score');
+  const friendScoreUnit = document.querySelector('#friend-score-unit');
   const friendAnnouncement = document.querySelector('#friend-announcement');
   const startFriendButton = document.querySelector('#start-friend-attempt');
   const dismissFriendButton = document.querySelector('#dismiss-friend-attempt');
@@ -469,6 +672,8 @@ if (typeof document !== 'undefined') {
   const resultBackButton = document.querySelector('#result-back');
   const comparisonEyebrow = document.querySelector('#comparison-eyebrow');
   const comparisonScores = document.querySelector('#comparison-scores');
+  const comparisonTargetLabel = document.querySelector('#comparison-target-label');
+  const comparisonFriendLabel = document.querySelector('#comparison-friend-label');
   const comparisonTargetScore = document.querySelector('#comparison-target-score');
   const comparisonFriendScore = document.querySelector('#comparison-friend-score');
   const comparisonOutcome = document.querySelector('#comparison-outcome');
@@ -480,9 +685,15 @@ if (typeof document !== 'undefined') {
   const comparisonReplayButton = document.querySelector('#comparison-replay');
   const comparisonBackButton = document.querySelector('#comparison-back');
   const timeValue = document.querySelector('#time-value');
+  const timeLabel = document.querySelector('#time-label');
   const tapCount = document.querySelector('#tap-count');
+  const scoreUnit = document.querySelector('#score-unit');
+  const timingBoard = document.querySelector('#timing-board');
+  const timingMarker = document.querySelector('#timing-marker');
+  const timingReadout = document.querySelector('#timing-readout');
   const gameStatus = document.querySelector('#game-status');
   const resultScore = document.querySelector('#result-score');
+  const resultScoreUnit = document.querySelector('#result-score-unit');
   const resultMessage = document.querySelector('#result-message');
   const resultAnnouncement = document.querySelector('#result-announcement');
   const shareStatus = document.querySelector('#share-status');
@@ -502,6 +713,7 @@ if (typeof document !== 'undefined') {
     friendChallengeName,
     friendDuration,
     friendTargetScore,
+    friendScoreUnit,
     friendAnnouncement,
     startFriendButton,
     dismissFriendButton,
@@ -517,6 +729,8 @@ if (typeof document !== 'undefined') {
     resultBackButton,
     comparisonEyebrow,
     comparisonScores,
+    comparisonTargetLabel,
+    comparisonFriendLabel,
     comparisonTargetScore,
     comparisonFriendScore,
     comparisonOutcome,
@@ -528,9 +742,15 @@ if (typeof document !== 'undefined') {
     comparisonReplayButton,
     comparisonBackButton,
     timeValue,
+    timeLabel,
     tapCount,
+    scoreUnit,
+    timingBoard,
+    timingMarker,
+    timingReadout,
     gameStatus,
     resultScore,
+    resultScoreUnit,
     resultMessage,
     resultAnnouncement,
     shareStatus,
@@ -581,7 +801,7 @@ if (typeof document !== 'undefined') {
     function updateSelectedChallenge() {
       selectedCategory.textContent = activeChallenge.category;
       selectedTitle.textContent = activeChallenge.title;
-      selectedMeta.textContent = `${activeChallenge.difficulty} · ${activeChallenge.durationSeconds} sec`;
+      selectedMeta.textContent = `${activeChallenge.difficulty} · ${getChallengeFormat(activeChallenge)}`;
       startButton.textContent = `Play ${activeChallenge.title}`;
 
       for (const option of challengeList.querySelectorAll('[data-challenge-id]')) {
@@ -607,7 +827,7 @@ if (typeof document !== 'undefined') {
         option.setAttribute('aria-pressed', 'false');
         option.setAttribute(
           'aria-label',
-          `${challenge.title}, ${challenge.category}, ${challenge.difficulty}, ${challenge.durationSeconds} seconds`
+          `${challenge.title}, ${challenge.category}, ${challenge.difficulty}, ${getChallengeFormat(challenge)}`
         );
 
         const category = document.createElement('span');
@@ -619,7 +839,7 @@ if (typeof document !== 'undefined') {
 
         const meta = document.createElement('span');
         meta.className = 'challenge-option-meta';
-        meta.textContent = `${challenge.difficulty} · ${challenge.durationSeconds}s`;
+        meta.textContent = `${challenge.difficulty} · ${getChallengeFormat(challenge)}`;
 
         option.append(category, title, meta);
         option.addEventListener('click', () => selectChallenge(challenge));
@@ -634,23 +854,31 @@ if (typeof document !== 'undefined') {
       activeFriendInvitation = invitation;
       activeChallenge = getChallengeById(invitation.challengeId);
       updateSelectedChallenge();
+      const targetUnit = getChallengeScoreUnit(activeChallenge, invitation.targetTaps);
+      const challengeFormat = getChallengeFormat(activeChallenge);
       friendChallengeName.textContent = invitation.challengeTitle;
-      friendDuration.textContent = String(invitation.durationSeconds);
+      friendDuration.textContent = challengeFormat;
       friendTargetScore.textContent = String(invitation.targetTaps);
+      friendScoreUnit.textContent = `${targetUnit} to beat`;
       discoveryView.hidden = true;
       challengeView.hidden = true;
       resultView.hidden = true;
       comparisonView.hidden = true;
       friendView.hidden = false;
-      friendAnnouncement.textContent = `${invitation.challengeTitle} challenge. Beat ${invitation.targetTaps} taps in ${invitation.durationSeconds} seconds.`;
+      friendAnnouncement.textContent = `${invitation.challengeTitle} challenge. Beat ${invitation.targetTaps} ${targetUnit} in ${challengeFormat}.`;
       startFriendButton.focus();
     }
 
     function showComparison(comparison) {
       completedComparison = comparison;
       resetShareState(comparisonShareStatus, comparisonShareFallback);
+      const challenge = getChallengeById(comparison.challengeId);
+      const targetUnit = getChallengeScoreUnit(challenge, comparison.targetTaps);
+      const friendUnit = getChallengeScoreUnit(challenge, comparison.friendTaps);
       comparisonEyebrow.textContent = `${comparison.challengeTitle} complete`;
-      comparisonScores.setAttribute('aria-label', `${comparison.challengeTitle} score comparison`);
+      comparisonScores.setAttribute('aria-label', `${comparison.challengeTitle} score comparison in ${challenge.scoreUnit || 'taps'}`);
+      comparisonTargetLabel.textContent = `Target (${targetUnit})`;
+      comparisonFriendLabel.textContent = `Your score (${friendUnit})`;
       comparisonTargetScore.textContent = String(comparison.targetTaps);
       comparisonFriendScore.textContent = String(comparison.friendTaps);
       comparisonOutcome.textContent = comparison.headline;
@@ -660,16 +888,41 @@ if (typeof document !== 'undefined') {
       challengeView.hidden = true;
       resultView.hidden = true;
       comparisonView.hidden = false;
-      comparisonAnnouncement.textContent = `${comparison.headline}. Target ${comparison.targetTaps} taps. You scored ${comparison.friendTaps} taps. ${comparison.message}`;
+      comparisonAnnouncement.textContent = `${comparison.headline}. Target ${comparison.targetTaps} ${targetUnit}. You scored ${comparison.friendTaps} ${friendUnit}. ${comparison.message}`;
       comparisonShareButton.focus();
     }
 
-    function configureGame() {
-      if (game) game.destroy();
+    function completeAttempt(score) {
+      completedResult = createResultSummary(
+        score,
+        activeChallenge.durationSeconds,
+        activeChallenge
+      );
+      challengeView.hidden = true;
 
-      gameEyebrow.textContent = `${activeChallenge.category} challenge`;
-      gameTitle.textContent = activeChallenge.title;
-      gameInstruction.textContent = activeChallenge.instruction;
+      if (activeFriendInvitation) {
+        showComparison(createComparisonSummary(completedResult.taps, activeFriendInvitation));
+        return;
+      }
+
+      completedComparison = null;
+      const unit = getChallengeScoreUnit(activeChallenge, completedResult.taps);
+      resultEyebrow.textContent = `${activeChallenge.title} complete`;
+      resultScore.textContent = String(completedResult.taps);
+      resultScoreUnit.textContent = unit;
+      resultMessage.textContent = completedResult.message;
+      comparisonView.hidden = true;
+      resultView.hidden = false;
+      resultAnnouncement.textContent = `You scored ${completedResult.taps} ${unit} in ${activeChallenge.title}.`;
+      shareButton.focus();
+    }
+
+    function configureTapGame() {
+      timingBoard.hidden = true;
+      timingBoard.removeAttribute('data-feedback');
+      tapButton.classList.remove('timing-action');
+      timeLabel.textContent = 'seconds';
+      scoreUnit.textContent = 'taps';
       timeValue.textContent = String(activeChallenge.durationSeconds);
       tapCount.textContent = '0';
 
@@ -685,24 +938,73 @@ if (typeof document !== 'undefined') {
           gameStatus.textContent = isRunning ? 'Go!' : 'Ready';
         },
         onComplete(state) {
-          completedResult = createResultSummary(state.taps, state.durationSeconds);
-          challengeView.hidden = true;
-
-          if (activeFriendInvitation) {
-            showComparison(createComparisonSummary(completedResult.taps, activeFriendInvitation));
-            return;
-          }
-
-          completedComparison = null;
-          resultEyebrow.textContent = `${activeChallenge.title} complete`;
-          resultScore.textContent = String(completedResult.taps);
-          resultMessage.textContent = completedResult.message;
-          comparisonView.hidden = true;
-          resultView.hidden = false;
-          resultAnnouncement.textContent = `You scored ${completedResult.taps} taps in ${activeChallenge.title}.`;
-          shareButton.focus();
+          completeAttempt(state.taps);
         }
       });
+    }
+
+    function configureCenterSnapGame() {
+      const reducedMotion = typeof window.matchMedia === 'function'
+        && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      timingBoard.hidden = false;
+      timingBoard.removeAttribute('data-feedback');
+      tapButton.classList.add('timing-action');
+      timeLabel.textContent = 'rounds';
+      scoreUnit.textContent = 'points';
+      timeValue.textContent = `0/${activeChallenge.rounds}`;
+      tapCount.textContent = '0';
+      timingMarker.style.left = '0%';
+      timingReadout.textContent = reducedMotion
+        ? 'Reduced motion: the marker moves in clear steps.'
+        : 'Watch the marker and stop it near the center.';
+
+      game = createCenterSnapGame({
+        rounds: activeChallenge.rounds,
+        reducedMotion,
+        onUpdate(state) {
+          timeValue.textContent = `${state.round}/${state.rounds}`;
+          tapCount.textContent = String(state.score);
+          timingMarker.style.left = `${state.position}%`;
+
+          if (state.status === 'running') {
+            timingBoard.removeAttribute('data-feedback');
+            timingReadout.textContent = `Round ${state.round} of ${state.rounds}. ${getCenterSnapPositionLabel(state.position)}.`;
+            tapButton.disabled = false;
+            tapButton.textContent = 'Stop';
+            gameStatus.textContent = `Round ${state.round}: stop near the center`;
+          } else if (state.status === 'feedback') {
+            const feedback = getCenterSnapFeedback(state.lastPoints);
+            timingBoard.dataset.feedback = feedback.toLowerCase();
+            timingReadout.textContent = `${feedback}. +${state.lastPoints} points.`;
+            tapButton.disabled = true;
+            tapButton.textContent = 'Locked';
+            gameStatus.textContent = `${feedback}: ${state.score} points total`;
+          } else if (state.status === 'complete') {
+            timingBoard.removeAttribute('data-feedback');
+            tapButton.disabled = true;
+            tapButton.textContent = 'Done';
+            gameStatus.textContent = 'Three stops complete';
+          } else {
+            tapButton.disabled = true;
+            tapButton.textContent = 'Stop';
+            gameStatus.textContent = 'Ready';
+          }
+        },
+        onComplete(state) {
+          completeAttempt(state.score);
+        }
+      });
+    }
+
+    function configureGame() {
+      if (game) game.destroy();
+
+      gameEyebrow.textContent = `${activeChallenge.category} challenge`;
+      gameTitle.textContent = activeChallenge.title;
+      gameInstruction.textContent = activeChallenge.instruction;
+
+      if (activeChallenge.mechanic === 'center-snap') configureCenterSnapGame();
+      else configureTapGame();
     }
 
     function startAttempt() {
@@ -752,10 +1054,11 @@ if (typeof document !== 'undefined') {
       );
       shareFallback.href = shareUrl;
       shareFallback.textContent = shareUrl;
+      const unit = getChallengeScoreUnit(activeChallenge, completedResult.taps);
 
       const outcome = await shareResultLink(shareUrl, {
         title: activeChallenge.title,
-        text: `I scored ${completedResult.taps} taps in ${activeChallenge.title}. Can you beat it?`
+        text: `I scored ${completedResult.taps} ${unit} in ${activeChallenge.title}. Can you beat it?`
       });
 
       showShareOutcome(outcome, shareStatus, shareFallback);
@@ -767,13 +1070,21 @@ if (typeof document !== 'undefined') {
       const shareUrl = createComparisonShareUrl(completedComparison, canonicalLink.href);
       comparisonShareFallback.href = shareUrl;
       comparisonShareFallback.textContent = shareUrl;
+      const challenge = getChallengeById(completedComparison.challengeId);
+      const unit = getChallengeScoreUnit(challenge, completedComparison.friendTaps);
 
       const outcome = await shareResultLink(shareUrl, {
         title: completedComparison.challengeTitle,
-        text: `I scored ${completedComparison.friendTaps} taps in ${completedComparison.challengeTitle}. Can you beat it?`
+        text: `I scored ${completedComparison.friendTaps} ${unit} in ${completedComparison.challengeTitle}. Can you beat it?`
       });
 
       showShareOutcome(outcome, comparisonShareStatus, comparisonShareFallback);
+    }
+
+    function activateGameAction() {
+      if (!game) return;
+      if (activeChallenge.mechanic === 'center-snap') game.stop();
+      else game.tap();
     }
 
     renderChallengeCatalog();
@@ -781,7 +1092,7 @@ if (typeof document !== 'undefined') {
     startFriendButton.addEventListener('click', startAttempt);
     dismissFriendButton.addEventListener('click', returnToDiscovery);
     startButton.addEventListener('click', startAttempt);
-    tapButton.addEventListener('click', () => game?.tap());
+    tapButton.addEventListener('click', activateGameAction);
     shareButton.addEventListener('click', shareCompletedResult);
     comparisonShareButton.addEventListener('click', shareCompletedComparison);
     resultReplayButton.addEventListener('click', startAttempt);

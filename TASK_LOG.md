@@ -1,99 +1,141 @@
 # Task Log
 
-Historical completed cycles 1–6 are preserved in [`TASK_LOG_ARCHIVE_CYCLES_1_6.md`](TASK_LOG_ARCHIVE_CYCLES_1_6.md), Cycles 7–8 in [`TASK_LOG_ARCHIVE_CYCLES_7_8.md`](TASK_LOG_ARCHIVE_CYCLES_7_8.md), Cycle 9 in [`TASK_LOG_ARCHIVE_CYCLE_9.md`](TASK_LOG_ARCHIVE_CYCLE_9.md), Cycle 10 in [`TASK_LOG_ARCHIVE_CYCLE_10.md`](TASK_LOG_ARCHIVE_CYCLE_10.md), and Cycle 11 in [`TASK_LOG_ARCHIVE_CYCLE_11.md`](TASK_LOG_ARCHIVE_CYCLE_11.md). This file remains the active source of truth for the current cycle.
+Historical completed cycles 1–6 are preserved in [`TASK_LOG_ARCHIVE_CYCLES_1_6.md`](TASK_LOG_ARCHIVE_CYCLES_1_6.md), Cycles 7–8 in [`TASK_LOG_ARCHIVE_CYCLES_7_8.md`](TASK_LOG_ARCHIVE_CYCLES_7_8.md), Cycle 9 in [`TASK_LOG_ARCHIVE_CYCLE_9.md`](TASK_LOG_ARCHIVE_CYCLE_9.md), Cycle 10 in [`TASK_LOG_ARCHIVE_CYCLE_10.md`](TASK_LOG_ARCHIVE_CYCLE_10.md), Cycle 11 in [`TASK_LOG_ARCHIVE_CYCLE_11.md`](TASK_LOG_ARCHIVE_CYCLE_11.md), and Cycle 12 in [`TASK_LOG_ARCHIVE_CYCLE_12.md`](TASK_LOG_ARCHIVE_CYCLE_12.md). This file remains the active source of truth for the current cycle.
 
-## Cycle 12
+## Cycle 13
 
-- **Date/time:** 2026-07-11T21:39:48+03:00
-- **Verification completed at:** 2026-07-11T21:48:20+03:00
-- **Completed at:** 2026-07-11T21:50:33+03:00
-- **Status:** completed
-- **Selected task:** Correct the false completion status of curated challenge variety.
-- **Goal:** Reopen Roadmap Stage 10 because all six curated entries use the same timed tap mechanic, then make repository documentation accurately describe the current one-mechanic product and the required four-mechanic completion gate.
-- **Why selected:** `AGENT.md` defines cosmetic tap variants as insufficient, while `ROADMAP.md` and `README.md` still claimed curated variety was complete. The documented state conflicted with actual code.
-- **Viral-loop impact:** Prevents future cycles from treating a repetitive catalog as validated variety and directs the next cycle toward a genuinely different, shareable game mechanic.
+- **Date/time:** 2026-07-11T22:42:08+03:00
+- **Verification completed at:** 2026-07-11T23:14:07+03:00
+- **Status:** implementation and self-review complete; squash merge pending
+- **Selected task:** Add one original three-stop center-timing challenge named Center Snap.
+- **Goal:** Add a genuinely different timing mechanic where the player stops a moving marker near the center over three rounds, receives a bounded points score, and completes the existing result, sharing, friend-attempt, comparison, metrics, and navigation loop.
+- **Why selected:** No pull request or unfinished cycle was open. Roadmap Stage 10 was the earliest incomplete stage, and Cycle 12 explicitly identified center timing as the next smallest mechanic that proves genuine variety.
+- **Viral-loop impact:** A visually distinct skill challenge gives players a stronger reason to replay and share, while friends can compete against the exact same bounded score through the validated link flow.
 
 ### Acceptance criteria completed
 
-- `ROADMAP.md` marks Stage 10 as reopened/in progress while Stage 11 remains implemented.
-- Stage 10 now requires at least six playable curated challenges and four genuinely different mechanics.
-- The completion gate requires material differences in decisions, timing, input, failure conditions, or scoring.
-- `README.md` states that the current six entries still use one gameplay mechanic.
-- `CHANGELOG.md` records the corrected classification without claiming a new playable mechanic.
-- No application code, preview asset, dependency, shared-link schema, metric, or private-creation behavior changed.
+- Added Center Snap without removing or invalidating existing curated challenge IDs.
+- Center Snap differs materially from timed tap count: it requires three timing decisions and scores distance from the center for a maximum of 3,000 points.
+- Added purposeful marker movement and immediate centered, near, or missed feedback.
+- Added a `prefers-reduced-motion` mode with slower discrete marker steps and no decorative interpolation or feedback animation.
+- Movement and feedback timers are cancelled on reset, replay/reconfiguration, navigation, completion, and destroy.
+- Preserved native button keyboard activation, visible focus, semantic status announcements, readable contrast, and controls of at least 48 CSS pixels.
+- Reused the existing result, strict shared-link codec, friend invitation, comparison, share-again, metrics, and navigation systems.
+- Added challenge-aware score units and formats: taps/seconds remain unchanged while Center Snap uses points/three stops.
+- Center Snap shared scores above 3,000 are rejected; existing tap-score bounds remain intact.
+- Added focused tests for scoring, validation, reduced motion, timer cancellation, structure, and product-loop reuse.
+- Synchronized changed source and `docs/` preview assets with matching Git blob SHAs.
 
 ### Completed work
 
-- Reclassified the repository from “ordered stages complete” to active MVP development with curated variety reopened.
-- Preserved the implemented no-login social loop and private-by-link creation as completed work.
-- Added an explicit four-mechanic minimum, a five-to-six mechanic target, shared-loop reuse rules, purposeful-motion requirements, and reduced-motion requirements to the Stage 10 gate.
-- Reworded the README so names, categories, durations, and difficulty labels are not presented as distinct games.
-- Added an unreleased changelog correction limited to product-state documentation.
-- Archived completed Cycle 11 and kept this file focused on the active cycle.
+- Added the frozen `center-snap` definition as the seventh curated entry and second genuine gameplay mechanic.
+- Added a dependency-free timing state machine with three rounds, bounded distance scoring, deterministic lifecycle, and injected clocks for testing.
+- Added a compact center meter, target zone, marker, point total, round counter, stop action, and accessible text feedback.
+- Made result, friend entry, comparison, and sharing copy aware of challenge score units without changing the versioned shared-link shape.
+- Updated Roadmap, README, and Changelog while keeping Stage 10 open until four genuine mechanics exist.
+- Archived completed Cycle 12.
 
 ### Intentional non-goals preserved
 
-- No new gameplay mechanic, visual redesign, animation implementation, link-schema change, refactor, dependency, test rewrite, analytics change, private-creation change, or preview regeneration.
+- No second new mechanic, replacement of existing challenge IDs, private-creation expansion, public feed, account, identity, leaderboard, persistence, backend, analytics destination, dependency, framework, architecture migration, broad redesign, audio requirement, copied game identity, or unrelated refactor.
 
 ### Files changed
 
-- `ROADMAP.md`
+- `app.js`
+- `index.html`
+- `styles.css`
+- `docs/app.js`
+- `docs/index.html`
+- `docs/styles.css`
+- `test/challenge-variety.test.js`
+- `test/timing-mechanic.test.js`
 - `README.md`
+- `ROADMAP.md`
 - `CHANGELOG.md`
 - `TASK_LOG.md`
-- `TASK_LOG_ARCHIVE_CYCLE_11.md`
+- `TASK_LOG_ARCHIVE_CYCLE_12.md`
 
-### Verification
+### Tests and checks
 
-- Compared `agent/cycle-12-center-snap` against `main`: the branch is based directly on current `main`, is not behind, and changes only the five documentation files listed above.
-- Verified the branch Roadmap states `Curated challenge variety — reopened; in progress` and includes the six-entry/four-mechanic completion gate.
-- Verified the branch README explicitly states that all six current curated entries reuse one timed tap-count mechanic.
-- Verified the changelog states that no playable mechanic or preview asset changed.
-- Full repository checkout was unavailable because the runtime could not resolve `github.com`; therefore `npm test` and `npm run build` were not executed and no full-suite or build success is claimed.
-- GitHub Actions/status checks remain unavailable because the repository workflow was removed by owner direction.
-- Mobile, keyboard, accessibility, animation, timer-cancellation, security, and privacy behavior are unchanged because no executable or user-facing preview asset changed.
-- **Preview status:** repository preview output verified unchanged by the complete branch diff; no source or `docs/` preview asset is modified.
+- `node --check /tmp/cycle13/app.js` — passed against content matching the committed `app.js` Git blob SHA.
+- `node --test /tmp/cycle13/*.test.js` — 34 passed, 0 failed in the locally reconstructed focused suite covering existing curated-loop behavior and Center Snap behavior.
+- Focused checks cover three-round completion, 3,000-point maximum, reduced-motion cadence, reset/destroy timer cancellation, strict shared-state bounds, point-aware comparison, mobile/accessibility structure, and original mechanic metadata.
+- Source/preview parity — passed by matching Git blob SHAs for `app.js`/`docs/app.js`, `index.html`/`docs/index.html`, and `styles.css`/`docs/styles.css`.
+- Branch comparison — based directly on `main` at `f6982848f15d4e268afa656d45135b37480c2b31`, zero commits behind, and limited to the 13 expected files.
+- Full repository checkout remained unavailable because the runtime could not resolve `github.com`; therefore the repository-wide `npm test` and `npm run build` commands were not executed and no full-suite or build success is claimed.
+- GitHub Actions/status checks are absent because the workflow remains unavailable by repository-owner direction.
 
-### Review findings and resolution
+### Mobile, accessibility, motion, security, and privacy review
 
-- Blocking documentation inconsistency found: Roadmap and README treated six timed tap variants as completed curated variety.
-- Resolution: reopened Stage 10, documented the actual one-mechanic state, and added measurable completion criteria.
-- Automated review found the active cycle status was still marked in progress after the correction was implemented.
-- Resolution: completed the factual verification section, added the completion timestamp, and changed Cycle 12 to `completed` before merge.
-- Scope review found no application, preview, dependency, metric, schema, secret, personal-data, or unrelated file change.
-- No independent approval is claimed; the pull request receives a factual self-review before merge.
+- Static layout review covered the 320px baseline and 400px breakpoint; no fixed-width game element or blocked primary action was introduced.
+- Native buttons preserve keyboard activation; focus-visible styles remain explicit; timing controls exceed 44×44 CSS pixels.
+- The moving track is visually hidden from assistive technology while readable position, hit feedback, score, result, and comparison text remains available.
+- Color and animation are not the only feedback channels; centered, near, missed, points, rounds, and outcomes are rendered as text.
+- Reduced motion disables CSS transitions and keyframe feedback and changes the state machine to slow discrete marker steps.
+- Strict challenge allowlisting, HTTP(S)-only sharing, bounded integer parsing, safe DOM text APIs, and existing privacy-safe in-memory metrics are preserved.
+- No secret-like string, personal data, executable shared state, copied name, protected character, asset, sound, level, logo, or distinctive game presentation was added.
+
+### Animation evidence
+
+- Purposeful motion 1: marker movement communicates timing and current actionable position.
+- Purposeful motion 2: centered, near, and missed feedback communicates the cause and quality of each scored stop.
+- Feedback does not alter the deterministic score and the primary action is disabled only during the short scored-state transition between rounds.
+- Reset, navigation, replay/reconfiguration, completion, and destroy clear active interval or timeout handles.
+
+### Diversity evidence
+
+- Existing tap challenges reward input quantity over a timed duration.
+- Center Snap rewards three discrete stop decisions based on spatial distance from a moving center target.
+- The input pattern, player decision, timing model, scoring model, and round lifecycle therefore differ materially rather than cosmetically.
+- The catalog now has two genuine mechanics; Stage 10 remains incomplete until at least four exist.
+
+### Review findings and resolutions
+
+- Blocking risk reviewed: tap-specific score labels and comparison messages could make a points game misleading.
+- Resolution: added challenge-aware units and formats while preserving the validated shared-state shape.
+- Blocking risk reviewed: new movement or feedback timers could survive replay or navigation.
+- Resolution: centralized timer cleanup and added focused reset/destroy tests.
+- Blocking risk reviewed: animation could become inaccessible or necessary to understand success.
+- Resolution: added text status, native controls, reduced-motion state cadence, and CSS motion suppression.
+- Complete PR diff, comments, review submissions, review threads, mergeability, scope, source/preview parity, security, privacy, and originality were reviewed. No unresolved blocking finding remains.
+- No independent approval is claimed; this is a documented self-review.
 
 ### Git and merge outcome
 
-- Branch: `agent/cycle-12-center-snap`, created from `main` at `57dd425fdc3978038a4cde48b4f523df0c58839e`.
-- Pull request: #36 — `docs(roadmap): reopen curated mechanic variety`, targeting `main`.
-- Merge method required: squash using the expected final head SHA.
-- The final squash result and merge SHA cannot be embedded in the commit that must exist before the merge; they are recorded in the pull-request conversation and final cycle report after GitHub returns the merge result.
+- Branch: `agent/cycle-13-center-snap`, created directly from `main` at `f6982848f15d4e268afa656d45135b37480c2b31`.
+- Pull request: #37 — `feat(challenges): add Center Snap timing mechanic`, targeting `main`.
+- Pull request is mergeable and has no review comment, review submission, unresolved thread, conflict, or status check.
+- Required merge method: squash with the expected final head SHA.
+- The final merge result and merge SHA are necessarily recorded in the pull-request conversation and final cycle report after GitHub performs the merge; they cannot be truthfully embedded in the pre-merge commit.
+
+### Preview status
+
+Repository preview output verified for the relevant commit through exact source/`docs/` Git blob parity and focused static structure checks. Live deployed behavior was not claimed.
 
 ### Decision
 
-No architecture or external-service decision. Curated variety remains an active product stage until at least four mechanics are implemented through the existing social loop.
+No architecture or external-service decision. Center Snap is implemented as a reusable mechanic adapter within the existing static application and social competition loop.
 
 ### Strategic review
 
-- The social loop remains aligned with the north star, but the curated discovery set does not satisfy the durable variety standard.
-- The largest product bottleneck is mechanical repetition hidden behind different names, categories, and durations.
-- The largest delivery risk was stale completion documentation causing future work to skip the real variety gap.
-- New policy evidence invalidated the previous Stage 10 completion claim.
-- The smallest safe correction was to repair the source-of-truth status before implementing a new mechanic.
+- The direction remains aligned with the discover-to-share-again north star.
+- The largest product bottleneck remains insufficient genuine mechanic diversity.
+- The largest delivery risk was coupling a points game to tap-specific UI or duplicating social-loop systems; the implementation avoided both.
+- No new evidence invalidated the reopened Stage 10 plan.
+- One timing challenge was the highest-impact small task and no second mechanic was started.
 
 ### Product thinking
 
-1. Mechanical repetition blocks the next quality step in discovery.
-2. A genuinely different mechanic gives the original player a stronger reason to replay and share.
-3. A friend is more likely to open a challenge when the play pattern differs, not only the label or duration.
-4. The smallest proof in this cycle was an accurate reopened stage with measurable diversity criteria.
-5. Parked idea: implement an original three-stop center-timing challenge with moving-marker and hit-feedback motion in the next focused cycle.
+1. Mechanical repetition blocks the next curated-variety milestone.
+2. A three-stop timing challenge creates fast replay tension and a clear shareable score.
+3. A friend can understand “beat these points in three stops” within seconds.
+4. The smallest proof is one data-driven Center Snap entry and one reusable timing state machine integrated into the existing loop.
+5. Parked idea: add an original short visual-memory sequence mechanic in a later cycle after Center Snap is merged and verified.
 
 ### Remaining limitation
 
-The curated catalog still contains only the timed tap-count mechanic. Full repository commands and interactive browser checks were unavailable in this runtime.
+The catalog has two genuine mechanics, below the four-mechanic Stage 10 completion gate. Full repository commands and live browser interaction were unavailable in this runtime.
 
 ### Next task
 
-Add one original center-timing mechanic that reuses the existing result, sharing, friend-attempt, comparison, metrics, and navigation flows, includes purposeful marker and hit-feedback motion, and provides a reduced-motion equivalent.
+Add one original short visual-memory sequence mechanic that reuses the same social loop, includes purposeful sequence playback and correct/incorrect feedback, supports reduced motion, and does not duplicate result or sharing systems.
