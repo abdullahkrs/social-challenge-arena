@@ -133,3 +133,48 @@ Private creation supports only the existing tap-count mechanic and ASCII titles.
 ### Next suggested task
 
 Do not add another feature without evidence. Validate the completed MVP with real users and use observed drop-off or sharing behavior to select any post-MVP work.
+
+## Cycle 12
+
+- **Date/time:** 2026-07-11T21:39:48+03:00
+- **Status:** in progress
+- **Selected task:** Correct the false completion status of curated challenge variety.
+- **Goal:** Reopen Roadmap Stage 10 because all six curated entries use the same timed tap mechanic, then make repository documentation accurately describe the current one-mechanic product and the required four-mechanic completion gate.
+- **Why selected:** `AGENT.md` now defines cosmetic tap variants as insufficient, while `ROADMAP.md` and `README.md` still claim curated variety is complete. The documented state conflicts with actual code.
+- **Viral-loop impact:** Prevents future cycles from treating a repetitive catalog as validated variety and directs the next cycle toward a genuinely different, shareable game mechanic.
+
+### Acceptance criteria
+
+- `ROADMAP.md` marks Stage 10 as reopened/in progress and Stage 11 remains implemented without being treated as evidence of mechanic diversity.
+- Stage 10 completion criteria explicitly require at least six playable challenges and four genuinely different mechanics.
+- `README.md` states that the current catalog has six entries but only one gameplay mechanic.
+- `CHANGELOG.md` records the corrected product-state classification without claiming a new playable mechanic.
+- No product code, preview assets, dependencies, shared-link schema, metrics, or private-creation behavior changes.
+
+### Expected files
+
+- `TASK_LOG.md`
+- `ROADMAP.md`
+- `README.md`
+- `CHANGELOG.md`
+
+### Explicit non-goals
+
+- No new gameplay mechanic in this cycle.
+- No visual redesign, animation implementation, link-schema change, refactor, dependency, test rewrite, or preview regeneration.
+
+### Strategic review
+
+- The social loop remains complete, but the curated discovery set does not satisfy the new durable variety standard.
+- The largest product bottleneck is mechanical repetition hidden behind different names, categories, and durations.
+- The largest delivery risk is allowing stale completion documentation to select post-MVP work instead of fixing variety.
+- New policy evidence invalidates the previous Stage 10 completion claim.
+- The smallest safe task is correcting source-of-truth status before adding one new mechanic in a later cycle.
+
+### Product thinking
+
+1. Mechanical repetition blocks the next quality step in discovery.
+2. A genuinely different mechanic gives the original player a stronger reason to replay and share.
+3. A friend is more likely to open a challenge when the play pattern differs, not only the label or duration.
+4. The smallest proof in this cycle is an accurate reopened stage with measurable diversity criteria.
+5. Parked idea: implement an original three-stop center-timing challenge with moving-marker and hit-feedback motion in the next focused cycle.
