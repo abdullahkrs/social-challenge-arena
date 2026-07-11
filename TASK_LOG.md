@@ -5,7 +5,7 @@ Historical completed cycles 1–6 are preserved in [`TASK_LOG_ARCHIVE_CYCLES_1_6
 ## Cycle 17
 
 - **Date/time:** 2026-07-12T02:41:33+03:00
-- **Status:** implementation complete; pull-request review and merge pending
+- **Status:** implementation complete; PR #44 review and merge pending
 - **Selected task:** Define one manual, privacy-safe experiment for validating the complete social loop with the existing eleven session counters.
 - **Goal:** Turn the existing counters into a controlled two-person protocol with exact role-specific expectations, aggregate-only recording, conversion formulas, success thresholds, and decision rules.
 - **Why selected:** No pull request or unfinished cycle was open, every MVP roadmap stage was complete, and Cycle 16 explicitly identified this as the next evidence step. Adding another mechanic before measuring the loop would broaden scope without evidence.
@@ -111,9 +111,9 @@ E-001 has been defined but not run. Real participants and manual cohort totals a
 ### Pull request and merge outcome
 
 - Branch: `agent/cycle-17-define-loop-validation-experiment`, created directly from `main` at `98ee13261068dcb346f665de8498f0440fa176d6`.
-- Pull request: pending creation, targeting `main` directly.
-- Reviewed head SHA: pending final pull-request review.
-- Merge SHA: unavailable until the pull request is squash-merged; final merge metadata will be recorded in the pull request and cycle report without opening a second pull request.
+- Pull request: #44 — `docs(experiment): define privacy-safe loop validation`, targeting `main` directly.
+- Reviewed head SHA: recorded in the final PR self-review after the complete diff is inspected.
+- Merge SHA: unavailable until PR #44 is squash-merged; final merge metadata will be recorded in the pull request and cycle report without opening a second pull request.
 
 ### Next task
 
