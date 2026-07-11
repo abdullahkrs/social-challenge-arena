@@ -29,21 +29,28 @@ button { font: inherit; }
   min-height: calc(100vh - 2.5rem);
 }
 
-.discovery-view {
+.discovery-view,
+.game-view,
+.result-view {
   display: grid;
   align-content: center;
-  gap: 1.5rem;
+  gap: 1.15rem;
 }
 
+.discovery-view { gap: 1.5rem; }
+
 .hero,
-.game-header { display: grid; gap: 0.65rem; }
+.game-header,
+.result-header { display: grid; gap: 0.65rem; }
 
 .eyebrow,
 .intro,
 .challenge-card p,
 .challenge-meta,
 .game-instruction,
-.game-status { margin: 0; }
+.game-status,
+.result-score,
+.result-message { margin: 0; }
 
 .eyebrow {
   color: #c4b5fd;
@@ -67,12 +74,14 @@ h1 {
 .challenge-card p,
 .challenge-meta,
 .game-instruction,
-.game-status {
+.game-status,
+.result-message {
   color: #cbd5e1;
   line-height: 1.5;
 }
 
-.challenge-card {
+.challenge-card,
+.result-card {
   display: grid;
   gap: 1rem;
   padding: 1.25rem;
@@ -135,12 +144,6 @@ h2 {
   outline-offset: 3px;
 }
 
-.game-view {
-  display: grid;
-  align-content: center;
-  gap: 1.15rem;
-}
-
 .scoreboard {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -162,7 +165,8 @@ h2 {
   line-height: 1;
 }
 
-.stat span {
+.stat span,
+.result-score span {
   color: #cbd5e1;
   font-size: 0.82rem;
   font-weight: 700;
@@ -198,15 +202,50 @@ h2 {
   font-weight: 700;
 }
 
-.game-controls {
+.game-controls,
+.result-controls {
   display: grid;
   gap: 0.65rem;
+}
+
+.result-card {
+  justify-items: center;
+  text-align: center;
+}
+
+.result-score {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.result-score strong {
+  font-size: clamp(4.5rem, 28vw, 7.5rem);
+  line-height: 0.88;
+  letter-spacing: -0.07em;
+}
+
+.result-message {
+  max-width: 26ch;
+  font-weight: 700;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 @media (min-width: 400px) {
   .shell { padding: 1.75rem; }
   .view { min-height: calc(100vh - 3.5rem); }
-  .challenge-card { padding: 1.5rem; }
+  .challenge-card,
+  .result-card { padding: 1.5rem; }
 }
 
 @media (prefers-reduced-motion: reduce) {
