@@ -158,14 +158,15 @@ if (typeof document !== 'undefined') {
         const result = createResultSummary(state.taps, state.durationSeconds);
         resultScore.textContent = String(result.taps);
         resultMessage.textContent = result.message;
-        resultAnnouncement.textContent = `You scored ${result.taps} taps.`;
         challengeView.hidden = true;
         resultView.hidden = false;
+        resultAnnouncement.textContent = `You scored ${result.taps} taps.`;
         resultReplayButton.focus();
       }
     });
 
     function startAttempt() {
+      resultAnnouncement.textContent = '';
       discoveryView.hidden = true;
       resultView.hidden = true;
       challengeView.hidden = false;
@@ -175,6 +176,7 @@ if (typeof document !== 'undefined') {
 
     function returnToDiscovery() {
       game.reset();
+      resultAnnouncement.textContent = '';
       challengeView.hidden = true;
       resultView.hidden = true;
       discoveryView.hidden = false;
