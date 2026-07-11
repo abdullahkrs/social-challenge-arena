@@ -1,7 +1,7 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const { readFileSync } = require('node:fs');
-const { featuredChallenge, toggleChallengeDetails } = require('../app.js');
+const { featuredChallenge } = require('../app.js');
 
 test('featured challenge metadata is complete and bounded', () => {
   assert.equal(featuredChallenge.id, 'tap-sprint');
@@ -13,30 +13,12 @@ test('featured challenge metadata is complete and bounded', () => {
   assert.ok(featuredChallenge.goal.length > 0);
 });
 
-test('landing page exposes one clear discovery action', () => {
+test('landing page exposes one clear play action and one gameplay state', () => {
   const html = readFileSync('index.html', 'utf8');
   assert.match(html, /Pick\. Play\. Compete\./);
   assert.match(html, /Tap Sprint/);
-  assert.match(html, /id="discover-challenge"/);
-  assert.match(html, /aria-controls="challenge-details"/);
-  assert.doesNotMatch(html, /share|compare|score/i);
-});
-
-test('discovery action toggles details and accessible state', () => {
-  const attributes = new Map();
-  const button = {
-    textContent: 'View challenge',
-    setAttribute(name, value) { attributes.set(name, value); }
-  };
-  const details = { hidden: true };
-
-  assert.equal(toggleChallengeDetails(button, details), true);
-  assert.equal(details.hidden, false);
-  assert.equal(attributes.get('aria-expanded'), 'true');
-  assert.equal(button.textContent, 'Hide details');
-
-  assert.equal(toggleChallengeDetails(button, details), false);
-  assert.equal(details.hidden, true);
-  assert.equal(attributes.get('aria-expanded'), 'false');
-  assert.equal(button.textContent, 'View challenge');
+  assert.match(html, /id="start-challenge"/);
+  assert.match(html, /id="challenge-view"[^>]*hidden/);
+  assert.match(html, /id="tap-button"/);
+  assert.doesNotMatch(html, /share|compare/i);
 });
