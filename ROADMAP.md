@@ -86,12 +86,13 @@ Active MVP development. The no-login social loop, lightweight private creation, 
 
 ### Stage 9
 
-- A strict allowlist covers the ten planned viral-loop events.
+- A strict allowlist covers eleven viral-loop events.
 - Only aggregate integer counts are kept in memory for the current page session.
 - Ordinary discovery and validated shared-link entry are counted separately.
 - Existing result, comparison, share, and share-again transitions are observed without altering product behavior.
-- Share completion is counted only after successful Web Share or clipboard copy feedback.
-- No payloads, scores, URLs, timestamps, identities, cookies, persistence, network requests, or third-party analytics were added.
+- Successful first-result sharing and successful comparison re-sharing are counted separately.
+- Share completion is counted only after successful Web Share or clipboard copy feedback, and repeated unchanged observer notifications do not double-count it.
+- No payloads, scores, URLs, fragments, timestamps, identities, cookies, persistence, network requests, or third-party analytics were added.
 
 ### Stage 10
 
