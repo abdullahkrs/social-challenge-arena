@@ -10,7 +10,7 @@ on:
 jobs:
   smoke:
     name: Smoke runner
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - name: Confirm runner starts
         run: echo "runner-started"
