@@ -125,7 +125,7 @@
 ### Changed
 
 - Valid shared links now open a friend challenge entry instead of ordinary discovery.
-- Dismissing or leaving shared context removes the shared fragment safely.
+- Dismissing or leaving shared context removes the fragment safely.
 - Friend attempts reuse the existing gameplay and result states; comparison remains deferred.
 
 ## 0.5.0 — 2026-07-11
