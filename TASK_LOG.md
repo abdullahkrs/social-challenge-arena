@@ -94,3 +94,64 @@ Live mobile browser verification and deployed-preview verification are unavailab
 ### Next suggested task
 
 Implement the first playable curated challenge using the existing Tap Sprint identity and shared landing flow. Do not implement the result screen until gameplay is complete.
+
+## Cycle 3
+
+- **Date/time:** 2026-07-11T10:39:52+03:00
+- **Status:** in progress
+- **Selected task:** Implement the first playable curated challenge using the existing Tap Sprint identity.
+- **Goal:** Turn the discovery action into a complete 20-second tapping attempt with a live timer, live tap count, safe completion, and replay.
+- **Why selected:** Cycle 2 is complete and the first playable challenge is the earliest incomplete roadmap stage.
+- **Viral-loop impact:** Converts discovery into a real attempt and creates the attempt data required by the next result and sharing stages.
+
+### Planned acceptance criteria
+
+- The landing primary action opens and starts Tap Sprint.
+- The challenge shows the existing title, a 20-second countdown, and a live tap count.
+- Taps increment only while the attempt is running.
+- Reaching zero stops the timer, disables tapping, and shows a compact inline completion summary.
+- Replay starts a clean independent attempt without reloading the page.
+- The gameplay state is keyboard accessible, uses clear live regions, and keeps primary targets at least 44×44 CSS pixels.
+- The layout remains fluid from 320px upward without horizontal overflow.
+- Focused tests cover start, tap, countdown, completion, ignored late taps, and replay/reset behavior.
+
+### Expected files to change
+
+- `index.html`
+- `styles.css`
+- `app.js`
+- `test/landing.test.js`
+- `test/gameplay.test.js`
+- `docs/index.html`
+- `docs/styles.css`
+- `docs/app.js`
+- `ROADMAP.md`
+- `CHANGELOG.md`
+- `TASK_LOG.md`
+
+### Explicit non-goals
+
+- No focused result screen.
+- No sharing or copied links.
+- No friend attempt, comparison, share-again action, metrics, challenge variety, or challenge creation.
+- No dependency, framework, backend, login, or broad redesign.
+
+### Strategic review
+
+- The direction remains aligned with the discover-to-compete north star.
+- The largest product bottleneck is that the discovered challenge cannot yet be played.
+- The largest delivery risk is browser behavior that cannot be fully exercised in the current connector-only environment.
+- No evidence invalidates the static HTML/CSS/JavaScript architecture.
+- A single reusable Tap Sprint attempt is the highest-impact small task in the current stage.
+
+### Product thinking
+
+1. The absence of gameplay blocks the next core-loop step.
+2. Immediate feedback through a visible timer and tap count should make the original player more likely to finish the attempt.
+3. A quick, understandable 20-second mechanic gives a future friend a low-friction reason to compete.
+4. The smallest proof is one deterministic start/tap/countdown/complete/replay state machine connected to the existing card.
+5. No useful new idea this cycle.
+
+### Parked idea
+
+None.
