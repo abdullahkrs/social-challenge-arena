@@ -6,7 +6,8 @@ Historical completed cycles 1–6 are preserved in [`TASK_LOG_ARCHIVE_CYCLES_1_6
 
 - **Date/time:** 2026-07-12T01:42:03+03:00
 - **Verification completed at:** 2026-07-12T01:54:00+03:00
-- **Status:** implementation complete and reviewed; awaiting squash merge
+- **Merge verified at:** 2026-07-12T01:56:56+03:00
+- **Status:** complete; implementation squash-merged into `main`
 - **Selected task:** Distinguish successful comparison re-shares from successful first-result shares in the privacy-safe session metrics.
 - **Goal:** Add one aggregate `share_again_completed` counter so the final Share Again step can be measured independently without payloads, persistence, identity, timestamps, URLs, or network delivery.
 - **Why selected:** No pull request or unfinished cycle was open and all roadmap stages were complete. The documented next step is real usage evidence, but the previous collector recorded successful first shares and successful comparison re-shares in the same `share_completed` bucket, preventing direct measurement of loop closure.
@@ -85,12 +86,14 @@ Historical completed cycles 1–6 are preserved in [`TASK_LOG_ARCHIVE_CYCLES_1_6
 - Complete diff, changed filenames, branch ancestry, tests, build behavior, source/preview parity, documentation, privacy, security, scope, and secrets were reviewed. No unresolved blocking finding remained before merge.
 - No independent approval is claimed; this is a factual self-review.
 
-### Git and merge status
+### Git and merge outcome
 
 - Implementation branch: `agent/cycle-16-track-share-again-completion`, created directly from `main` at `b4196d5b38a32183a56a98088cfde9a1da0bc943`.
 - Pull request: #42 — `fix(metrics): track successful share-again separately`, targeting `main`.
-- Reviewed head before the final task-log evidence commit: `287dfde128e58d40f416c558ea2cda6ef23f6a0a`.
-- Final head, squash merge result, and merge SHA will be verified and recorded after merge.
+- Final reviewed head SHA: `ca5e946db475e40672a39108b31b1b11a5a0f41d`.
+- Squash merge completed at 2026-07-12T01:56:56+03:00.
+- Merge SHA: `d3f3ff0b79801f78cd6c7a303ec53ceae3bcca1c`.
+- GitHub reports PR #42 as closed and merged with no remaining conflict, review thread, submitted review, workflow run, or status check.
 
 ### Preview status
 
