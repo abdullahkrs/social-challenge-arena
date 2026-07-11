@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.3.0 — 2026-07-11
+
+### Added
+
+- Playable 20-second Tap Sprint challenge.
+- Live countdown and tap counter.
+- Safe completion, replay, and return-to-discovery controls.
+- Focused gameplay lifecycle tests.
+
+### Changed
+
+- The discovery action now starts the challenge instead of revealing placeholder details.
+
 ## 0.2.0 — 2026-07-11
 
 ### Added
