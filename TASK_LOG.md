@@ -6,7 +6,8 @@ Historical completed cycles 1–6 are preserved in [`TASK_LOG_ARCHIVE_CYCLES_1_6
 
 - **Date/time:** 2026-07-11T20:40:37+03:00
 - **Verification completed at:** 2026-07-11T21:02:50+03:00
-- **Status:** ready for final pull-request review and merge
+- **Completed at:** 2026-07-11T21:09:10+03:00
+- **Status:** completed
 - **Selected task:** Add lightweight no-login private tap challenge creation by link.
 - **Goal:** Let a player enter one short safe challenge name, choose one bounded duration, play the existing tap mechanic, and share a validated private result link that a friend can open, compete against, compare, and share again.
 - **Why selected:** Cycle 10 was complete on `main`, no pull request was open, and lightweight private creation was the earliest incomplete roadmap stage.
@@ -73,7 +74,7 @@ Historical completed cycles 1–6 are preserved in [`TASK_LOG_ARCHIVE_CYCLES_1_6
 - Accessibility review: explicit form labels, visible focus, live validation/status regions, one primary action per state, semantic buttons/links, focus movement, and short state announcements.
 - Security/privacy review: exact key sets, duplicate and extra-key rejection, bounded fragment length, title allowlist, duration allowlist, score cap, HTTP(S)-only sharing, safe text APIs, and no storage, cookie, network sink, executable input, secret, or personal-data collection.
 - Interactive browser screenshots were unavailable in this runtime.
-- **Preview status:** repository preview output verified for the reviewed branch blobs.
+- **Preview status:** repository preview output verified for the merged source blobs.
 
 ### Review findings and resolution
 
@@ -82,16 +83,20 @@ Historical completed cycles 1–6 are preserved in [`TASK_LOG_ARCHIVE_CYCLES_1_6
 - Initial preview review found the build manifest had to include all three new private assets.
 - Resolution: added `create.html`, `private.css`, and `private.js` to the required build asset list and added parity tests for all seven preview files.
 - Blocking test finding during complete PR review: the invalid-title list expected `' leading'` to fail even though the specified normalizer intentionally trims surrounding whitespace, so the committed test would fail against the implemented acceptance rule.
-- Resolution: removed the contradictory invalid case, retained the explicit whitespace-normalization assertion, and reran a focused title-validation check successfully.
-- No remaining correctness, security, privacy, accessibility, scope, synchronization, or secret-like-string finding was identified after the fix.
+- Resolution: removed the contradictory invalid case, retained the explicit whitespace-normalization assertion, reran a focused title-validation check successfully, replied to the review, and resolved the thread.
+- Final factual self-review at head `747f65d212c8c23089d7a1b81871885432ccdcf6` covered the complete 16-file diff and found no remaining correctness, security, privacy, accessibility, scope, synchronization, conflict, or secret-like-string issue; no independent approval was claimed.
+- Final merge gate confirmed PR #31 targeted `main`, was mergeable, had no conflict, no unresolved review thread, and no commit status failure.
 
 ### Git and merge outcome
 
 - Product branch: `agent/cycle-11-private-creation`, created from `main` at `675105f51ac007560674ecb09d1d0d9081d8263f`.
 - Planning/archive commits began at `b9bc5cfc5c2a595f01526ef98f3bd3156d325947` and `08f6213cb5b182e4afdc334705cf37f7c747f41b`.
 - Pull request: #31 — `feat(private): add lightweight private challenge creation`, targeting `main`.
-- Reviewed code/test head before this factual log update: `3bff4e8b0aff720292ea307555226ff5f81c182e`.
-- Final PR head, merge method, outcome, and merge SHA: pending final merge gate.
+- Final reviewed PR head SHA: `747f65d212c8c23089d7a1b81871885432ccdcf6`.
+- Merge method: squash using the expected final head SHA.
+- Merge outcome: successfully merged and verified on 2026-07-11T21:09:10+03:00.
+- Merge SHA: `d78548e0f617ac4c0cb4307d94d83d5fdc7d415c`.
+- Cycle-close branch: `agent/cycle-11-close-private-creation`, created from the updated `main` merge SHA solely to record the final merge facts that could not exist inside the implementation PR before merge.
 
 ### Decision
 
@@ -99,7 +104,7 @@ No new architecture or external service decision. Private creation remains a sta
 
 ### Strategic review
 
-- The current direction remains aligned with the north star: the full curated loop works, and private-by-link creation is the final ordered MVP stage.
+- The current direction remains aligned with the north star: the full curated loop works, and private-by-link creation completes the ordered MVP.
 - The personalization bottleneck is addressed without weakening the existing curated path.
 - The largest technical risk was untrusted custom state; strict title, duration, score, shape, protocol, and fragment bounds address it.
 - No new evidence invalidates the static architecture or existing tap mechanic.
