@@ -35,6 +35,8 @@ test('result view presents score, sharing, replay, and discovery actions', () =>
   assert.match(html, /id="result-message"/);
   assert.match(html, /id="result-announcement"[^>]*aria-live="polite"/);
   assert.match(html, /id="share-result"[^>]*>Share score</);
+  assert.match(html, /id="share-status"[^>]*aria-live="polite"/);
+  assert.match(html, /id="share-fallback"[^>]*hidden>Open score link</);
   assert.match(html, /id="result-replay"[^>]*>Play again</);
   assert.match(html, /id="result-back"[^>]*>Challenges</);
   assert.match(css, /\.result-score strong[\s\S]*overflow-wrap: anywhere/);
