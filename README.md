@@ -6,7 +6,7 @@ Discover → Play → Result → Share → Friend Competes → Compare → Share
 
 ## Current state
 
-The no-login social loop and lightweight private challenge creation are implemented. The curated catalog now contains seven playable entries across Speed, Rhythm, Endurance, and Timing, backed by two genuinely different mechanics: timed tap count and three-stop center timing.
+The no-login social loop and lightweight private challenge creation are implemented. The curated catalog contains eight playable entries across Speed, Rhythm, Endurance, Timing, and Memory, backed by three genuinely different mechanics: timed tap count, three-stop center timing, and growing visual-sequence recall.
 
 A friend opening a valid curated or private link sees the exact challenge, target score, and format, can compete without login, receives a deterministic side-by-side comparison, and can share their validated score as the next target.
 
@@ -18,10 +18,11 @@ The completed loop has dependency-free privacy-safe instrumentation on the curat
 - Rhythm label: Rhythm Rush (Easy), Tempo Storm (Hard)
 - Endurance: Tap Marathon (Easy), Endurance Blitz (Hard)
 - Timing: Center Snap (Easy)
+- Memory: Signal Echo (Easy)
 
-The first six definitions reuse timed tap count. Center Snap is a different game: the marker moves across a meter, the player makes three stop decisions, and each stop scores up to 1,000 points based on distance from the center.
+The first six definitions reuse timed tap count. Center Snap asks the player to stop a moving marker three times and scores distance from the center. Signal Echo shows four growing patterns of 2, 3, 4, and 5 signals; the player repeats them with four native buttons, earns 100 points per correct signal, and immediately ends the attempt after a wrong choice.
 
-Center Snap uses purposeful marker movement and centered/near/missed feedback. With `prefers-reduced-motion`, it switches to slower discrete marker steps and removes decorative interpolation while preserving the same scoring, text feedback, keyboard control, and social competition loop.
+Center Snap uses purposeful marker movement and centered/near/missed feedback. Signal Echo uses purposeful sequence playback and correct/incorrect input feedback. With `prefers-reduced-motion`, Center Snap uses slower discrete marker steps, while Signal Echo uses longer still signal states and suppresses transform and shake animation. Both preserve text feedback, keyboard control, bounded scoring, safe timer cleanup, and the same social competition loop.
 
 Curated variety remains in progress. Completion requires at least six playable entries and at least four genuinely different mechanics that materially change player decisions, timing, input, failure conditions, or scoring while reusing the existing result, sharing, friend-attempt, comparison, and share-again flow.
 

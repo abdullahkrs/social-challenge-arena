@@ -2,7 +2,7 @@
 
 ## Current repository state
 
-Active MVP development. The no-login social loop and lightweight private creation are implemented. Curated challenge variety remains in progress with seven playable entries and two genuinely different mechanics: timed tap count and three-stop center timing.
+Active MVP development. The no-login social loop and lightweight private creation are implemented. Curated challenge variety remains in progress with eight playable entries and three genuinely different mechanics: timed tap count, three-stop center timing, and growing visual-sequence recall.
 
 ## MVP stages
 
@@ -97,18 +97,20 @@ Active MVP development. The no-login social loop and lightweight private creatio
 
 Current implementation evidence:
 
-- Seven frozen data-driven curated definitions cover Speed, Rhythm, Endurance, and Timing labels.
+- Eight frozen data-driven curated definitions cover Speed, Rhythm, Endurance, Timing, and Memory labels.
 - The existing six definitions continue to use the timed tap-count engine.
 - Center Snap adds a genuinely different three-stop timing mechanic with a moving marker and distance-based points scoring up to 3,000.
-- Center Snap reuses the existing result, strict shared-link codec, friend invitation, comparison, share-again, metrics, and navigation flows.
-- Marker movement and centered/near/missed feedback provide purposeful state motion; `prefers-reduced-motion` uses slower discrete steps and disables decorative animation.
-- A compact keyboard-accessible selector preserves one primary play action on discovery.
-- Shared links preserve the selected challenge and configured format while rejecting unknown IDs, mismatches, and Center Snap scores above 3,000.
+- Signal Echo adds a genuinely different visual-memory mechanic: watch and repeat patterns of 2, 3, 4, and 5 signals with immediate failure on a wrong ordered input and bounded scoring up to 1,400.
+- Center Snap and Signal Echo both reuse the existing result, strict shared-link codec, friend invitation, comparison, share-again, metrics, and navigation flows.
+- Center Snap provides purposeful marker movement and centered/near/missed feedback; Signal Echo provides purposeful sequence playback and correct/incorrect feedback.
+- `prefers-reduced-motion` uses slower discrete timing steps for Center Snap and longer still signal states with transform/shake suppression for Signal Echo.
+- A compact keyboard-accessible selector preserves one primary play action on discovery, and Signal Echo uses four native buttons with text announcements.
+- Shared links preserve the selected challenge and configured format while rejecting unknown IDs, mismatches, Center Snap scores above 3,000, and Signal Echo scores above 1,400.
 - Source and GitHub Pages preview files remain synchronized without dependencies, login, storage, or backend changes.
 
 Current gap:
 
-- The curated catalog now has two genuinely different mechanics, below the required minimum of four.
+- The curated catalog now has three genuinely different mechanics, below the required minimum of four.
 - The six tap definitions remain cosmetic variants of one mechanic despite their different names, labels, and durations.
 
 Completion gate:

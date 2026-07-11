@@ -15,7 +15,7 @@ test('curated catalog keeps at least six frozen challenges and adds genuine mech
   assert.equal(new Set(curatedChallenges.map(challenge => challenge.id)).size, curatedChallenges.length);
   assert.deepEqual(
     [...new Set(curatedChallenges.map(challenge => challenge.category))].sort(),
-    ['Endurance', 'Rhythm', 'Speed', 'Timing']
+    ['Endurance', 'Memory', 'Rhythm', 'Speed', 'Timing']
   );
   assert.deepEqual(
     [...new Set(curatedChallenges.map(challenge => challenge.difficulty))].sort(),
@@ -23,7 +23,7 @@ test('curated catalog keeps at least six frozen challenges and adds genuine mech
   );
   assert.deepEqual(
     [...new Set(curatedChallenges.map(challenge => challenge.mechanic || 'tap'))].sort(),
-    ['center-snap', 'tap']
+    ['center-snap', 'signal-echo', 'tap']
   );
 
   for (const challenge of curatedChallenges) {

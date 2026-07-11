@@ -6,17 +6,19 @@
 
 - Center Snap, an original three-stop timing challenge with a moving marker and distance-based scoring up to 3,000 points.
 - Centered, near, and missed feedback plus text announcements for every stop.
-- Focused tests for scoring, reduced motion, timer cancellation, strict shared-state bounds, and source/preview structure.
+- Signal Echo, an original four-round visual-memory challenge with growing patterns of 2, 3, 4, and 5 signals and bounded scoring up to 1,400 points.
+- Purposeful sequence playback and immediate correct or incorrect input feedback using four native keyboard-accessible buttons.
+- Focused tests for timing and memory scoring, reduced motion, timer cancellation, strict shared-state bounds, accessibility, and social-loop reuse.
 
 ### Changed
 
-- Curated discovery now contains seven playable entries and two genuinely different gameplay mechanics.
-- Result, friend invitation, comparison, and share copy now use challenge-aware score units and round formats.
-- Reduced-motion users receive slower discrete marker movement with decorative interpolation and feedback animation disabled.
+- Curated discovery now contains eight playable entries and three genuinely different gameplay mechanics.
+- Result, friend invitation, comparison, and sharing use challenge-aware score units and round formats without changing the shared-link schema.
+- Reduced-motion users receive discrete Center Snap marker movement and longer still Signal Echo states with decorative transform and feedback animation disabled.
 
 ### Privacy and scope
 
-- Center Snap reuses the existing strict shared-link codec, result, friend-attempt, comparison, share-again, metrics, and navigation flows.
+- Center Snap and Signal Echo reuse the existing strict shared-link codec, result, friend-attempt, comparison, share-again, metrics, and navigation flows.
 - No login, identity, persistence, backend, cookie, analytics destination, dependency, framework, copied game identity, private-creation change, or shared-link schema expansion was added.
 
 ## 0.11.0 — 2026-07-11
