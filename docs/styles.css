@@ -219,6 +219,8 @@ h2 {
 }
 
 .result-score strong {
+  max-width: 100%;
+  overflow-wrap: anywhere;
   font-size: clamp(4.5rem, 28vw, 7.5rem);
   line-height: 0.88;
   letter-spacing: -0.07em;
