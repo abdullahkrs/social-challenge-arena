@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.6.0 — 2026-07-11
+
+### Added
+
+- Dedicated mobile-first invitation for valid shared Tap Sprint results.
+- Validated target score, challenge identity, duration, and accessible friend-entry announcement.
+- Primary `Try to beat it` and secondary `Browse challenges` actions.
+- Focused friend-invitation and fragment-cleanup tests.
+
+### Changed
+
+- Valid shared links now open a friend challenge entry instead of ordinary discovery.
+- Dismissing or leaving shared context removes the fragment safely.
+- Friend attempts reuse the existing gameplay and result states; comparison remains deferred.
+
 ## 0.5.0 — 2026-07-11
 
 ### Added

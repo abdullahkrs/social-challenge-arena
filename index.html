@@ -11,6 +11,29 @@
 </head>
 <body>
   <main class="shell">
+    <section class="view friend-view" id="friend-view" aria-labelledby="friend-title" hidden>
+      <header class="friend-header">
+        <p class="eyebrow">Friend challenge</p>
+        <h1 id="friend-title">Beat this score</h1>
+        <p class="friend-meta"><span id="friend-challenge-name">Tap Sprint</span> · <span id="friend-duration">20</span> sec</p>
+      </header>
+
+      <div class="friend-card">
+        <p class="friend-target">
+          <strong id="friend-target-score">0</strong>
+          <span>taps to beat</span>
+        </p>
+        <p class="friend-message">Same challenge. One attempt.</p>
+      </div>
+
+      <p class="sr-only" id="friend-announcement" aria-live="polite"></p>
+
+      <div class="friend-controls">
+        <button class="primary-action" id="start-friend-attempt" type="button">Try to beat it</button>
+        <button class="secondary-action" id="dismiss-friend-attempt" type="button">Browse challenges</button>
+      </div>
+    </section>
+
     <section class="view discovery-view" id="discovery-view" aria-labelledby="page-title">
       <header class="hero">
         <p class="eyebrow">Social Challenge Arena</p>

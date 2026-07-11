@@ -426,3 +426,61 @@ Live deployed-preview verification, interactive browser exercise, and automated 
 ### Next suggested task
 
 Implement the friend-attempt entry state for a valid shared Tap Sprint link: present the sharer's validated target, let the friend start the same challenge, and preserve comparison as a later stage.
+
+## Cycle 6
+
+- **Date/time:** 2026-07-11T15:05:02+03:00
+- **Status:** in progress
+- **Selected task:** Add a friend-attempt entry state for a valid shared Tap Sprint link.
+- **Goal:** Present the sharer's validated target clearly and let a friend start the same 20-second challenge without implementing post-attempt comparison.
+- **Why selected:** Cycle 5 is complete on `main`, no continuity pull request is open, and friend attempt from a shared link is the earliest incomplete roadmap stage.
+- **Viral-loop impact:** Advances Friend Competes by converting a validated shared result link into a clear challenge invitation and playable attempt.
+
+### Acceptance criteria
+
+- A valid shared result hash opens a dedicated friend-entry view instead of ordinary discovery.
+- The view shows only the validated Tap Sprint identity, target score, and duration using safe DOM text properties.
+- One obvious primary action starts the same 20-second Tap Sprint attempt while preserving the validated target in memory.
+- A secondary action dismisses the shared invitation, removes the fragment, and returns to ordinary discovery.
+- Invalid shared state continues to be removed without rendering or execution.
+- Completing the friend attempt still opens the existing result state; comparison wording, win/loss logic, and share-again behavior remain deferred.
+- Keyboard focus, live announcements, 48px controls, and mobile layout remain usable at 320px and 390px without horizontal overflow.
+- Focused tests cover friend-entry model validation, valid shared-entry structure and behavior boundaries, dismissal cleanup, and unchanged strict hash parsing.
+- Source and generated `docs/` preview files remain synchronized.
+
+### Expected files
+
+- `index.html`
+- `styles.css`
+- `app.js`
+- `test/friend-attempt.test.js`
+- `test/landing.test.js`
+- `docs/index.html`
+- `docs/styles.css`
+- `docs/app.js`
+- `README.md`
+- `ROADMAP.md`
+- `CHANGELOG.md`
+- `TASK_LOG.md`
+
+### Explicit non-goals
+
+- No original-player versus friend comparison, beat/tie/loss messaging, or comparison screen.
+- No share-again action, analytics, storage, login, backend, challenge variety, or challenge creation.
+- No dependency, framework, workflow restoration, architecture migration, broad redesign, or personalized identity.
+
+### Strategic review
+
+- The current direction remains aligned with the north star through Discover → Play → Result → Share → Friend Competes.
+- The largest product bottleneck is that a valid shared link is parsed but not yet presented as an invitation a friend can act on.
+- The largest delivery risk remains unavailable automated CI and interactive deployed-preview verification; repository scripts and source/preview comparison remain available.
+- No evidence invalidates the bounded fragment model or static architecture.
+- A dedicated friend-entry state is the highest-impact small task and does not require comparison logic.
+
+### Product thinking
+
+1. The next core-loop step is blocked because valid incoming target state is retained but invisible and unactionable.
+2. A concise invitation with a visible target makes the original player's shared result meaningful.
+3. A single `Try to beat it` action and no login reduce friction for the friend.
+4. The smallest proof is one validated invitation view that starts the existing challenge while preserving target context.
+5. Parked idea: show a subtle target reminder during gameplay only if later usability evidence shows friends forget the goal; do not add it in this cycle.

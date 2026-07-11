@@ -171,6 +171,54 @@ function parseSharedResultHash(hash) {
   });
 }
 
+function createFriendAttemptInvitation(sharedResult) {
+  if (!sharedResult || typeof sharedResult !== 'object') {
+    throw new TypeError('Shared result is required.');
+  }
+
+  const expectedKeys = ['version', 'challengeId', 'taps', 'durationSeconds'];
+  const keys = Object.keys(sharedResult);
+  if (keys.length !== expectedKeys.length || keys.some(key => !expectedKeys.includes(key))) {
+    throw new TypeError('Shared result has an invalid shape.');
+  }
+  if (sharedResult.version !== sharedResultVersion) {
+    throw new TypeError('Shared result version is unsupported.');
+  }
+  if (sharedResult.challengeId !== featuredChallenge.id) {
+    throw new TypeError('Shared challenge is unsupported.');
+  }
+
+  const validated = validateSharedResult(sharedResult.taps, sharedResult.durationSeconds);
+  return Object.freeze({
+    challengeId: featuredChallenge.id,
+    challengeTitle: featuredChallenge.title,
+    targetTaps: validated.taps,
+    durationSeconds: validated.durationSeconds
+  });
+}
+
+function clearSharedResultHash(locationObject, historyObject) {
+  if (!locationObject || !historyObject || typeof historyObject.replaceState !== 'function') {
+    return false;
+  }
+
+  const pathname = typeof locationObject.pathname === 'string'
+    && locationObject.pathname.startsWith('/')
+    && !locationObject.pathname.startsWith('//')
+    ? locationObject.pathname
+    : '/';
+  const search = typeof locationObject.search === 'string' && locationObject.search.startsWith('?')
+    ? locationObject.search
+    : '';
+
+  try {
+    historyObject.replaceState(null, '', `${pathname}${search}`);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 async function shareResultLink(url, options = {}) {
   let normalizedUrl;
   try {
@@ -217,14 +265,23 @@ if (typeof module !== 'undefined') {
     createResultSummary,
     createSharedResultUrl,
     parseSharedResultHash,
+    createFriendAttemptInvitation,
+    clearSharedResultHash,
     shareResultLink
   };
 }
 
 if (typeof document !== 'undefined') {
+  const friendView = document.querySelector('#friend-view');
   const discoveryView = document.querySelector('#discovery-view');
   const challengeView = document.querySelector('#challenge-view');
   const resultView = document.querySelector('#result-view');
+  const friendChallengeName = document.querySelector('#friend-challenge-name');
+  const friendDuration = document.querySelector('#friend-duration');
+  const friendTargetScore = document.querySelector('#friend-target-score');
+  const friendAnnouncement = document.querySelector('#friend-announcement');
+  const startFriendButton = document.querySelector('#start-friend-attempt');
+  const dismissFriendButton = document.querySelector('#dismiss-friend-attempt');
   const startButton = document.querySelector('#start-challenge');
   const tapButton = document.querySelector('#tap-button');
   const backButton = document.querySelector('#back-to-challenges');
@@ -242,9 +299,16 @@ if (typeof document !== 'undefined') {
   const canonicalLink = document.querySelector('link[rel="canonical"]');
 
   const requiredElements = [
+    friendView,
     discoveryView,
     challengeView,
     resultView,
+    friendChallengeName,
+    friendDuration,
+    friendTargetScore,
+    friendAnnouncement,
+    startFriendButton,
+    dismissFriendButton,
     startButton,
     tapButton,
     backButton,
@@ -264,10 +328,11 @@ if (typeof document !== 'undefined') {
 
   if (requiredElements.every(Boolean)) {
     let completedResult = null;
+    let activeFriendInvitation = null;
 
     const incomingShare = parseSharedResultHash(window.location.hash);
-    if (window.location.hash && !incomingShare && typeof history.replaceState === 'function') {
-      history.replaceState(null, '', `${window.location.pathname}${window.location.search}`);
+    if (window.location.hash && !incomingShare) {
+      clearSharedResultHash(window.location, window.history);
     }
 
     function resetShareState() {
@@ -275,6 +340,19 @@ if (typeof document !== 'undefined') {
       shareFallback.hidden = true;
       shareFallback.removeAttribute('href');
       shareFallback.textContent = 'Open score link';
+    }
+
+    function showFriendInvitation(invitation) {
+      activeFriendInvitation = invitation;
+      friendChallengeName.textContent = invitation.challengeTitle;
+      friendDuration.textContent = String(invitation.durationSeconds);
+      friendTargetScore.textContent = String(invitation.targetTaps);
+      discoveryView.hidden = true;
+      challengeView.hidden = true;
+      resultView.hidden = true;
+      friendView.hidden = false;
+      friendAnnouncement.textContent = `${invitation.challengeTitle} challenge. Beat ${invitation.targetTaps} taps in ${invitation.durationSeconds} seconds.`;
+      startFriendButton.focus();
     }
 
     const game = createTapSprintGame({
@@ -300,8 +378,10 @@ if (typeof document !== 'undefined') {
 
     function startAttempt() {
       completedResult = null;
+      friendAnnouncement.textContent = '';
       resultAnnouncement.textContent = '';
       resetShareState();
+      friendView.hidden = true;
       discoveryView.hidden = true;
       resultView.hidden = true;
       challengeView.hidden = false;
@@ -310,10 +390,14 @@ if (typeof document !== 'undefined') {
     }
 
     function returnToDiscovery() {
+      activeFriendInvitation = null;
       completedResult = null;
       game.reset();
+      friendAnnouncement.textContent = '';
       resultAnnouncement.textContent = '';
       resetShareState();
+      clearSharedResultHash(window.location, window.history);
+      friendView.hidden = true;
       challengeView.hidden = true;
       resultView.hidden = true;
       discoveryView.hidden = false;
@@ -350,11 +434,17 @@ if (typeof document !== 'undefined') {
       }
     }
 
+    startFriendButton.addEventListener('click', startAttempt);
+    dismissFriendButton.addEventListener('click', returnToDiscovery);
     startButton.addEventListener('click', startAttempt);
     tapButton.addEventListener('click', () => game.tap());
     shareButton.addEventListener('click', shareCompletedResult);
     resultReplayButton.addEventListener('click', startAttempt);
     backButton.addEventListener('click', returnToDiscovery);
     resultBackButton.addEventListener('click', returnToDiscovery);
+
+    if (incomingShare) {
+      showFriendInvitation(createFriendAttemptInvitation(incomingShare));
+    }
   }
 }
