@@ -6,7 +6,7 @@ Discover → Play → Result → Share → Friend Competes → Compare → Share
 
 ## Current state
 
-The repository contains a minimal runnable, testable, buildable, and previewable baseline. Product stages have not started yet.
+The repository includes a mobile-first discovery screen and the first playable curated challenge. Tap Sprint runs a 20-second attempt with a live timer, tap counter, safe completion, and replay. A focused result screen and sharing flow are not implemented yet.
 
 ## Run
 
