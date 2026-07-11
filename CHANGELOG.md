@@ -4,19 +4,21 @@
 
 ### Added
 
+- Center Snap, an original three-stop timing challenge with a moving marker and distance-based scoring up to 3,000 points.
+- Centered, near, and missed feedback plus text announcements for every stop.
 - Signal Echo, an original four-round visual-memory challenge with growing patterns of 2, 3, 4, and 5 signals and bounded scoring up to 1,400 points.
 - Purposeful sequence playback and immediate correct or incorrect input feedback using four native keyboard-accessible buttons.
-- Focused tests for sequence progression, maximum scoring, wrong input, reduced motion, timer cancellation, strict shared-state bounds, and social-loop reuse.
+- Focused tests for timing and memory scoring, reduced motion, timer cancellation, strict shared-state bounds, accessibility, and social-loop reuse.
 
 ### Changed
 
 - Curated discovery now contains eight playable entries and three genuinely different gameplay mechanics.
-- Result, friend invitation, comparison, and sharing continue to use challenge-aware points and round formats without changing the shared-link schema.
-- Reduced-motion users receive longer still signal states with transform and shake animation disabled while scoring and text feedback remain unchanged.
+- Result, friend invitation, comparison, and sharing use challenge-aware score units and round formats without changing the shared-link schema.
+- Reduced-motion users receive discrete Center Snap marker movement and longer still Signal Echo states with decorative transform and feedback animation disabled.
 
 ### Privacy and scope
 
-- Signal Echo reuses the existing strict shared-link codec, result, friend-attempt, comparison, share-again, metrics, and navigation flows.
+- Center Snap and Signal Echo reuse the existing strict shared-link codec, result, friend-attempt, comparison, share-again, metrics, and navigation flows.
 - No login, identity, persistence, backend, cookie, analytics destination, dependency, framework, copied game identity, private-creation change, or shared-link schema expansion was added.
 
 ## 0.11.0 — 2026-07-11
