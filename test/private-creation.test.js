@@ -127,4 +127,13 @@ test('creation page exposes one compact safe form and the full private loop', ()
   assert.match(script, /createTapSprintGame\(/);
   assert.match(script, /textContent =/);
   assert.doesNotMatch(script, /innerHTML|eval\(|new Function|localStorage|sessionStorage|document\.cookie|fetch\(|XMLHttpRequest/);
+
+  const finalViewEnd = html.lastIndexOf('</section>');
+  for (const id of [
+    'private-invite-announcement',
+    'private-result-announcement',
+    'private-comparison-announcement'
+  ]) {
+    assert.ok(html.indexOf(`id="${id}"`) > finalViewEnd, `${id} must remain outside hidden views`);
+  }
 });
