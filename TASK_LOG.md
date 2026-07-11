@@ -197,3 +197,67 @@ Interactive browser and deployed live-preview verification were not available. P
 ### Next suggested task
 
 Replace the inline completion summary with a focused, reusable score/result state. Do not implement sharing in that cycle.
+
+## Cycle 4
+
+- **Date/time:** 2026-07-11T11:39:45+03:00
+- **Status:** in progress
+- **Selected task:** Replace the inline completion summary with a focused, reusable score/result state.
+- **Goal:** Move completed Tap Sprint attempts into a distinct mobile-first result view where the score is dominant and replay is the single primary action.
+- **Why selected:** Cycle 3 completed the first playable challenge, and the focused score/result state is the earliest incomplete roadmap stage.
+- **Viral-loop impact:** Gives the original player a clear, share-ready outcome while preserving sharing itself for the next focused cycle.
+
+### Acceptance criteria
+
+- Completing Tap Sprint transitions from gameplay to a distinct result view.
+- Tap Sprint identity remains clear and the tap score is the most prominent information.
+- A brief message is derived from the real score without fabricated ranking or social proof.
+- Replay is the single primary action and starts a clean attempt.
+- Returning to discovery remains available as a secondary action.
+- Invalid or incomplete result data falls back safely instead of rendering a broken result.
+- Result rendering is separated from Tap Sprint timing logic so later challenges can reuse the result view.
+- Focused tests cover result creation, invalid-result fallback, completion output, and replay readiness.
+- No sharing, friend attempt, comparison, metrics, variety expansion, or challenge creation is added.
+
+### Expected files to change
+
+- `index.html`
+- `styles.css`
+- `app.js`
+- `test/landing.test.js`
+- `test/gameplay.test.js`
+- `test/result.test.js`
+- `docs/index.html`
+- `docs/styles.css`
+- `docs/app.js`
+- `README.md`
+- `ROADMAP.md`
+- `CHANGELOG.md`
+- `TASK_LOG.md`
+
+### Explicit non-goals
+
+- No share or copy action.
+- No URL state, friend attempt, comparison, share-again behavior, or metrics.
+- No new challenge, challenge engine, dependency, framework, backend, login, or architecture migration.
+- No broad redesign of discovery or active gameplay.
+
+### Strategic review
+
+- Direction remains aligned with the discover-to-compete north star.
+- The largest current product bottleneck is the lack of a clear outcome after a completed attempt.
+- Interactive browser verification remains the largest delivery risk.
+- No evidence invalidates the existing static architecture or Tap Sprint state machine.
+- A focused result view is the highest-impact small task in the current stage.
+
+### Product thinking
+
+1. The inline completion sentence blocks a clear result moment and the next sharing step.
+2. A dominant real score plus immediate replay gives the original player a stronger reason to try again and later share.
+3. A concise, challenge-identified result will make the future shared competitive context easier for a friend to understand.
+4. The smallest proof is one generic result renderer fed by validated Tap Sprint attempt data and connected to completion/replay/back actions.
+5. No useful new idea this cycle.
+
+### Parked idea
+
+None.
