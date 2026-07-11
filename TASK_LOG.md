@@ -66,6 +66,7 @@ Historical completed cycles 1–6 are preserved in [`TASK_LOG_ARCHIVE_CYCLES_1_6
 - GitHub Actions/status checks remain unavailable because the repository workflow was removed by owner direction.
 - A focused local Node helper harness matching the committed private title, duration, score, fragment, comparison, and share-again logic passed: 4 tests passed, 0 failed.
 - `node --check` passed for the focused private helper module used by that harness.
+- After correcting the title test expectation, a focused runtime check confirmed whitespace normalization and all listed invalid-title cases pass.
 - Static build-manifest review confirmed all seven required source assets are copied to both `dist/` and `docs/`.
 - Repository blob equality confirms `index.html`, `create.html`, `private.js`, and `private.css` exactly match their corresponding `docs/` files; unchanged `app.js`, `styles.css`, and `metrics.js` were already synchronized and remain untouched.
 - Static 320px and 390px review: `min-width: 0` fields, full-width 48px controls, responsive shared score layouts, wrapping link fallback, and no fixed-width horizontal-scroll source.
@@ -80,13 +81,17 @@ Historical completed cycles 1–6 are preserved in [`TASK_LOG_ARCHIVE_CYCLES_1_6
 - Resolution: loaded `private.css` on discovery, expanded `.private-create-link` styling, synchronized `docs/index.html`, and retained the curated play button as the single primary action.
 - Initial preview review found the build manifest had to include all three new private assets.
 - Resolution: added `create.html`, `private.css`, and `private.js` to the required build asset list and added parity tests for all seven preview files.
-- No remaining correctness, security, privacy, accessibility, scope, synchronization, or secret-like-string finding was identified in the pre-PR review.
+- Blocking test finding during complete PR review: the invalid-title list expected `' leading'` to fail even though the specified normalizer intentionally trims surrounding whitespace, so the committed test would fail against the implemented acceptance rule.
+- Resolution: removed the contradictory invalid case, retained the explicit whitespace-normalization assertion, and reran a focused title-validation check successfully.
+- No remaining correctness, security, privacy, accessibility, scope, synchronization, or secret-like-string finding was identified after the fix.
 
 ### Git and merge outcome
 
 - Product branch: `agent/cycle-11-private-creation`, created from `main` at `675105f51ac007560674ecb09d1d0d9081d8263f`.
 - Planning/archive commits began at `b9bc5cfc5c2a595f01526ef98f3bd3156d325947` and `08f6213cb5b182e4afdc334705cf37f7c747f41b`.
-- Pull request, final reviewed head, merge method, outcome, and merge SHA: pending final merge gate.
+- Pull request: #31 — `feat(private): add lightweight private challenge creation`, targeting `main`.
+- Reviewed code/test head before this factual log update: `3bff4e8b0aff720292ea307555226ff5f81c182e`.
+- Final PR head, merge method, outcome, and merge SHA: pending final merge gate.
 
 ### Decision
 
