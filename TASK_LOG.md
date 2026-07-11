@@ -123,3 +123,61 @@ Live deployed-preview verification, interactive browser exercise, and automated 
 ### Next suggested task
 
 Add one safe share-again action from the completed comparison using the friend’s validated score as the next target. Reuse the existing strict link codec and sharing fallbacks; do not add analytics, identity, persistence, or challenge variety.
+
+## Cycle 8
+
+- **Date/time:** 2026-07-11T17:43:15+03:00
+- **Status:** in progress
+- **Selected task:** Add one safe share-again action from the completed comparison.
+- **Goal:** Let the friend share their validated completed score as the next Tap Sprint target using the existing strict URL codec and share/copy fallbacks.
+- **Why selected:** Cycle 7 is completed on `main`, no pull request is open, and share-again is the earliest incomplete roadmap stage.
+- **Viral-loop impact:** Completes the first end-to-end loop by turning the friend’s result into a new challenge link for another person.
+
+### Acceptance criteria
+
+- The comparison view exposes one obvious primary `Share your score` action.
+- Share-again uses only the validated friend score and challenge duration from the completed comparison.
+- The generated URL reuses the existing strict versioned fragment format and canonical base URL.
+- Web Share remains preferred, clipboard remains the fallback, and a visible validated link appears only when neither succeeds.
+- Share status is announced accessibly; cancelled sharing does not expose a fallback link.
+- Replay retains the original validated target and remains secondary; returning to challenges clears shared context.
+- Focused tests cover share-again URL generation, friend-score selection, fallback behavior wiring, structure, and absence of identity or storage.
+- Static review confirms no blocked primary action or fixed-width overflow source at 320px and 390px.
+- Source and generated `docs/` preview files remain byte-for-byte synchronized.
+
+### Expected files
+
+- `index.html`
+- `styles.css` only if required for the new primary-action order
+- `app.js`
+- focused tests under `test/`
+- `docs/index.html`
+- `docs/styles.css` only if source changes
+- `docs/app.js`
+- `README.md`
+- `ROADMAP.md`
+- `CHANGELOG.md`
+- `TASK_LOG.md`
+
+### Explicit non-goals
+
+- No analytics or instrumentation.
+- No identity, login, storage, backend, leaderboard, ranking, challenge variety, or challenge creation.
+- No change to the shared-link schema or score bounds.
+- No framework, dependency, workflow, architecture, broad design, or unrelated cleanup.
+
+### Strategic review
+
+- The current direction is aligned with the north star and already reaches comparison.
+- The largest product bottleneck is the missing share-again action.
+- The largest delivery risk is unavailable CI and interactive deployed-preview tooling, so fresh local repository tests/build and static mobile review are required.
+- No new evidence invalidates the static architecture or bounded fragment state.
+- Stage 8 remains the highest-impact narrow task.
+
+### Product thinking
+
+1. The next core-loop step is blocked only by the absence of a comparison share action.
+2. A friend is more likely to continue when their own score becomes the next clear target.
+3. A recipient is more likely to open when the shared message directly asks them to beat a validated score.
+4. The smallest proof is one comparison share button reusing the existing URL and share helpers.
+5. Parked idea: later instrumentation can measure share-again attempts after the full loop exists.
