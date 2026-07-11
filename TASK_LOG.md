@@ -6,7 +6,8 @@ Historical completed cycles 1–6 are preserved in [`TASK_LOG_ARCHIVE_CYCLES_1_6
 
 - **Date/time:** 2026-07-11T21:39:48+03:00
 - **Verification completed at:** 2026-07-11T21:48:20+03:00
-- **Status:** implementation complete; merge pending
+- **Completed at:** 2026-07-11T21:50:33+03:00
+- **Status:** completed
 - **Selected task:** Correct the false completion status of curated challenge variety.
 - **Goal:** Reopen Roadmap Stage 10 because all six curated entries use the same timed tap mechanic, then make repository documentation accurately describe the current one-mechanic product and the required four-mechanic completion gate.
 - **Why selected:** `AGENT.md` defines cosmetic tap variants as insufficient, while `ROADMAP.md` and `README.md` still claimed curated variety was complete. The documented state conflicted with actual code.
@@ -57,6 +58,8 @@ Historical completed cycles 1–6 are preserved in [`TASK_LOG_ARCHIVE_CYCLES_1_6
 
 - Blocking documentation inconsistency found: Roadmap and README treated six timed tap variants as completed curated variety.
 - Resolution: reopened Stage 10, documented the actual one-mechanic state, and added measurable completion criteria.
+- Automated review found the active cycle status was still marked in progress after the correction was implemented.
+- Resolution: completed the factual verification section, added the completion timestamp, and changed Cycle 12 to `completed` before merge.
 - Scope review found no application, preview, dependency, metric, schema, secret, personal-data, or unrelated file change.
 - No independent approval is claimed; the pull request receives a factual self-review before merge.
 
