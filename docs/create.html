@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Create a private tap challenge and compete by link.">
+  <title>Create a Private Challenge · Social Challenge Arena</title>
+  <link rel="canonical" href="https://abdullahkrs.github.io/social-challenge-arena/create.html">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="private.css">
+  <script src="app.js" defer></script>
+  <script src="private.js" defer></script>
+</head>
+<body>
+  <main class="shell">
+    <section class="view private-builder-view" id="private-builder-view" aria-labelledby="private-builder-title">
+      <header class="hero">
+        <p class="eyebrow">Private by link</p>
+        <h1 id="private-builder-title">Create your challenge</h1>
+        <p class="intro">Name it. Pick a time. Set the score.</p>
+      </header>
+
+      <form class="private-form" id="private-form" novalidate>
+        <label class="private-field" for="private-title">
+          <span>Challenge name</span>
+          <input id="private-title" name="title" type="text" minlength="3" maxlength="24" autocomplete="off" inputmode="text" placeholder="Family Tap Battle" required>
+        </label>
+
+        <label class="private-field" for="private-duration">
+          <span>Duration</span>
+          <select id="private-duration" name="duration">
+            <option value="10">10 seconds</option>
+            <option value="20" selected>20 seconds</option>
+            <option value="30">30 seconds</option>
+          </select>
+        </label>
+
+        <p class="private-form-status" id="private-form-status" aria-live="polite"></p>
+        <button class="primary-action" type="submit">Create and play</button>
+        <a class="secondary-action private-link-action" href="index.html">Back to challenges</a>
+      </form>
+    </section>
+
+    <section class="view friend-view" id="private-invite-view" aria-labelledby="private-invite-heading" hidden>
+      <header class="friend-header">
+        <p class="eyebrow">Private challenge</p>
+        <h1 id="private-invite-heading">Beat this score</h1>
+        <p class="friend-meta"><span id="private-invite-title">Private Tap</span> · <span id="private-invite-duration">20</span> sec</p>
+      </header>
+
+      <div class="friend-card">
+        <p class="friend-target">
+          <strong id="private-invite-target">0</strong>
+          <span>taps to beat</span>
+        </p>
+        <p class="friend-message">Same private challenge. One attempt.</p>
+      </div>
+
+      <p class="sr-only" id="private-invite-announcement" aria-live="polite"></p>
+      <div class="friend-controls">
+        <button class="primary-action" id="private-start-invite" type="button">Try to beat it</button>
+        <button class="secondary-action" id="private-dismiss-invite" type="button">Create your own</button>
+      </div>
+    </section>
+
+    <section class="view game-view" id="private-game-view" aria-labelledby="private-game-title" hidden>
+      <header class="game-header">
+        <p class="eyebrow">Private tap challenge</p>
+        <h1 id="private-game-title">Private Tap</h1>
+        <p class="game-instruction">Tap fast until time runs out.</p>
+      </header>
+
+      <div class="scoreboard" aria-label="Private challenge status">
+        <div class="stat">
+          <strong id="private-time-value">20</strong>
+          <span>seconds</span>
+        </div>
+        <div class="stat">
+          <strong id="private-tap-count">0</strong>
+          <span>taps</span>
+        </div>
+      </div>
+
+      <button class="tap-action" id="private-tap-button" type="button">Tap!</button>
+      <p class="game-status" id="private-game-status" aria-live="polite">Ready</p>
+      <div class="game-controls">
+        <button class="secondary-action" id="private-game-back" type="button">Back</button>
+      </div>
+    </section>
+
+    <section class="view result-view" id="private-result-view" aria-labelledby="private-result-heading" hidden>
+      <header class="result-header">
+        <p class="eyebrow" id="private-result-title">Private challenge complete</p>
+        <h1 id="private-result-heading">Your score</h1>
+      </header>
+
+      <div class="result-card">
+        <p class="result-score">
+          <strong id="private-result-score">0</strong>
+          <span>taps</span>
+        </p>
+        <p class="result-message" id="private-result-message">Ready to share?</p>
+      </div>
+
+      <p class="sr-only" id="private-result-announcement" aria-live="polite"></p>
+      <p class="share-status" id="private-share-status" aria-live="polite"></p>
+      <a class="share-fallback" id="private-share-fallback" href="" hidden>Open private link</a>
+      <div class="result-controls">
+        <button class="primary-action" id="private-share-result" type="button">Share private challenge</button>
+        <button class="secondary-action" id="private-result-replay" type="button">Play again</button>
+        <button class="secondary-action" id="private-result-edit" type="button">Edit challenge</button>
+      </div>
+    </section>
+
+    <section class="view comparison-view" id="private-comparison-view" aria-labelledby="private-comparison-heading" hidden>
+      <header class="comparison-header">
+        <p class="eyebrow" id="private-comparison-title">Private challenge</p>
+        <h1 id="private-comparison-heading">Score comparison</h1>
+      </header>
+
+      <div class="comparison-card">
+        <div class="comparison-scores" aria-label="Private challenge score comparison">
+          <p class="comparison-score">
+            <span>Target</span>
+            <strong id="private-comparison-target">0</strong>
+          </p>
+          <p class="comparison-score">
+            <span>Your score</span>
+            <strong id="private-comparison-friend">0</strong>
+          </p>
+        </div>
+        <p class="comparison-outcome" id="private-comparison-outcome">Attempt complete</p>
+        <p class="comparison-message" id="private-comparison-message">Scores ready.</p>
+      </div>
+
+      <p class="sr-only" id="private-comparison-announcement" aria-live="polite"></p>
+      <p class="share-status" id="private-comparison-share-status" aria-live="polite"></p>
+      <a class="share-fallback" id="private-comparison-share-fallback" href="" hidden>Open private link</a>
+      <div class="comparison-controls">
+        <button class="primary-action" id="private-share-again" type="button">Share your score</button>
+        <button class="secondary-action" id="private-comparison-replay" type="button">Try again</button>
+        <button class="secondary-action" id="private-comparison-create" type="button">Create your own</button>
+      </div>
+    </section>
+  </main>
+</body>
+</html>
