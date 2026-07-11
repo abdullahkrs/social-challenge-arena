@@ -6,9 +6,19 @@ Discover → Play → Result → Share → Friend Competes → Compare → Share
 
 ## Current state
 
-The repository includes a mobile-first discovery screen, the playable 20-second Tap Sprint challenge, a focused score/result state, and a validated share-or-copy result link. A friend opening a valid shared link sees the target, can complete the same attempt without login, receives a deterministic side-by-side comparison, and can share their validated score as the next target.
+The repository includes a compact catalog of six playable curated tap challenges across Speed, Rhythm, and Endurance, with Easy and Hard choices. A player selects one challenge, completes its bounded timed round, receives a focused result, and can share a validated challenge-aware score link.
 
-The completed loop now has dependency-free privacy-safe instrumentation. It keeps only allowlisted aggregate event counts in memory. It does not send network requests, set cookies, use persistent storage, or record scores, URLs, timestamps, identities, device data, or personal data.
+A friend opening a valid shared link sees the exact curated challenge, target score, and duration, can compete without login, receives a deterministic side-by-side comparison, and can share their validated score as the next target.
+
+The completed loop has dependency-free privacy-safe instrumentation. It keeps only allowlisted aggregate event counts in memory. It does not send network requests, set cookies, use persistent storage, or record scores, URLs, timestamps, identities, device data, or personal data.
+
+## Curated challenges
+
+- Speed: Tap Sprint (Easy), Turbo Tap (Hard)
+- Rhythm: Rhythm Rush (Easy), Tempo Storm (Hard)
+- Endurance: Tap Marathon (Easy), Endurance Blitz (Hard)
+
+All six entries reuse the validated tap-count mechanic while preserving distinct allowlisted identities and durations in shared links.
 
 ## Run
 
