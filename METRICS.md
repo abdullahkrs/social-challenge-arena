@@ -10,12 +10,15 @@ Implemented events:
 - `challenge_started` — an ordinary or friend attempt starts.
 - `challenge_completed` — an attempt reveals a result or comparison.
 - `result_viewed` — an ordinary result becomes visible.
-- `share_attempted` — the result share action is pressed.
-- `share_completed` — Web Share succeeds or the validated link is copied.
+- `share_attempted` — the ordinary result share action is pressed.
+- `share_completed` — Web Share succeeds or the validated ordinary-result link is copied.
 - `shared_link_opened` — a validated friend invitation is initially visible.
 - `friend_completed` — a friend attempt reveals comparison.
 - `comparison_viewed` — comparison becomes visible.
-- `share_again_attempted` — the comparison share action is pressed.
+- `share_again_attempted` — the comparison Share Again action is pressed.
+- `share_again_completed` — comparison Web Share succeeds or the validated comparison link is copied.
+
+The two completion events intentionally distinguish successful first-result sharing from successful comparison re-sharing. Repeated DOM observer notifications for unchanged success text do not increment either counter again.
 
 ## Privacy boundary
 
