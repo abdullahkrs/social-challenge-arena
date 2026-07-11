@@ -46,6 +46,7 @@
   line-height: 1.4;
 }
 
+.private-create-link,
 .private-link-action {
   display: grid;
   place-items: center;
