@@ -6,7 +6,7 @@ Discover → Play → Result → Share → Friend Competes → Compare → Share
 
 ## Current state
 
-The repository includes a mobile-first discovery screen and the first playable curated challenge. Tap Sprint runs a 20-second attempt with a live timer, tap counter, safe completion, and replay. A focused result screen and sharing flow are not implemented yet.
+The repository includes a mobile-first discovery screen, the playable 20-second Tap Sprint challenge, and a focused result state. Completed attempts show a validated tap score, brief score-based feedback, replay, and return-to-discovery actions. Sharing and friend competition are not implemented yet.
 
 ## Run
 

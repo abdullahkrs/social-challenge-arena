@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.4.0 — 2026-07-11
+
+### Added
+
+- Focused mobile-first result state for completed Tap Sprint attempts.
+- Validated reusable result summaries with score-based feedback.
+- Result transition, invalid-data fallback, and replay behavior tests.
+
+### Changed
+
+- Completed attempts now leave gameplay and show a dedicated score-first result view.
+- Replay is now the result view's single primary action.
+
 ## 0.3.0 — 2026-07-11
 
 ### Added
