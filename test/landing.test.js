@@ -13,12 +13,13 @@ test('featured challenge metadata is complete and bounded', () => {
   assert.ok(featuredChallenge.goal.length > 0);
 });
 
-test('landing page exposes one clear play action and one gameplay state', () => {
+test('landing page exposes one clear play action and separate gameplay and result states', () => {
   const html = readFileSync('index.html', 'utf8');
   assert.match(html, /Pick\. Play\. Compete\./);
   assert.match(html, /Tap Sprint/);
   assert.match(html, /id="start-challenge"/);
   assert.match(html, /id="challenge-view"[^>]*hidden/);
+  assert.match(html, /id="result-view"[^>]*hidden/);
   assert.match(html, /id="tap-button"/);
   assert.doesNotMatch(html, /share|compare/i);
 });
