@@ -127,57 +127,109 @@ Add one safe share-again action from the completed comparison using the friend�
 ## Cycle 8
 
 - **Date/time:** 2026-07-11T17:43:15+03:00
-- **Status:** in progress
+- **Verification completed at:** 2026-07-11T18:00:47+03:00
+- **Status:** ready for pull-request review and merge
 - **Selected task:** Add one safe share-again action from the completed comparison.
 - **Goal:** Let the friend share their validated completed score as the next Tap Sprint target using the existing strict URL codec and share/copy fallbacks.
 - **Why selected:** Cycle 7 is completed on `main`, no pull request is open, and share-again is the earliest incomplete roadmap stage.
 - **Viral-loop impact:** Completes the first end-to-end loop by turning the friend’s result into a new challenge link for another person.
 
-### Acceptance criteria
+### Acceptance criteria completed
 
 - The comparison view exposes one obvious primary `Share your score` action.
-- Share-again uses only the validated friend score and challenge duration from the completed comparison.
+- Share-again uses only the revalidated friend score and challenge duration from the completed comparison.
 - The generated URL reuses the existing strict versioned fragment format and canonical base URL.
 - Web Share remains preferred, clipboard remains the fallback, and a visible validated link appears only when neither succeeds.
-- Share status is announced accessibly; cancelled sharing does not expose a fallback link.
+- Share status is announced accessibly; cancelled sharing keeps the fallback link hidden.
 - Replay retains the original validated target and remains secondary; returning to challenges clears shared context.
-- Focused tests cover share-again URL generation, friend-score selection, fallback behavior wiring, structure, and absence of identity or storage.
-- Static review confirms no blocked primary action or fixed-width overflow source at 320px and 390px.
-- Source and generated `docs/` preview files remain byte-for-byte synchronized.
+- Focused tests cover share-again URL generation, friend-score selection, malformed and inconsistent comparison rejection, fallback wiring, and structure.
+- Static review found no blocked primary action or fixed-width overflow source at 320px and 390px.
+- Source and generated `docs/` preview files are byte-for-byte synchronized by Git blob SHA.
 
-### Expected files
+### Completed work
 
-- `index.html`
-- `styles.css` only if required for the new primary-action order
-- `app.js`
-- focused tests under `test/`
-- `docs/index.html`
-- `docs/styles.css` only if source changes
-- `docs/app.js`
-- `README.md`
-- `ROADMAP.md`
-- `CHANGELOG.md`
-- `TASK_LOG.md`
+- Added the primary comparison `Share your score` action plus an accessible status region and validated visible-link fallback.
+- Added `createComparisonShareUrl`, which accepts only the exact completed-comparison shape, re-derives the comparison from bounded values, rejects inconsistent data, and promotes only the friend score into the existing result-link codec.
+- Reused the existing HTTP(S)-only Web Share, clipboard, cancellation, and unavailable-API behavior without changing the URL schema.
+- Kept comparison replay tied to the original validated invitation while clearing all shared context on return to discovery.
+- Added focused model, URL, rejection, structure, and event-wiring tests.
+- Corrected the stale baseline accessibility assertion discovered by the fresh test run so it checks the labelled discovery view rather than requiring an obsolete label on the `main` landmark.
+- Updated README, roadmap, changelog, and synchronized repository preview files.
 
-### Explicit non-goals
+### Intentional non-goals preserved
 
 - No analytics or instrumentation.
 - No identity, login, storage, backend, leaderboard, ranking, challenge variety, or challenge creation.
 - No change to the shared-link schema or score bounds.
 - No framework, dependency, workflow, architecture, broad design, or unrelated cleanup.
 
+### Files changed
+
+- `index.html`
+- `app.js`
+- `test/comparison.test.js`
+- `test/landing.test.js`
+- `tests/baseline.test.js`
+- `docs/index.html`
+- `docs/app.js`
+- `README.md`
+- `ROADMAP.md`
+- `CHANGELOG.md`
+- `TASK_LOG.md`
+
+`styles.css` and `docs/styles.css` required no change because the existing full-width control, live-status, focus, and fallback-link rules already cover the new action.
+
+### Verification
+
+- `node --version`: `v22.16.0`.
+- `npm test`: passed in a fresh verification workspace; 25 tests passed, 0 failed after the stale baseline assertion was corrected.
+- `npm run build`: passed; 3 files copied to `dist/` and `docs/`.
+- `node --check app.js`: passed.
+- Product source blobs are `c86f03726fa0975843dd9d280c757502c9a56e00` for `index.html`, `e234c53c78930a106396538c8080fba8b37915bc` for unchanged `styles.css`, and `ee38b6e46c31ba0b156fbe2ebf478452065891c2` for `app.js`.
+- Source/output comparison: each source blob matches its generated `docs/` blob exactly.
+- Static mobile review: the fluid `min(100%, 30rem)` shell, 320px body minimum, full-width 48px controls, grid-based action stack, bounded comparison columns, and wrapping fallback link introduce no fixed-width overflow or blocked primary action at 320px or 390px.
+- Accessibility review: one obvious primary comparison share button, keyboard-native controls, visible focus, polite share status, focus transfer to share after comparison reveal, and focusable visible fallback.
+- Security/privacy review: exact comparison shape is enforced, computed fields are re-derived, bounded score and duration validation is reused, non-HTTP(S) URLs remain rejected, dynamic values use safe DOM properties, and no HTML injection, storage, identity, secrets, analytics, personal data, or backend was added.
+- GitHub Actions/status checks remain unavailable because the owner removed the workflow; no automated CI success is claimed.
+- **Preview status:** repository preview output verified for the current share-again source blobs.
+
+### Review findings and resolution
+
+- Blocking finding during fresh verification: the pre-existing baseline test expected an obsolete `aria-labelledby` attribute on the `main` element and failed against the already-labelled view structure on `main`.
+- Resolution: updated only that stale assertion to verify the `main` landmark and the discovery view’s existing `aria-labelledby="page-title"`; then reran the complete test and build commands successfully.
+- Preliminary complete-diff review found no remaining correctness, accessibility, mobile, security, privacy, scope, dependency, or source/preview synchronization blocker.
+- Pull-request comments, threads, mergeability, conflicts, and final head status remain to be checked before merge.
+
+### Git and merge outcome
+
+- Product branch: `agent/cycle-8-share-again` created from `main` at `2c31f13a56c6c3cae4499172a3a44439b9476efa`.
+- Planning commit: `853a11ddfbea984182026ae0a76959de565555fe`.
+- Pull request: pending creation against `main`.
+- Merge method: squash with expected head SHA when final review is clean.
+
+### Decision
+
+No new product or architecture decision. The existing static architecture, strict fragment codec, and browser-sharing fallbacks are sufficient to close the first viral loop.
+
 ### Strategic review
 
-- The current direction is aligned with the north star and already reaches comparison.
-- The largest product bottleneck is the missing share-again action.
-- The largest delivery risk is unavailable CI and interactive deployed-preview tooling, so fresh local repository tests/build and static mobile review are required.
-- No new evidence invalidates the static architecture or bounded fragment state.
-- Stage 8 remains the highest-impact narrow task.
+- The direction now reaches the complete Discover → Play → Result → Share → Friend Competes → Compare → Share Again loop.
+- The share-again bottleneck is resolved in the branch; privacy-safe instrumentation is the next roadmap stage after merge.
+- Unavailable automated CI and interactive deployed-preview verification remain the largest delivery risk.
+- No evidence invalidated the static architecture or bounded fragment transport.
 
 ### Product thinking
 
-1. The next core-loop step is blocked only by the absence of a comparison share action.
-2. A friend is more likely to continue when their own score becomes the next clear target.
-3. A recipient is more likely to open when the shared message directly asks them to beat a validated score.
-4. The smallest proof is one comparison share button reusing the existing URL and share helpers.
-5. Parked idea: later instrumentation can measure share-again attempts after the full loop exists.
+1. The comparison now has a clear continuation action instead of ending the loop.
+2. The friend’s own validated score becomes the next meaningful target without identity or persistence.
+3. The shared message directly invites the next recipient to beat that score.
+4. The minimum proof was one share button and one strict comparison-to-existing-link adapter.
+5. Parked idea: instrument share-again attempts and completions in the next stage without adding a third-party destination.
+
+### Remaining limitation
+
+Live deployed-preview interaction and automated GitHub Actions validation are unavailable. The next cycle must not begin until this branch is reviewed and merged into `main`.
+
+### Next suggested task
+
+Add basic privacy-safe MVP event instrumentation for the completed loop without a third-party analytics destination, identity, cookies, or persistent personal data.
