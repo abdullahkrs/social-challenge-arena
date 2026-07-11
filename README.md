@@ -8,6 +8,8 @@ Discover → Play → Result → Share → Friend Competes → Compare → Share
 
 The repository includes a mobile-first discovery screen, the playable 20-second Tap Sprint challenge, a focused score/result state, and a validated share-or-copy result link. A friend opening a valid shared link sees the target, can complete the same attempt without login, and receives a deterministic side-by-side comparison. From comparison, the friend can share their validated score as the next target using the same strict URL and browser-sharing fallbacks, completing the first end-to-end loop.
 
+The completed loop now emits a strict allowlist of session-only milestone events. The recorder keeps only in-memory per-event counts and a fixed challenge identifier; it does not record scores, URLs, identity, free text, device data, cookies, browser storage, or network analytics.
+
 ## Run
 
 Open `index.html` directly in a browser.
