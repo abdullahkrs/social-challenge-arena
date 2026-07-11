@@ -315,25 +315,42 @@ Implement one safe share-or-copy challenge/result link from the focused result s
 ## Cycle 5
 
 - **Date/time:** 2026-07-11T14:40:00+03:00
-- **Status:** in progress
+- **Completed at:** 2026-07-11T14:59:52+03:00
+- **Status:** completed
 - **Selected task:** Add one safe share-or-copy Tap Sprint result link from the focused result state.
 - **Goal:** Let the original player share a validated result URL with one action while preserving a reliable clipboard or visible-link fallback.
-- **Why selected:** Cycles 1–4 are complete on `main`, no continuity pull request is open, and share/copy is the earliest incomplete roadmap stage.
+- **Why selected:** Cycles 1–4 were complete on `main`, no continuity pull request was open, and share/copy was the earliest incomplete roadmap stage.
 - **Viral-loop impact:** Completes the Share handoff so the next cycle can let a friend open the link and compete against the encoded target.
 
-### Acceptance criteria
+### Acceptance criteria completed
 
 - The result view exposes one obvious primary `Share score` action.
 - A generated canonical HTTP(S) URL encodes only version, challenge ID, validated score, and duration.
 - Shared state parsing rejects malformed numbers, unsupported versions or challenges, duplicate keys, extra keys, mismatched duration, oversized scores, and overlong hashes.
 - The action prefers the Web Share API, falls back to clipboard copy, and exposes a safe visible link when neither succeeds.
 - Share status is announced accessibly and all dynamic text or URLs are assigned through safe DOM properties.
-- Invalid incoming shared hashes are removed without executing or rendering their values; valid state is retained for the next friend-attempt cycle but not consumed in this cycle.
-- The result layout remains usable without horizontal overflow at 320px and 390px.
-- Focused tests cover URL round-tripping, strict rejection, Web Share, clipboard fallback, cancellation, and page structure.
-- Source and `docs/` preview files remain synchronized.
+- Invalid incoming shared hashes are removed without executing or rendering their values; valid state is validated and retained for the next friend-attempt cycle without being presented early.
+- The result layout has no fixed-width overflow source or blocked primary action at 320px and 390px.
+- Focused tests cover URL round-tripping, strict rejection, Web Share, clipboard fallback, cancellation, unavailable browser APIs, visible fallback structure, and page structure.
+- Source and `docs/` preview files are synchronized.
 
-### Expected files
+### Completed work
+
+- Added `Share score` as the primary result action while keeping replay and discovery secondary.
+- Added a strict versioned fragment codec carrying only challenge ID, score, and duration.
+- Added bounded score and duration validation, duplicate/extra-key rejection, supported-version and challenge checks, overlong-fragment rejection, and HTTP(S)-only URL creation.
+- Added Web Share support with clipboard fallback, cancellation handling, and a visible validated-link fallback.
+- Added accessible share-status announcements, safe property-based DOM updates, and invalid-fragment cleanup.
+- Added focused share tests and updated landing/result structure coverage.
+- Updated README, roadmap, changelog, and generated repository preview files.
+
+### Intentional non-goals preserved
+
+- No friend attempt, incoming target presentation, result comparison, share-again behavior, analytics, challenge variety, or challenge creation.
+- No backend, login, storage, third-party sharing SDK, dependency, framework, workflow restoration, or architecture change.
+- No generated image card, social preview metadata personalization, leaderboard, ranking, or personal-best persistence.
+
+### Files changed
 
 - `index.html`
 - `styles.css`
@@ -349,24 +366,63 @@ Implement one safe share-or-copy challenge/result link from the focused result s
 - `CHANGELOG.md`
 - `TASK_LOG.md`
 
-### Explicit non-goals
+### Verification
 
-- No friend attempt, incoming target presentation, result comparison, share-again behavior, analytics, challenge variety, or challenge creation.
-- No backend, login, storage, third-party sharing SDK, dependency, framework, workflow restoration, or architecture change.
-- No generated image card, social preview metadata personalization, leaderboard, ranking, or personal-best persistence.
+- `npm test`: passed using Node.js `v22.16.0`; 14 tests passed, 0 failed.
+- `npm run build`: passed; 3 files copied to `dist/` and `docs/`.
+- `node --check app.js`: passed.
+- Committed source blob hashes were `f33ed30ef4e2b5455009b310a02115fa61109c7a` for `index.html`, `e363d2d1725a74ef831112bae34ab4efd7be788d` for `styles.css`, and `311d86c559ec23c328f81f5fa0d8141f6bcbb0a2` for `app.js`.
+- Source/output comparison: each source blob matched its corresponding generated `docs/` blob exactly.
+- Static mobile review: 320px body minimum, fluid `min(100%, 30rem)` shell, full-width 48px controls, `max-width: 100%`, and `overflow-wrap: anywhere` for the visible fallback URL at 320px and 390px.
+- Accessibility review: one primary share action, keyboard-native controls, visible focus, focus transfer to share after completion, polite share-status announcements, and a focusable visible-link fallback.
+- Security/privacy review: shared state is confined to a URL fragment; only four bounded keys are accepted; non-HTTP(S) links are rejected; invalid fragments are removed; dynamic values use `textContent`, `href`, and other safe properties; no untrusted HTML, storage, secrets, tokens, analytics, personal data, or executable content was added.
+- GitHub Actions/status checks: no workflow runs or commit statuses existed because the owner removed the workflow; no automated CI success was claimed.
+- **Preview status:** repository preview output verified for the merged share-link content; live deployed and interactive browser preview were unavailable in the execution environment.
+
+### Review findings and resolution
+
+- Reviewed the complete 13-file pull-request diff, including source, tests, generated preview files, and documentation.
+- Found and fixed one blocking security issue before opening the PR: the browser share helper initially accepted non-HTTP(S) URLs.
+- Found and fixed one blocking acceptance-coverage gap during final review: explicit coverage was added for overlong fragments, unavailable browser APIs, and the visible fallback structure.
+- Re-ran all 14 tests, build, syntax, and source/preview comparisons after the fixes, then re-reviewed the complete final diff.
+- Confirmed one-task scope, acceptance-criteria alignment, state handling, accessibility, mobile layout, security, privacy, base branch, dependency order, and mergeability.
+- No blocking or non-blocking findings remained; no external requested changes, unresolved review threads, merge conflicts, workflow runs, or commit statuses existed.
+- Recorded a factual self-review comment and did not claim independent approval.
+
+### Git and merge outcome
+
+- Product branch: `agent/cycle-5-share-link-main`.
+- Product branch head SHA: `3ddbbcc65d1f151d64868fa810cb9ce2529aabe3`.
+- Pull request: #17 — `feat(share): add validated result link`.
+- Base branch: `main` at `0cbfcb8e1cff72319ee3d6bd8eeb8c7c6aa426d8`.
+- Merge method: squash using the expected head SHA.
+- Merge outcome: successfully merged on 2026-07-11T14:59:52+03:00.
+- Merge SHA: `9d5976779f8593fc9ad6ecf47ab18fb3a9e882e4`.
+
+### Decision
+
+No new product or architecture decision. The existing static architecture and bounded URL-fragment transport are sufficient for the next friend-attempt cycle.
 
 ### Strategic review
 
-- The current direction remains aligned with the Discover → Play → Result → Share sequence.
-- The largest product bottleneck is the absence of a portable result handoff.
-- The largest delivery risk remains unavailable automated CI and interactive deployed-preview verification.
-- No new evidence invalidates the static architecture; URL fragments provide a backend-free, privacy-safe transport for bounded state.
-- A strict share-link codec plus one result action is the highest-impact narrow task.
+- The direction remains aligned with the Discover → Play → Result → Share sequence.
+- The share handoff is complete; the largest product bottleneck is now opening a validated link as a friend and presenting the target before play.
+- Unavailable automated CI and interactive deployed-preview verification remain the largest delivery risk.
+- No new evidence invalidated the static architecture or the bounded shared-state model.
+- A focused friend-attempt entry state is now the highest-impact narrow task.
 
 ### Product thinking
 
-1. The missing Share step blocks the next friend-competition step.
-2. One prominent share action immediately after a clear score should increase continuation from result to sharing.
-3. A short challenge identity plus score target makes the link understandable enough for a friend to open later.
-4. The smallest proof is a bounded URL codec, Web Share/clipboard fallback, accessible status, and focused tests.
+1. The missing Share step blocked the next friend-competition step and is now resolved.
+2. One prominent share action immediately after the score gives the original player a clear continuation path.
+3. A bounded challenge identity and score target make the link suitable for a friend to open and compete in the next cycle.
+4. The minimum proof was a strict URL codec, Web Share and clipboard handling, visible fallback, accessible status, and focused tests.
 5. Parked idea: generate a branded score image only after the text-link loop is measurable and complete.
+
+### Remaining limitation
+
+Live deployed-preview verification, interactive browser exercise, and automated GitHub Actions validation remain unavailable. The valid incoming target is intentionally not presented or used to start a friend attempt until Cycle 6.
+
+### Next suggested task
+
+Implement the friend-attempt entry state for a valid shared Tap Sprint link: present the sharer's validated target, let the friend start the same challenge, and preserve comparison as a later stage.
