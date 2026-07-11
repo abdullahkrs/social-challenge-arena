@@ -5,7 +5,7 @@ Historical completed cycles 1–6 are preserved in [`TASK_LOG_ARCHIVE_CYCLES_1_6
 ## Cycle 10
 
 - **Date/time:** 2026-07-11T19:40:23+03:00
-- **Verification completed at:** 2026-07-11T20:18:00+03:00
+- **Verification completed at:** 2026-07-11T20:24:00+03:00
 - **Status:** ready for final pull-request review and merge
 - **Selected task:** Add a compact curated challenge catalog backed by reusable data-driven definitions.
 - **Goal:** Let a player select and complete any of six safe tap challenges while preserving the existing result, sharing, friend-attempt, comparison, share-again, and privacy-safe metrics loop.
@@ -22,7 +22,7 @@ Historical completed cycles 1–6 are preserved in [`TASK_LOG_ARCHIVE_CYCLES_1_6
 - Shared links now preserve the selected allowlisted challenge ID and exact configured duration; unknown IDs and duration mismatches are rejected.
 - Preserved no-login, no-storage, no-backend, no-third-party-analytics, and aggregate-only instrumentation boundaries.
 - Synchronized `index.html`, `styles.css`, `app.js`, and `metrics.js` with their `docs/` preview copies.
-- Added focused catalog, full challenge-link round-trip, malformed-duration, selector, and generic-loop tests.
+- Added focused catalog, full challenge-link round-trip, malformed-duration, selector, generic-loop, and source/preview parity tests.
 - Completed static mobile review for 320px and 390px constraints with no fixed-width overflow source.
 
 ### Completed work
@@ -45,6 +45,7 @@ Historical completed cycles 1–6 are preserved in [`TASK_LOG_ARCHIVE_CYCLES_1_6
 - `index.html`
 - `styles.css`
 - `test/challenge-variety.test.js`
+- `test/branch-verification.test.js`
 - `docs/app.js`
 - `docs/index.html`
 - `docs/styles.css`
@@ -59,14 +60,14 @@ Historical completed cycles 1–6 are preserved in [`TASK_LOG_ARCHIVE_CYCLES_1_6
 ### Verification
 
 - `node --version`: `v22.16.0`.
-- `npm test`: passed in a fresh local candidate workspace; 33 tests passed, 0 failed.
+- `npm test`: passed in a fresh local candidate workspace; 37 tests passed, 0 failed.
 - `npm run build`: passed; 4 files copied to `dist/` and `docs/`.
 - `node --check app.js`: passed.
 - `node --check metrics.js`: passed.
-- Source/output Git blob equality: `app.js` and `docs/app.js` are `b6d0a87e6461b48fcbdd6afddaeefc5b0399c672`; `index.html` and `docs/index.html` are `ec3a42f9d589d53948f680fc5db1fb04802ee368`; `styles.css` and `docs/styles.css` are `fb53bae8ab9689a19e08b9934715e47b7f14dce9`; unchanged `metrics.js` and `docs/metrics.js` remain identical.
-- Focused test blob: `test/challenge-variety.test.js` is `e30bf4119ccb21e359e4857f5591eb70d05cb18e`.
+- Source/output Git blob equality: `app.js` and `docs/app.js` are `b6d0a87e6461b48fcbdd6afddaeefc5b0399c672`; `index.html` and `docs/index.html` are `eee6ff2eff6f0ba6cae003ac40365a7b4bd93950`; `styles.css` and `docs/styles.css` are `fb53bae8ab9689a19e08b9934715e47b7f14dce9`; unchanged `metrics.js` and `docs/metrics.js` remain identical.
+- Focused catalog test blob: `test/challenge-variety.test.js` is `f7acbfbb6c88610998a0bdbd2b89968e7d12fe0f`.
 - Static 320px and 390px review: two `minmax(0, 1fr)` catalog columns, overflow-safe labels, responsive selected summary, full-width 48px primary action, and no horizontal-scroll source.
-- Accessibility review: semantic buttons remain keyboard operable, selected state uses `aria-pressed`, dynamic state is announced, focus continues to move to each primary state action, and visible focus is retained.
+- Accessibility review: semantic challenge buttons are exposed as one labelled group, selected state uses `aria-pressed`, dynamic state is announced, focus continues to move to each primary state action, and visible focus is retained.
 - Security/privacy review: only frozen allowlisted IDs and exact configured durations are accepted; dynamic values use safe DOM text APIs; no executable input, identity, storage, network sink, secret, or personal data was introduced.
 - GitHub Actions/status checks are unavailable because the repository workflow was removed by owner direction; no CI success is claimed.
 - Interactive Chromium screenshots at 320px and 390px could not be completed because the available headless browser process stalled on sandbox DBus/inotify/netlink restrictions.
@@ -74,16 +75,20 @@ Historical completed cycles 1–6 are preserved in [`TASK_LOG_ARCHIVE_CYCLES_1_6
 
 ### Review findings and resolution
 
-- Candidate review covered one-task scope, all Stage 10 acceptance criteria, catalog uniqueness, challenge-aware state validation, prior-loop compatibility, safe DOM handling, accessibility, mobile layout, privacy, documentation, source/preview synchronization, and secret-like strings.
-- No blocking candidate finding remains before the pull request review.
-- Final PR comments, threads, mergeability, conflicts, and current-head status remain to be checked before squash merge.
+- Reviewed the complete 13-file PR diff for one-task scope, all Stage 10 acceptance criteria, catalog uniqueness, challenge-aware state validation, prior-loop compatibility, safe DOM handling, accessibility, mobile layout, privacy, documentation, source/preview synchronization, and secret-like strings.
+- Blocking accessibility finding: the challenge buttons were initially direct children of `role="list"` without `listitem` semantics.
+- Resolution: changed the selector container to one labelled `role="group"`, strengthened the focused test, synchronized `docs/index.html`, and reran all 37 tests and build checks successfully.
+- Documentation mismatch finding: the active log still reported 33 tests after adding four preview-parity tests.
+- Resolution: corrected the verified total to 37 and listed the parity test file.
+- No blocking finding remains before the final PR metadata, comments, threads, status, conflict, and mergeability check.
 
 ### Git and merge outcome
 
 - Branch: `agent/cycle-10-curated-variety`, created from `main` at `4cde43ec4e48a8dec4d6cb81fc2f8559c75e7e97`.
 - Planning commit: `b3de9c558bb0c21fe23dd39d0baa412a5d6db274`.
-- Current implementation branch head before this log update: `1a92fa7eb874e797633f45606df6e4a2d2f54ed9`.
-- Pull request, final reviewed head, merge method, outcome, and merge SHA: pending final review.
+- Pull request: #29 — `feat(challenges): add curated challenge variety`, targeting `main`.
+- Current implementation branch head before this factual log update: `5cd346c7649bbb2d845e2a16d5c8ea800666a533`.
+- Final reviewed head, merge method, outcome, and merge SHA: pending final merge gate.
 
 ### Decision
 
