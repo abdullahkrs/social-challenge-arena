@@ -88,34 +88,117 @@ function createTapSprintGame(options = {}) {
   return Object.freeze({ start, tap, reset, destroy, getState });
 }
 
+function createResultSummary(options = {}) {
+  const challenge = options.challenge;
+  const score = options.score;
+  const unit = options.unit;
+  const message = options.message;
+
+  const validChallenge = challenge
+    && typeof challenge.id === 'string'
+    && challenge.id.length > 0
+    && typeof challenge.title === 'string'
+    && challenge.title.length > 0;
+
+  if (!validChallenge) return null;
+  if (!Number.isInteger(score) || score < 0 || score > 100000) return null;
+  if (typeof unit !== 'string' || unit.length === 0 || unit.length > 20) return null;
+  if (typeof message !== 'string' || message.length === 0 || message.length > 120) return null;
+
+  return Object.freeze({
+    challengeId: challenge.id,
+    challengeTitle: challenge.title,
+    score,
+    unit,
+    message
+  });
+}
+
+function getTapSprintMessage(taps) {
+  if (taps === 0) return 'Try again and build your rhythm.';
+  if (taps < 40) return 'Good start. Can you beat it?';
+  if (taps < 80) return 'Fast run. Go again?';
+  return 'Rapid run. Can you top it?';
+}
+
+function createTapSprintResult(state) {
+  if (!state || state.status !== 'complete') return null;
+
+  return createResultSummary({
+    challenge: featuredChallenge,
+    score: state.taps,
+    unit: 'taps',
+    message: getTapSprintMessage(state.taps)
+  });
+}
+
 if (typeof module !== 'undefined') {
-  module.exports = { featuredChallenge, createTapSprintGame };
+  module.exports = {
+    featuredChallenge,
+    createTapSprintGame,
+    createResultSummary,
+    createTapSprintResult,
+    getTapSprintMessage
+  };
 }
 
 if (typeof document !== 'undefined') {
   const discoveryView = document.querySelector('#discovery-view');
   const challengeView = document.querySelector('#challenge-view');
+  const resultView = document.querySelector('#result-view');
   const startButton = document.querySelector('#start-challenge');
   const tapButton = document.querySelector('#tap-button');
-  const replayButton = document.querySelector('#replay-challenge');
-  const backButton = document.querySelector('#back-to-challenges');
+  const gameBackButton = document.querySelector('#back-to-challenges');
   const timeValue = document.querySelector('#time-value');
   const tapCount = document.querySelector('#tap-count');
   const gameStatus = document.querySelector('#game-status');
+  const resultTitle = document.querySelector('#result-title');
+  const resultScore = document.querySelector('#result-score');
+  const resultUnit = document.querySelector('#result-unit');
+  const resultMessage = document.querySelector('#result-message');
+  const replayButton = document.querySelector('#replay-challenge');
+  const resultBackButton = document.querySelector('#result-back-to-challenges');
 
   const requiredElements = [
     discoveryView,
     challengeView,
+    resultView,
     startButton,
     tapButton,
-    replayButton,
-    backButton,
+    gameBackButton,
     timeValue,
     tapCount,
-    gameStatus
+    gameStatus,
+    resultTitle,
+    resultScore,
+    resultUnit,
+    resultMessage,
+    replayButton,
+    resultBackButton
   ];
 
   if (requiredElements.every(Boolean)) {
+    function showView(activeView) {
+      discoveryView.hidden = activeView !== discoveryView;
+      challengeView.hidden = activeView !== challengeView;
+      resultView.hidden = activeView !== resultView;
+    }
+
+    function renderResult(summary) {
+      if (!summary) {
+        showDiscovery();
+        return false;
+      }
+
+      resultTitle.textContent = summary.challengeTitle;
+      resultScore.textContent = String(summary.score);
+      resultUnit.textContent = summary.unit;
+      resultMessage.textContent = summary.message;
+      showView(resultView);
+      replayButton.focus();
+      return true;
+    }
+
     const game = createTapSprintGame({
       onUpdate(state) {
         timeValue.textContent = String(state.remainingSeconds);
@@ -124,34 +207,32 @@ if (typeof document !== 'undefined') {
         const isRunning = state.status === 'running';
         tapButton.disabled = !isRunning;
         tapButton.textContent = isRunning ? 'Tap!' : 'Time!';
-        replayButton.hidden = state.status !== 'complete';
 
         if (isRunning) gameStatus.textContent = 'Go!';
-        if (state.status === 'complete') {
-          gameStatus.textContent = `Finished with ${state.taps} taps.`;
-        }
+        if (state.status === 'complete') gameStatus.textContent = 'Complete';
         if (state.status === 'idle') gameStatus.textContent = 'Ready';
+      },
+      onComplete(state) {
+        renderResult(createTapSprintResult(state));
       }
     });
 
-    function openChallenge() {
-      discoveryView.hidden = true;
-      challengeView.hidden = false;
+    function startAttempt() {
+      showView(challengeView);
       game.start();
       tapButton.focus();
     }
 
-    startButton.addEventListener('click', openChallenge);
-    tapButton.addEventListener('click', () => game.tap());
-    replayButton.addEventListener('click', () => {
-      game.start();
-      tapButton.focus();
-    });
-    backButton.addEventListener('click', () => {
+    function showDiscovery() {
       game.reset();
-      challengeView.hidden = true;
-      discoveryView.hidden = false;
+      showView(discoveryView);
       startButton.focus();
-    });
+    }
+
+    startButton.addEventListener('click', startAttempt);
+    tapButton.addEventListener('click', () => game.tap());
+    replayButton.addEventListener('click', startAttempt);
+    gameBackButton.addEventListener('click', showDiscovery);
+    resultBackButton.addEventListener('click', showDiscovery);
   }
 }
