@@ -29,6 +29,7 @@ button { font: inherit; }
   min-height: calc(100vh - 2.5rem);
 }
 
+.friend-view,
 .discovery-view,
 .game-view,
 .result-view {
@@ -40,6 +41,7 @@ button { font: inherit; }
 .discovery-view { gap: 1.5rem; }
 
 .hero,
+.friend-header,
 .game-header,
 .result-header { display: grid; gap: 0.65rem; }
 
@@ -47,6 +49,9 @@ button { font: inherit; }
 .intro,
 .challenge-card p,
 .challenge-meta,
+.friend-meta,
+.friend-target,
+.friend-message,
 .game-instruction,
 .game-status,
 .result-score,
@@ -74,6 +79,8 @@ h1 {
 .intro,
 .challenge-card p,
 .challenge-meta,
+.friend-meta,
+.friend-message,
 .game-instruction,
 .game-status,
 .result-message,
@@ -83,6 +90,7 @@ h1 {
 }
 
 .challenge-card,
+.friend-card,
 .result-card {
   display: grid;
   gap: 1rem;
@@ -147,6 +155,41 @@ h2 {
   outline-offset: 3px;
 }
 
+.friend-card,
+.result-card {
+  justify-items: center;
+  text-align: center;
+}
+
+.friend-target,
+.result-score {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.friend-target strong {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  font-size: clamp(4rem, 25vw, 7rem);
+  line-height: 0.9;
+  letter-spacing: -0.065em;
+}
+
+.friend-target span,
+.stat span,
+.result-score span {
+  color: #cbd5e1;
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.friend-message {
+  max-width: 24ch;
+  font-weight: 700;
+}
+
 .scoreboard {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -166,15 +209,6 @@ h2 {
 .stat strong {
   font-size: clamp(2rem, 11vw, 3rem);
   line-height: 1;
-}
-
-.stat span,
-.result-score span {
-  color: #cbd5e1;
-  font-size: 0.82rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
 }
 
 .tap-action {
@@ -205,20 +239,11 @@ h2 {
   font-weight: 700;
 }
 
+.friend-controls,
 .game-controls,
 .result-controls {
   display: grid;
   gap: 0.65rem;
-}
-
-.result-card {
-  justify-items: center;
-  text-align: center;
-}
-
-.result-score {
-  display: grid;
-  gap: 0.35rem;
 }
 
 .result-score strong {
@@ -267,6 +292,7 @@ h2 {
   .shell { padding: 1.75rem; }
   .view { min-height: calc(100vh - 3.5rem); }
   .challenge-card,
+  .friend-card,
   .result-card { padding: 1.5rem; }
 }
 
