@@ -13,8 +13,11 @@ test('featured challenge metadata is complete and bounded', () => {
   assert.ok(featuredChallenge.goal.length > 0);
 });
 
-test('landing page exposes discovery, gameplay, result, and share states', () => {
+test('landing page exposes friend entry, discovery, gameplay, result, and share states', () => {
   const html = readFileSync('index.html', 'utf8');
+  assert.match(html, /id="friend-view"[^>]*hidden/);
+  assert.match(html, /id="start-friend-attempt"/);
+  assert.match(html, /id="dismiss-friend-attempt"/);
   assert.match(html, /Pick\. Play\. Compete\./);
   assert.match(html, /Tap Sprint/);
   assert.match(html, /id="start-challenge"/);
@@ -22,5 +25,5 @@ test('landing page exposes discovery, gameplay, result, and share states', () =>
   assert.match(html, /id="tap-button"/);
   assert.match(html, /id="result-view"[^>]*hidden/);
   assert.match(html, /id="share-result"/);
-  assert.doesNotMatch(html, /compare/i);
+  assert.doesNotMatch(html, /\b(compare|comparison|winner|won|lost|tie)\b/i);
 });
