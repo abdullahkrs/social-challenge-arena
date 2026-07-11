@@ -7,6 +7,8 @@
 
 * { box-sizing: border-box; }
 
+[hidden] { display: none !important; }
+
 body {
   margin: 0;
   min-width: 320px;
@@ -21,17 +23,27 @@ button { font: inherit; }
   min-height: 100vh;
   margin: 0 auto;
   padding: 1.25rem;
+}
+
+.view {
+  min-height: calc(100vh - 2.5rem);
+}
+
+.discovery-view {
   display: grid;
   align-content: center;
   gap: 1.5rem;
 }
 
-.hero { display: grid; gap: 0.65rem; }
+.hero,
+.game-header { display: grid; gap: 0.65rem; }
 
 .eyebrow,
 .intro,
 .challenge-card p,
-.challenge-meta { margin: 0; }
+.challenge-meta,
+.game-instruction,
+.game-status { margin: 0; }
 
 .eyebrow {
   color: #c4b5fd;
@@ -53,7 +65,9 @@ h1 {
 
 .intro,
 .challenge-card p,
-.challenge-meta {
+.challenge-meta,
+.game-instruction,
+.game-status {
   color: #cbd5e1;
   line-height: 1.5;
 }
@@ -89,43 +103,115 @@ h2 {
   letter-spacing: -0.03em;
 }
 
-.primary-action {
+.primary-action,
+.secondary-action,
+.tap-action {
   min-height: 3rem;
   width: 100%;
-  border: 0;
   border-radius: 0.9rem;
   padding: 0.75rem 1rem;
-  background: #f8fafc;
-  color: #111827;
   font-weight: 900;
   cursor: pointer;
 }
 
+.primary-action {
+  border: 0;
+  background: #f8fafc;
+  color: #111827;
+}
+
 .primary-action:hover { background: #ede9fe; }
 
-.primary-action:focus-visible {
+.secondary-action {
+  border: 1px solid rgba(196, 181, 253, 0.42);
+  background: transparent;
+  color: #e2e8f0;
+}
+
+.primary-action:focus-visible,
+.secondary-action:focus-visible,
+.tap-action:focus-visible {
   outline: 3px solid #c4b5fd;
   outline-offset: 3px;
 }
 
-.challenge-details {
+.game-view {
   display: grid;
-  gap: 0.4rem;
-  padding-top: 0.1rem;
+  align-content: center;
+  gap: 1.15rem;
 }
 
-.challenge-details[hidden] { display: none; }
+.scoreboard {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+}
 
-.challenge-details .next-step {
-  color: #a5b4fc;
-  font-size: 0.88rem;
+.stat {
+  display: grid;
+  gap: 0.15rem;
+  padding: 0.85rem;
+  border: 1px solid rgba(196, 181, 253, 0.26);
+  border-radius: 1rem;
+  background: rgba(15, 23, 42, 0.72);
+  text-align: center;
+}
+
+.stat strong {
+  font-size: clamp(2rem, 11vw, 3rem);
+  line-height: 1;
+}
+
+.stat span {
+  color: #cbd5e1;
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.tap-action {
+  min-height: clamp(10rem, 34vh, 16rem);
+  border: 0;
+  border-radius: 50%;
+  background: #8b5cf6;
+  color: #ffffff;
+  font-size: clamp(2rem, 12vw, 3.75rem);
+  box-shadow: 0 1rem 3rem rgba(76, 29, 149, 0.42);
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.tap-action:active:not(:disabled) { transform: scale(0.98); }
+
+.tap-action:disabled {
+  background: #334155;
+  color: #cbd5e1;
+  cursor: default;
+  box-shadow: none;
+}
+
+.game-status {
+  min-height: 1.5rem;
+  text-align: center;
+  font-weight: 700;
+}
+
+.game-controls {
+  display: grid;
+  gap: 0.65rem;
 }
 
 @media (min-width: 400px) {
   .shell { padding: 1.75rem; }
+  .view { min-height: calc(100vh - 3.5rem); }
   .challenge-card { padding: 1.5rem; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after { scroll-behavior: auto !important; }
+  *, *::before, *::after {
+    scroll-behavior: auto !important;
+    transition: none !important;
+  }
 }
