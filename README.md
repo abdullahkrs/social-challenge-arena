@@ -6,11 +6,11 @@ Discover → Play → Result → Share → Friend Competes → Compare → Share
 
 ## Current state
 
-The repository includes a compact catalog of six playable curated tap challenges across Speed, Rhythm, and Endurance, with Easy and Hard choices. A player selects one challenge, completes its bounded timed round, receives a focused result, and can share a validated challenge-aware score link.
+The repository includes six playable curated tap challenges across Speed, Rhythm, and Endurance, plus lightweight private challenge creation. A player can enter one short safe name, choose a 10, 20, or 30 second round, play the existing tap mechanic, and share a validated private result link without login.
 
-A friend opening a valid shared link sees the exact curated challenge, target score, and duration, can compete without login, receives a deterministic side-by-side comparison, and can share their validated score as the next target.
+A friend opening a valid curated or private link sees the exact challenge, target score, and duration, can compete without login, receives a deterministic side-by-side comparison, and can share their validated score as the next target.
 
-The completed loop has dependency-free privacy-safe instrumentation. It keeps only allowlisted aggregate event counts in memory. It does not send network requests, set cookies, use persistent storage, or record scores, URLs, timestamps, identities, device data, or personal data.
+The completed loop has dependency-free privacy-safe instrumentation on the curated entry. It keeps only allowlisted aggregate event counts in memory. The product does not send analytics requests, set cookies, use persistent storage, or record identities, device data, or personal data.
 
 ## Curated challenges
 
@@ -19,6 +19,10 @@ The completed loop has dependency-free privacy-safe instrumentation. It keeps on
 - Endurance: Tap Marathon (Easy), Endurance Blitz (Hard)
 
 All six entries reuse the validated tap-count mechanic while preserving distinct allowlisted identities and durations in shared links.
+
+## Private challenge
+
+Open `create.html` or use **Create private challenge** from discovery. Private challenge titles are normalized to 3–24 ASCII letters, numbers, and spaces. Durations are restricted to 10, 20, or 30 seconds. The challenge and result exist only in the validated link and current page memory.
 
 ## Run
 
@@ -40,7 +44,7 @@ The build creates `dist/` and synchronizes `docs/` for GitHub Pages.
 
 ## Metrics
 
-For local inspection during a page session, the non-enumerable `window.socialChallengeMetrics` collector exposes `snapshot()`. Counts reset when the page reloads and are not transmitted or persisted.
+For local inspection during a curated page session, the non-enumerable `window.socialChallengeMetrics` collector exposes `snapshot()`. Counts reset when the page reloads and are not transmitted or persisted.
 
 ## Preview
 
