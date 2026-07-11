@@ -202,15 +202,21 @@ function clearSharedResultHash(locationObject, historyObject) {
     return false;
   }
 
-  const pathname = typeof locationObject.pathname === 'string' && locationObject.pathname.startsWith('/')
+  const pathname = typeof locationObject.pathname === 'string'
+    && locationObject.pathname.startsWith('/')
+    && !locationObject.pathname.startsWith('//')
     ? locationObject.pathname
     : '/';
   const search = typeof locationObject.search === 'string' && locationObject.search.startsWith('?')
     ? locationObject.search
     : '';
 
-  historyObject.replaceState(null, '', `${pathname}${search}`);
-  return true;
+  try {
+    historyObject.replaceState(null, '', `${pathname}${search}`);
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 async function shareResultLink(url, options = {}) {
