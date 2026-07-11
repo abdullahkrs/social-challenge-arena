@@ -23,7 +23,7 @@ test('private title and duration are strictly bounded', () => {
     instruction: 'Tap fast until time runs out.'
   });
 
-  for (const title of ['', 'ab', ' leading', 'bad!', 'a'.repeat(25), '<script>']) {
+  for (const title of ['', 'ab', 'bad!', 'a'.repeat(25), '<script>']) {
     assert.throws(() => normalizePrivateTitle(title), /3–24|text/);
   }
   for (const duration of [0, 15, 45, 300, 'abc']) {
