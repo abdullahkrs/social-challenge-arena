@@ -6,7 +6,7 @@ Discover → Play → Result → Share → Friend Competes → Compare → Share
 
 ## Current state
 
-The repository includes a mobile-first discovery screen, the playable 20-second Tap Sprint challenge, a focused score/result state, and a validated share-or-copy result link. A friend opening a valid shared link sees the target, can complete the same attempt without login, and receives a deterministic side-by-side comparison showing whether the target was beaten, tied, or missed. Share-again from comparison is not implemented yet.
+The repository includes a mobile-first discovery screen, the playable 20-second Tap Sprint challenge, a focused score/result state, and a validated share-or-copy result link. A friend opening a valid shared link sees the target, can complete the same attempt without login, and receives a deterministic side-by-side comparison. From comparison, the friend can share their validated score as the next target using the same strict URL and browser-sharing fallbacks, completing the first end-to-end loop.
 
 ## Run
 

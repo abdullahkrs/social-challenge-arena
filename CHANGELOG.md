@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.8.0 — 2026-07-11
+
+### Added
+
+- One primary `Share your score` action on the completed friend comparison.
+- Strict comparison-state revalidation before creating the next challenge link.
+- Focused tests for friend-score promotion, malformed comparison rejection, and share-again structure.
+
+### Changed
+
+- The friend’s validated completed score now becomes the next Tap Sprint target.
+- Comparison sharing reuses the existing Web Share, clipboard, and visible validated-link fallbacks.
+- The baseline accessibility test now checks the labelled discovery view instead of requiring a stale label on the main landmark.
+
 ## 0.7.0 — 2026-07-11
 
 ### Added

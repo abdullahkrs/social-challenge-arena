@@ -246,6 +246,41 @@ function createComparisonSummary(friendTaps, invitation) {
   });
 }
 
+function createComparisonShareUrl(comparison, baseUrl) {
+  if (!comparison || typeof comparison !== 'object') {
+    throw new TypeError('Completed comparison is required.');
+  }
+
+  const expectedKeys = [
+    'challengeId',
+    'challengeTitle',
+    'targetTaps',
+    'friendTaps',
+    'durationSeconds',
+    'difference',
+    'outcome',
+    'headline',
+    'message'
+  ];
+  const keys = Object.keys(comparison);
+  if (keys.length !== expectedKeys.length || keys.some(key => !expectedKeys.includes(key))) {
+    throw new TypeError('Completed comparison has an invalid shape.');
+  }
+
+  const validated = createComparisonSummary(comparison.friendTaps, {
+    challengeId: comparison.challengeId,
+    challengeTitle: comparison.challengeTitle,
+    targetTaps: comparison.targetTaps,
+    durationSeconds: comparison.durationSeconds
+  });
+
+  if (expectedKeys.some(key => comparison[key] !== validated[key])) {
+    throw new TypeError('Completed comparison is inconsistent.');
+  }
+
+  return createSharedResultUrl(validated.friendTaps, validated.durationSeconds, baseUrl);
+}
+
 function clearSharedResultHash(locationObject, historyObject) {
   if (!locationObject || !historyObject || typeof historyObject.replaceState !== 'function') {
     return false;
@@ -316,6 +351,7 @@ if (typeof module !== 'undefined') {
     parseSharedResultHash,
     createFriendAttemptInvitation,
     createComparisonSummary,
+    createComparisonShareUrl,
     clearSharedResultHash,
     shareResultLink
   };
@@ -344,6 +380,9 @@ if (typeof document !== 'undefined') {
   const comparisonOutcome = document.querySelector('#comparison-outcome');
   const comparisonMessage = document.querySelector('#comparison-message');
   const comparisonAnnouncement = document.querySelector('#comparison-announcement');
+  const comparisonShareButton = document.querySelector('#share-again');
+  const comparisonShareStatus = document.querySelector('#comparison-share-status');
+  const comparisonShareFallback = document.querySelector('#comparison-share-fallback');
   const comparisonReplayButton = document.querySelector('#comparison-replay');
   const comparisonBackButton = document.querySelector('#comparison-back');
   const timeValue = document.querySelector('#time-value');
@@ -379,6 +418,9 @@ if (typeof document !== 'undefined') {
     comparisonOutcome,
     comparisonMessage,
     comparisonAnnouncement,
+    comparisonShareButton,
+    comparisonShareStatus,
+    comparisonShareFallback,
     comparisonReplayButton,
     comparisonBackButton,
     timeValue,
@@ -394,6 +436,7 @@ if (typeof document !== 'undefined') {
 
   if (requiredElements.every(Boolean)) {
     let completedResult = null;
+    let completedComparison = null;
     let activeFriendInvitation = null;
 
     const incomingShare = parseSharedResultHash(window.location.hash);
@@ -401,11 +444,32 @@ if (typeof document !== 'undefined') {
       clearSharedResultHash(window.location, window.history);
     }
 
-    function resetShareState() {
-      shareStatus.textContent = '';
-      shareFallback.hidden = true;
-      shareFallback.removeAttribute('href');
-      shareFallback.textContent = 'Open score link';
+    function resetShareState(statusElement, fallbackElement) {
+      statusElement.textContent = '';
+      fallbackElement.hidden = true;
+      fallbackElement.removeAttribute('href');
+      fallbackElement.textContent = 'Open score link';
+    }
+
+    function resetAllShareStates() {
+      resetShareState(shareStatus, shareFallback);
+      resetShareState(comparisonShareStatus, comparisonShareFallback);
+    }
+
+    function showShareOutcome(outcome, statusElement, fallbackElement) {
+      if (outcome === 'shared') {
+        statusElement.textContent = 'Shared.';
+        fallbackElement.hidden = true;
+      } else if (outcome === 'copied') {
+        statusElement.textContent = 'Link copied.';
+        fallbackElement.hidden = true;
+      } else if (outcome === 'cancelled') {
+        statusElement.textContent = 'Share cancelled.';
+        fallbackElement.hidden = true;
+      } else {
+        statusElement.textContent = 'Link ready below.';
+        fallbackElement.hidden = false;
+      }
     }
 
     function showFriendInvitation(invitation) {
@@ -423,6 +487,8 @@ if (typeof document !== 'undefined') {
     }
 
     function showComparison(comparison) {
+      completedComparison = comparison;
+      resetShareState(comparisonShareStatus, comparisonShareFallback);
       comparisonTargetScore.textContent = String(comparison.targetTaps);
       comparisonFriendScore.textContent = String(comparison.friendTaps);
       comparisonOutcome.textContent = comparison.headline;
@@ -433,7 +499,7 @@ if (typeof document !== 'undefined') {
       resultView.hidden = true;
       comparisonView.hidden = false;
       comparisonAnnouncement.textContent = `${comparison.headline}. Target ${comparison.targetTaps} taps. You scored ${comparison.friendTaps} taps. ${comparison.message}`;
-      comparisonReplayButton.focus();
+      comparisonShareButton.focus();
     }
 
     const game = createTapSprintGame({
@@ -455,6 +521,7 @@ if (typeof document !== 'undefined') {
           return;
         }
 
+        completedComparison = null;
         resultScore.textContent = String(completedResult.taps);
         resultMessage.textContent = completedResult.message;
         comparisonView.hidden = true;
@@ -466,10 +533,11 @@ if (typeof document !== 'undefined') {
 
     function startAttempt() {
       completedResult = null;
+      completedComparison = null;
       friendAnnouncement.textContent = '';
       resultAnnouncement.textContent = '';
       comparisonAnnouncement.textContent = '';
-      resetShareState();
+      resetAllShareStates();
       friendView.hidden = true;
       discoveryView.hidden = true;
       resultView.hidden = true;
@@ -482,11 +550,12 @@ if (typeof document !== 'undefined') {
     function returnToDiscovery() {
       activeFriendInvitation = null;
       completedResult = null;
+      completedComparison = null;
       game.reset();
       friendAnnouncement.textContent = '';
       resultAnnouncement.textContent = '';
       comparisonAnnouncement.textContent = '';
-      resetShareState();
+      resetAllShareStates();
       clearSharedResultHash(window.location, window.history);
       friendView.hidden = true;
       challengeView.hidden = true;
@@ -511,19 +580,21 @@ if (typeof document !== 'undefined') {
         text: `I scored ${completedResult.taps} taps in Tap Sprint. Can you beat it?`
       });
 
-      if (outcome === 'shared') {
-        shareStatus.textContent = 'Shared.';
-        shareFallback.hidden = true;
-      } else if (outcome === 'copied') {
-        shareStatus.textContent = 'Link copied.';
-        shareFallback.hidden = true;
-      } else if (outcome === 'cancelled') {
-        shareStatus.textContent = 'Share cancelled.';
-        shareFallback.hidden = true;
-      } else {
-        shareStatus.textContent = 'Link ready below.';
-        shareFallback.hidden = false;
-      }
+      showShareOutcome(outcome, shareStatus, shareFallback);
+    }
+
+    async function shareCompletedComparison() {
+      if (!completedComparison) return;
+
+      const shareUrl = createComparisonShareUrl(completedComparison, canonicalLink.href);
+      comparisonShareFallback.href = shareUrl;
+      comparisonShareFallback.textContent = shareUrl;
+
+      const outcome = await shareResultLink(shareUrl, {
+        text: `I scored ${completedComparison.friendTaps} taps in Tap Sprint. Can you beat it?`
+      });
+
+      showShareOutcome(outcome, comparisonShareStatus, comparisonShareFallback);
     }
 
     startFriendButton.addEventListener('click', startAttempt);
@@ -531,6 +602,7 @@ if (typeof document !== 'undefined') {
     startButton.addEventListener('click', startAttempt);
     tapButton.addEventListener('click', () => game.tap());
     shareButton.addEventListener('click', shareCompletedResult);
+    comparisonShareButton.addEventListener('click', shareCompletedComparison);
     resultReplayButton.addEventListener('click', startAttempt);
     comparisonReplayButton.addEventListener('click', startAttempt);
     backButton.addEventListener('click', returnToDiscovery);

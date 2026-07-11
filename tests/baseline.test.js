@@ -7,7 +7,8 @@ const css = readFileSync('styles.css', 'utf8');
 
 test('application remains mobile-first and accessible', () => {
   assert.match(html, /name="viewport"/i);
-  assert.match(html, /<main[^>]+aria-labelledby="page-title"/i);
+  assert.match(html, /<main[^>]*class="shell"/i);
+  assert.match(html, /id="discovery-view"[^>]+aria-labelledby="page-title"/i);
   assert.match(html, /id="page-title"/i);
   assert.match(css, /min-width:\s*320px/i);
 });
