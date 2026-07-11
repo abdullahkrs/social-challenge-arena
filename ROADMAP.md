@@ -13,8 +13,8 @@ Active MVP development.
 5. Share or copy challenge/result link — complete.
 6. Friend attempt opened from the shared link — complete.
 7. Original-player and friend comparison — complete.
-8. Share-again action from the comparison — next.
-9. Basic privacy-safe MVP event instrumentation.
+8. Share-again action from the comparison — complete.
+9. Basic privacy-safe MVP event instrumentation — next.
 10. Curated challenge variety.
 11. Lightweight private challenge creation.
 
@@ -74,4 +74,12 @@ Active MVP development.
 - Beat, tie, and short outcomes are deterministic and avoid fabricated rankings or social proof.
 - Replaying from comparison retains the same validated target; returning to challenges clears shared context.
 - Comparison values use safe DOM text properties and are announced after the view becomes visible.
-- Share-again remains deferred to Stage 8.
+
+### Stage 8
+
+- Comparison exposes one primary `Share your score` action.
+- The friend's validated completed score becomes the next bounded Tap Sprint target.
+- Share-again reuses the canonical versioned fragment codec, Web Share, clipboard, and visible-link fallback.
+- Cancelled sharing keeps the fallback hidden; unavailable APIs reveal only the validated HTTP(S) link.
+- Replay remains secondary and retains the original target; returning to challenges clears shared context.
+- No identity, storage, backend, analytics, or shared-link schema expansion was introduced.
