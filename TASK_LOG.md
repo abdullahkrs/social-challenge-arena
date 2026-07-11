@@ -202,13 +202,14 @@ Implement the focused score/result state using the validated Tap Sprint completi
 ## Cycle 4
 
 - **Date/time:** 2026-07-11T13:39:57+03:00
-- **Status:** in progress
+- **Completed at:** 2026-07-11T13:55:46+03:00
+- **Status:** completed
 - **Selected task:** Add a focused Tap Sprint score/result state after a completed attempt.
 - **Goal:** Replace the inline completion sentence with a distinct mobile-first result view that makes the validated tap score immediately understandable and offers replay or return to discovery.
-- **Why selected:** Cycles 1–3 are complete on `main`, no continuity pull request is open, and the focused result state is the earliest incomplete roadmap stage.
+- **Why selected:** Cycles 1–3 were complete on `main`, no continuity pull request was open, and the focused result state was the earliest incomplete roadmap stage.
 - **Viral-loop impact:** Completes the Result step and creates a stable, validated score surface for the next share-link cycle.
 
-### Acceptance criteria
+### Acceptance criteria completed
 
 - A completed Tap Sprint attempt transitions from gameplay to a dedicated result view.
 - The final validated tap count is the dominant result information and is rendered with safe DOM text APIs.
@@ -220,7 +221,23 @@ Implement the focused score/result state using the validated Tap Sprint completi
 - Focused tests cover result-summary validation and the result page structure in addition to existing gameplay lifecycle tests.
 - Source and `docs/` preview files are synchronized.
 
-### Expected files
+### Completed work
+
+- Added a dedicated hidden result section that replaces gameplay after the completion snapshot is validated.
+- Added a frozen result-summary model with bounded duration validation and deterministic score feedback.
+- Made the final tap count the dominant content and added replay plus return-to-discovery actions.
+- Added focus transfer and a live-region score announcement after the result view becomes visible.
+- Added long-score wrapping so unusually large validated counts cannot force horizontal overflow.
+- Added focused result tests and updated landing structure coverage.
+- Updated README, roadmap, changelog, and generated repository preview files.
+
+### Intentional non-goals preserved
+
+- No share, copy-link, URL state, friend attempt, comparison, share-again, analytics, challenge variety, or challenge creation.
+- No dependency, framework, backend, login, workflow restoration, architecture migration, or broad visual redesign.
+- No fabricated benchmark, percentile, leaderboard, record, popularity claim, or personal-best persistence.
+
+### Files changed
 
 - `index.html`
 - `styles.css`
@@ -235,24 +252,62 @@ Implement the focused score/result state using the validated Tap Sprint completi
 - `CHANGELOG.md`
 - `TASK_LOG.md`
 
-### Explicit non-goals
+### Verification
 
-- No share, copy-link, URL state, friend attempt, comparison, share-again, analytics, challenge variety, or challenge creation.
-- No dependency, framework, backend, login, workflow restoration, architecture migration, or broad visual redesign.
-- No fabricated benchmark, percentile, leaderboard, record, or popularity claim.
+- `npm test`: passed using Node.js `v22.16.0`; 8 tests passed, 0 failed.
+- `npm run build`: passed; 3 files copied to `dist/` and `docs/`.
+- `node --check app.js`: passed.
+- Committed source blob hashes matched the freshly tested local files; `index.html` was `6de2d10dec38cd14c940933350599fb08e26f1df`, `styles.css` was `b48f94f41e610d9cb1e45e523ca1941c049c2d4e`, `app.js` was `60a006c6a2fd1f461b3281449c93b3e3555a0c9e`, and `test/result.test.js` was `b198955ab68d19ab4f217f3946c7d8f2c5b197ad`.
+- Source/output comparison: `index.html`, `styles.css`, and `app.js` matched their generated `docs/` files byte-for-byte.
+- Static mobile review: 320px body minimum, fluid `min(100%, 30rem)` shell, full-width 48px actions, bounded card content, and `overflow-wrap: anywhere` on the dominant score at 320px and 390px.
+- Accessibility review: labelled result section, semantic heading, keyboard-native controls, visible focus, focus transfer to replay, and score announcement after revealing the live region.
+- Security/privacy review: result values use `textContent`; no URL, clipboard, storage, untrusted HTML, secret, token, environment value, analytics, personal data, or executable user content was added.
+- GitHub Actions/status checks: none were available because the owner removed the workflow; no automated status was claimed.
+- **Preview status:** repository preview output verified for the merged result content; live deployed and interactive browser preview were unavailable in the execution environment.
+
+### Review findings and resolution
+
+- Reviewed the complete 12-file PR diff, including source, tests, generated preview files, and documentation.
+- Found and fixed two blocking issues during self-review: the live-region text was initially set while its parent view was hidden, and an unusually long score could overflow on narrow screens.
+- Re-ran all tests, build, syntax, and source/preview comparisons after both fixes, then re-reviewed the final diff.
+- Confirmed one-task scope, acceptance-criteria alignment, safe state handling, accessibility, mobile layout, security, privacy, base branch, dependency order, and mergeability.
+- No blocking or non-blocking findings remained; no external requested changes, unresolved review threads, merge conflicts, or CI statuses existed.
+- Recorded a factual self-review comment and did not claim independent approval.
+
+### Git and merge outcome
+
+- Product branch: `agent/cycle-4-focused-result-main`.
+- Product branch head SHA: `8cb693339e1ef418ec1502f61da7084409c1a6ff`.
+- Pull request: #15 — `feat(result): add focused score state`.
+- Base branch: `main` at `b0a62de19498b419dd32376ee29d163e531cb872`.
+- Merge method: squash with expected head SHA.
+- Merge outcome: successfully merged on 2026-07-11T13:55:46+03:00.
+- Merge SHA: `1f469810c645b956b086b683634123518566b17a`.
+
+### Decision
+
+No new product or architecture decision. The static HTML, CSS, and JavaScript architecture remains sufficient for the next share-link cycle.
 
 ### Strategic review
 
-- The direction remains aligned with the Discover → Play → Result sequence of the north star.
-- The largest product bottleneck is that completion currently leaves the score inside the gameplay screen rather than giving it a clear result state.
-- The largest delivery risk remains unavailable automated CI and interactive deployed-preview verification.
-- No new evidence invalidates the static HTML/CSS/JavaScript architecture or the Tap Sprint state machine.
-- A dedicated result view is still the highest-impact narrow task and should precede all sharing behavior.
+- The direction remained aligned with the Discover → Play → Result sequence of the north star.
+- The completed result state removed the largest product bottleneck; safe share-link state is now the next bottleneck.
+- Unavailable automated CI and interactive deployed-preview verification remain the largest delivery risk.
+- No evidence invalidated the static architecture or the existing Tap Sprint state machine.
+- The share-or-copy link stage is now the highest-impact narrow next task.
 
 ### Product thinking
 
-1. The missing dedicated Result step blocks a clear handoff from play to future sharing.
-2. A large score plus immediate replay makes the original player more likely to continue and later share a result.
-3. A stable result model gives a friend a clear target once shared-link behavior exists.
-4. The smallest proof is one hidden result section populated from the game completion snapshot, plus replay and discovery actions.
+1. The missing dedicated Result step blocked a clear handoff from play to future sharing; it is now resolved.
+2. A large score plus immediate replay gives the original player a clear reason to continue and later share.
+3. A stable validated result model gives a friend a clear target once shared-link behavior exists.
+4. The minimum proof was one result section populated from the completion snapshot, plus replay and discovery actions.
 5. Parked idea: add a personal-best comparison only after safe local persistence is explicitly selected in a later cycle.
+
+### Remaining limitation
+
+Live deployed-preview verification, interactive browser exercise, and automated GitHub Actions validation remain unavailable in the current environment. Repository preview output and focused local behavior were verified instead.
+
+### Next suggested task
+
+Implement one safe share-or-copy challenge/result link from the focused result state. Validate all encoded URL state and do not implement the friend attempt until sharing is complete.
