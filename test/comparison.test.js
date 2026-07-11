@@ -3,6 +3,7 @@ const assert = require('node:assert/strict');
 const { readFileSync } = require('node:fs');
 const {
   createComparisonSummary,
+  createComparisonShareUrl,
   createFriendAttemptInvitation,
   parseSharedResultHash
 } = require('../app.js');
@@ -56,7 +57,34 @@ test('comparison rejects malformed scores and unvalidated invitation state', () 
   assert.throws(() => createComparisonSummary(1000001, invitation()), /must not exceed/);
 });
 
-test('friend completion opens an accessible mobile-safe comparison without share-again', () => {
+test('share-again URL promotes the validated friend score as the next target', () => {
+  const comparison = createComparisonSummary(57, invitation(50));
+  const url = new URL(createComparisonShareUrl(
+    comparison,
+    'https://example.com/arena/?unsafe=1#old'
+  ));
+
+  assert.equal(url.origin, 'https://example.com');
+  assert.equal(url.pathname, '/arena/');
+  assert.equal(url.search, '');
+  assert.deepEqual(parseSharedResultHash(url.hash), {
+    version: 1,
+    challengeId: 'tap-sprint',
+    taps: 57,
+    durationSeconds: 20
+  });
+});
+
+test('share-again rejects missing, extra, or inconsistent comparison state', () => {
+  const comparison = createComparisonSummary(57, invitation(50));
+
+  assert.throws(() => createComparisonShareUrl(null, 'https://example.com/'), /required/);
+  assert.throws(() => createComparisonShareUrl({ ...comparison, extra: 'unsafe' }, 'https://example.com/'), /invalid shape/);
+  assert.throws(() => createComparisonShareUrl({ ...comparison, friendTaps: 58 }, 'https://example.com/'), /inconsistent/);
+  assert.throws(() => createComparisonShareUrl(comparison, 'file:///tmp/index.html'), /HTTP or HTTPS/);
+});
+
+test('friend completion opens an accessible mobile-safe comparison with share-again', () => {
   const html = readFileSync('index.html', 'utf8');
   const css = readFileSync('styles.css', 'utf8');
   const app = readFileSync('app.js', 'utf8');
@@ -65,11 +93,17 @@ test('friend completion opens an accessible mobile-safe comparison without share
   assert.match(html, /id="comparison-target-score"/);
   assert.match(html, /id="comparison-friend-score"/);
   assert.match(html, /id="comparison-announcement"[^>]*aria-live="polite"/);
+  assert.match(html, /id="comparison-share-status"[^>]*aria-live="polite"/);
+  assert.match(html, /id="comparison-share-fallback"[^>]*hidden>Open score link</);
+  assert.match(html, /id="share-again"[^>]*>Share your score</);
   assert.match(html, /id="comparison-replay"[^>]*>Try again</);
   assert.match(html, /id="comparison-back"[^>]*>Challenges</);
   assert.match(css, /\.comparison-scores[\s\S]*grid-template-columns: repeat\(2, minmax\(0, 1fr\)\)/);
   assert.match(css, /\.comparison-score strong[\s\S]*overflow-wrap: anywhere/);
+  assert.match(css, /\.share-fallback[\s\S]*overflow-wrap: anywhere/);
   assert.match(app, /if \(activeFriendInvitation\)[\s\S]*showComparison\(createComparisonSummary/);
-  assert.match(app, /comparisonReplayButton\.focus\(\)/);
-  assert.doesNotMatch(html, /id="share-again"/);
+  assert.match(app, /comparisonShareButton\.focus\(\)/);
+  assert.match(app, /comparisonShareButton\.addEventListener\('click', shareCompletedComparison\)/);
+  assert.match(app, /createComparisonShareUrl\(completedComparison, canonicalLink\.href\)/);
+  assert.match(app, /completedComparison\.friendTaps/);
 });
