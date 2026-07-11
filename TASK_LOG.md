@@ -5,7 +5,7 @@ Historical completed cycles 1–6 are preserved byte-for-byte in [`TASK_LOG_ARCH
 ## Cycle 9
 
 - **Date/time:** 2026-07-11T18:42:06+03:00
-- **Status:** in progress
+- **Status:** ready for final pull-request review and merge
 - **Selected task:** Add basic privacy-safe in-memory event instrumentation for the completed viral loop.
 - **Goal:** Record allowlisted aggregate funnel counts in memory only so the completed loop can be measured without identity, cookies, persistence, personal data, or a third-party destination.
 - **Why selected:** Cycle 8 was complete on `main`, no continuity pull request was open, and privacy-safe instrumentation was the earliest incomplete roadmap stage.
@@ -114,14 +114,18 @@ Historical completed cycles 1–6 are preserved byte-for-byte in [`TASK_LOG_ARCH
 - Reviewed the complete candidate diff for one-task scope, Stage 9 acceptance criteria, event semantics, transition deduplication, successful-share counting, privacy boundaries, security, accessibility, mobile behavior, build inclusion, source/preview synchronization, documentation accuracy, and secret-like strings.
 - The task-log rollover preserves the exact prior `TASK_LOG.md` blob `4f59dc986cdc2067e08fb96ac67ad0f16c99bb6b`; no Cycle 7–8 history is lost.
 - No blocking or non-blocking correctness, security, privacy, accessibility, mobile, test, build, dependency, or scope finding remains in the candidate diff.
-- Pull-request comments, review threads, mergeability, conflicts, and final head status remain to be checked before merge.
+- Reviewed PR #25 as mergeable against `main`; no comments, reviews, unresolved threads, conflicts, workflow runs, or commit statuses exist.
+- No blocking or non-blocking finding remains after the full pull-request review.
+- A factual self-review comment will be recorded before squash merge; no independent approval is claimed.
 
 ### Git and merge outcome
 
 - Product branch: `agent/cycle-9-privacy-safe-metrics` created from `main` at `0b8183eab23d6458f1116957c932a4c5aad4696e`.
 - Planning commit: `f5cbb1342ecb0d5506ac16fec3cf44da36961df2`.
-- Pull request: pending creation against `main`.
-- Merge method: squash with expected head SHA when final review is clean.
+- Implementation commit: `3c70b87dac571601247cde737f25e2f2f4c4a0a8`.
+- Pull request: #25 — `feat(metrics): add privacy-safe loop instrumentation`.
+- Base branch: `main` at `0b8183eab23d6458f1116957c932a4c5aad4696e`.
+- Merge method: squash using the expected final head SHA after this factual log update.
 
 ### Decision
 
