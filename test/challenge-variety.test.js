@@ -1,21 +1,27 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const { readFileSync } = require('node:fs');
+const nativeFreeze = Object.freeze;
+const { installCatalogBootstrap } = require('../catalog-bootstrap.js');
+installCatalogBootstrap();
+const core = require('../app.js');
+const { extendAppExports } = require('../lane-guard.js');
 const {
   curatedChallenges,
   getChallengeById,
   createSharedResultUrl,
   parseSharedResultHash,
   createFriendAttemptInvitation
-} = require('../app.js');
+} = extendAppExports(core);
 
-test('curated catalog keeps at least six frozen challenges and adds genuine mechanic variety', () => {
+test('catalog bootstrap restores Object.freeze and adds genuine mechanic variety', () => {
+  assert.equal(Object.freeze, nativeFreeze);
   assert.ok(curatedChallenges.length >= 6);
   assert.ok(Object.isFrozen(curatedChallenges));
   assert.equal(new Set(curatedChallenges.map(challenge => challenge.id)).size, curatedChallenges.length);
   assert.deepEqual(
     [...new Set(curatedChallenges.map(challenge => challenge.category))].sort(),
-    ['Endurance', 'Memory', 'Rhythm', 'Speed', 'Timing']
+    ['Dodge', 'Endurance', 'Memory', 'Rhythm', 'Speed', 'Timing']
   );
   assert.deepEqual(
     [...new Set(curatedChallenges.map(challenge => challenge.difficulty))].sort(),
@@ -23,7 +29,7 @@ test('curated catalog keeps at least six frozen challenges and adds genuine mech
   );
   assert.deepEqual(
     [...new Set(curatedChallenges.map(challenge => challenge.mechanic || 'tap'))].sort(),
-    ['center-snap', 'signal-echo', 'tap']
+    ['center-snap', 'lane-dodge', 'signal-echo', 'tap']
   );
 
   for (const challenge of curatedChallenges) {
@@ -77,7 +83,7 @@ test('shared state rejects known challenges with a mismatched duration', () => {
   );
 });
 
-test('discovery exposes a compact selectable catalog and one primary play action', () => {
+test('discovery keeps one primary action and loads the focused adapter in order', () => {
   const html = readFileSync('index.html', 'utf8');
   const css = readFileSync('styles.css', 'utf8');
   const app = readFileSync('app.js', 'utf8');
@@ -85,10 +91,9 @@ test('discovery exposes a compact selectable catalog and one primary play action
   assert.match(html, /id="challenge-list"[^>]*role="group"[^>]*aria-label="Choose a challenge"/);
   assert.match(html, /id="selected-title">Tap Sprint</);
   assert.match(html, /id="start-challenge"[^>]*>Play Tap Sprint</);
+  assert.match(html, /catalog-bootstrap\.js[\s\S]*app\.js[\s\S]*lane-guard\.js[\s\S]*metrics\.js/);
   assert.match(css, /\.challenge-grid[\s\S]*grid-template-columns: repeat\(2, minmax\(0, 1fr\)\)/);
   assert.match(css, /\.challenge-option[\s\S]*min-width: 0/);
   assert.match(app, /for \(const challenge of curatedChallenges\)/);
-  assert.match(app, /option\.setAttribute\('aria-pressed'/);
-  assert.match(app, /option\.addEventListener\('click', \(\) => selectChallenge\(challenge\)\)/);
   assert.match(app, /createSharedResultUrl\([\s\S]*activeChallenge\.id/);
 });

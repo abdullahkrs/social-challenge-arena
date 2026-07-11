@@ -4,7 +4,9 @@ const { join } = require('node:path');
 const requiredFiles = [
   'index.html',
   'styles.css',
+  'catalog-bootstrap.js',
   'app.js',
+  'lane-guard.js',
   'metrics.js',
   'create.html',
   'private.css',

@@ -6,7 +6,7 @@ Discover → Play → Result → Share → Friend Competes → Compare → Share
 
 ## Current state
 
-The no-login social loop and lightweight private challenge creation are implemented. The curated catalog contains eight playable entries across Speed, Rhythm, Endurance, Timing, and Memory, backed by three genuinely different mechanics: timed tap count, three-stop center timing, and growing visual-sequence recall.
+The no-login social loop and lightweight private challenge creation are implemented. The curated catalog contains nine playable entries across Speed, Rhythm, Endurance, Timing, Memory, and Dodge, backed by four genuinely different mechanics: timed tap count, three-stop center timing, growing visual-sequence recall, and three-lane obstacle avoidance.
 
 A friend opening a valid curated or private link sees the exact challenge, target score, and format, can compete without login, receives a deterministic side-by-side comparison, and can share their validated score as the next target.
 
@@ -19,12 +19,13 @@ The completed loop has dependency-free privacy-safe instrumentation on the curat
 - Endurance: Tap Marathon (Easy), Endurance Blitz (Hard)
 - Timing: Center Snap (Easy)
 - Memory: Signal Echo (Easy)
+- Dodge: Lane Guard (Easy)
 
-The first six definitions reuse timed tap count. Center Snap asks the player to stop a moving marker three times and scores distance from the center. Signal Echo shows four growing patterns of 2, 3, 4, and 5 signals; the player repeats them with four native buttons, earns 100 points per correct signal, and immediately ends the attempt after a wrong choice.
+The first six definitions reuse timed tap count. Center Snap asks the player to stop a moving marker three times and scores distance from the center. Signal Echo shows four growing patterns of 2, 3, 4, and 5 signals for ordered recall. Lane Guard asks the player to choose among three lanes while six deterministic obstacles approach; each cleared wave awards 100 points and a collision ends the attempt.
 
-Center Snap uses purposeful marker movement and centered/near/missed feedback. Signal Echo uses purposeful sequence playback and correct/incorrect input feedback. With `prefers-reduced-motion`, Center Snap uses slower discrete marker steps, while Signal Echo uses longer still signal states and suppresses transform and shake animation. Both preserve text feedback, keyboard control, bounded scoring, safe timer cleanup, and the same social competition loop.
+Center Snap uses purposeful marker movement and centered/near/missed feedback. Signal Echo uses purposeful sequence playback and correct/incorrect input feedback. Lane Guard uses purposeful obstacle approach steps and clear/hit feedback. With `prefers-reduced-motion`, each mechanic uses slower or still discrete states while preserving text feedback, keyboard controls, bounded scoring, safe timer cleanup, and the same social competition loop.
 
-Curated variety remains in progress. Completion requires at least six playable entries and at least four genuinely different mechanics that materially change player decisions, timing, input, failure conditions, or scoring while reusing the existing result, sharing, friend-attempt, comparison, and share-again flow.
+Curated variety now meets the minimum completion gate with at least six playable entries and four genuinely different mechanics that materially change player decisions, timing, input, failure conditions, or scoring while reusing the existing result, sharing, friend-attempt, comparison, and share-again flow. Additional mechanics remain optional rather than required for the initial measurable loop.
 
 ## Private challenge
 
