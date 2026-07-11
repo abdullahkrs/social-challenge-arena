@@ -12,6 +12,7 @@
 - Purposeful obstacle approach movement, safe-lane choices, and clear or collision feedback using three native keyboard-accessible buttons.
 - Focused tests for timing, memory, and dodge scoring, reduced motion, timer cancellation, strict shared-state bounds, accessibility, and social-loop reuse.
 - A privacy-safe `share_again_completed` session counter for successful comparison Web Share or clipboard completion.
+- Experiment E-001, a facilitated ten-pair loop-validation protocol with role-specific expected snapshots, aggregate conversion formulas, privacy limits, thresholds, and decision rules.
 
 ### Changed
 
@@ -19,11 +20,13 @@
 - Result, friend invitation, comparison, and sharing use challenge-aware score units and round or wave formats without changing the shared-link schema.
 - Reduced-motion users receive discrete Center Snap movement, longer still Signal Echo states, and slower stepped Lane Guard obstacles with decorative transforms and feedback animation disabled.
 - Successful first-result sharing and successful comparison re-sharing are now measured in separate aggregate counters.
+- Manual validation guidance now separates fresh sharer and friend sessions so the shared start and completion counters can be interpreted without adding production analytics.
 
 ### Privacy and scope
 
 - Center Snap, Signal Echo, and Lane Guard reuse the existing strict shared-link codec, result, friend-attempt, comparison, share-again, metrics, and navigation flows.
 - The new re-share completion counter remains an allowlisted integer in page memory and adds no payload, identity, timestamp, URL, persistence, cookie, network request, or analytics destination.
+- E-001 permits only cohort-level integer totals and predefined blocker counts; it prohibits participant-level snapshots, identifiers, scores, links, timestamps, screenshots, device data, demographics, and free-text quotes.
 - No login, identity, persistence, backend, cookie, analytics destination, dependency, framework, copied game identity, private-creation change, or shared-link schema expansion was added.
 
 ## 0.11.0 — 2026-07-11
@@ -122,7 +125,7 @@
 ### Changed
 
 - Valid shared links now open a friend challenge entry instead of ordinary discovery.
-- Dismissing or leaving shared context removes the fragment safely.
+- Dismissing or leaving shared context removes the shared fragment safely.
 - Friend attempts reuse the existing gameplay and result states; comparison remains deferred.
 
 ## 0.5.0 — 2026-07-11
