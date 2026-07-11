@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.4.0 — 2026-07-11
+
+### Added
+
+- Dedicated mobile-first Tap Sprint score/result view.
+- Validated deterministic score feedback without fabricated rankings or records.
+- Accessible completed-score announcement.
+- Focused result-summary and result-structure tests.
+
+### Changed
+
+- Completed attempts now leave gameplay and show the final score with replay and return actions.
+
 ## 0.3.0 — 2026-07-11
 
 ### Added
