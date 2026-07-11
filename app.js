@@ -10,6 +10,61 @@ const featuredChallenge = Object.freeze({
 
 const sharedResultVersion = 1;
 const maxSharedScore = 1000000;
+const metricEventNames = Object.freeze([
+  'challenge_viewed',
+  'challenge_started',
+  'challenge_completed',
+  'result_viewed',
+  'share_attempted',
+  'share_completed',
+  'shared_link_opened',
+  'friend_completed',
+  'comparison_viewed',
+  'share_again_attempted',
+  'share_again_completed'
+]);
+
+function createSessionMetrics(options = {}) {
+  const counts = Object.fromEntries(metricEventNames.map(name => [name, 0]));
+  const dispatch = typeof options.dispatch === 'function'
+    ? options.dispatch
+    : detail => {
+      if (
+        typeof window !== 'undefined'
+        && typeof window.dispatchEvent === 'function'
+        && typeof CustomEvent === 'function'
+      ) {
+        window.dispatchEvent(new CustomEvent('sca:metric', { detail }));
+      }
+    };
+
+  function record(name) {
+    if (!metricEventNames.includes(name)) {
+      throw new TypeError('Metric event is not allowlisted.');
+    }
+
+    counts[name] += 1;
+    const detail = Object.freeze({
+      name,
+      challengeId: featuredChallenge.id,
+      count: counts[name]
+    });
+
+    try {
+      dispatch(detail);
+    } catch {
+      // Instrumentation must never interrupt the product loop.
+    }
+
+    return detail;
+  }
+
+  function snapshot() {
+    return Object.freeze({ ...counts });
+  }
+
+  return Object.freeze({ record, snapshot });
+}
 
 function createTapSprintGame(options = {}) {
   const durationSeconds = Number.isInteger(options.durationSeconds)
@@ -345,6 +400,8 @@ async function shareResultLink(url, options = {}) {
 if (typeof module !== 'undefined') {
   module.exports = {
     featuredChallenge,
+    metricEventNames,
+    createSessionMetrics,
     createTapSprintGame,
     createResultSummary,
     createSharedResultUrl,
@@ -438,6 +495,7 @@ if (typeof document !== 'undefined') {
     let completedResult = null;
     let completedComparison = null;
     let activeFriendInvitation = null;
+    const metrics = createSessionMetrics();
 
     const incomingShare = parseSharedResultHash(window.location.hash);
     if (window.location.hash && !incomingShare) {
@@ -499,6 +557,7 @@ if (typeof document !== 'undefined') {
       resultView.hidden = true;
       comparisonView.hidden = false;
       comparisonAnnouncement.textContent = `${comparison.headline}. Target ${comparison.targetTaps} taps. You scored ${comparison.friendTaps} taps. ${comparison.message}`;
+      metrics.record('comparison_viewed');
       comparisonShareButton.focus();
     }
 
@@ -515,8 +574,10 @@ if (typeof document !== 'undefined') {
       onComplete(state) {
         completedResult = createResultSummary(state.taps, state.durationSeconds);
         challengeView.hidden = true;
+        metrics.record('challenge_completed');
 
         if (activeFriendInvitation) {
+          metrics.record('friend_completed');
           showComparison(createComparisonSummary(completedResult.taps, activeFriendInvitation));
           return;
         }
@@ -527,6 +588,7 @@ if (typeof document !== 'undefined') {
         comparisonView.hidden = true;
         resultView.hidden = false;
         resultAnnouncement.textContent = `You scored ${completedResult.taps} taps.`;
+        metrics.record('result_viewed');
         shareButton.focus();
       }
     });
@@ -543,6 +605,7 @@ if (typeof document !== 'undefined') {
       resultView.hidden = true;
       comparisonView.hidden = true;
       challengeView.hidden = false;
+      metrics.record('challenge_started');
       game.start();
       tapButton.focus();
     }
@@ -562,11 +625,13 @@ if (typeof document !== 'undefined') {
       resultView.hidden = true;
       comparisonView.hidden = true;
       discoveryView.hidden = false;
+      metrics.record('challenge_viewed');
       startButton.focus();
     }
 
     async function shareCompletedResult() {
       if (!completedResult) return;
+      metrics.record('share_attempted');
 
       const shareUrl = createSharedResultUrl(
         completedResult.taps,
@@ -580,11 +645,13 @@ if (typeof document !== 'undefined') {
         text: `I scored ${completedResult.taps} taps in Tap Sprint. Can you beat it?`
       });
 
+      if (outcome === 'shared' || outcome === 'copied') metrics.record('share_completed');
       showShareOutcome(outcome, shareStatus, shareFallback);
     }
 
     async function shareCompletedComparison() {
       if (!completedComparison) return;
+      metrics.record('share_again_attempted');
 
       const shareUrl = createComparisonShareUrl(completedComparison, canonicalLink.href);
       comparisonShareFallback.href = shareUrl;
@@ -594,6 +661,7 @@ if (typeof document !== 'undefined') {
         text: `I scored ${completedComparison.friendTaps} taps in Tap Sprint. Can you beat it?`
       });
 
+      if (outcome === 'shared' || outcome === 'copied') metrics.record('share_again_completed');
       showShareOutcome(outcome, comparisonShareStatus, comparisonShareFallback);
     }
 
@@ -610,7 +678,10 @@ if (typeof document !== 'undefined') {
     comparisonBackButton.addEventListener('click', returnToDiscovery);
 
     if (incomingShare) {
+      metrics.record('shared_link_opened');
       showFriendInvitation(createFriendAttemptInvitation(incomingShare));
+    } else {
+      metrics.record('challenge_viewed');
     }
   }
 }
