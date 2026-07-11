@@ -1,161 +1,124 @@
 # Task Log
 
-Historical completed cycles 1–6 are preserved in [`TASK_LOG_ARCHIVE_CYCLES_1_6.md`](TASK_LOG_ARCHIVE_CYCLES_1_6.md), Cycles 7–8 in [`TASK_LOG_ARCHIVE_CYCLES_7_8.md`](TASK_LOG_ARCHIVE_CYCLES_7_8.md), Cycle 9 in [`TASK_LOG_ARCHIVE_CYCLE_9.md`](TASK_LOG_ARCHIVE_CYCLE_9.md), Cycle 10 in [`TASK_LOG_ARCHIVE_CYCLE_10.md`](TASK_LOG_ARCHIVE_CYCLE_10.md), Cycle 11 in [`TASK_LOG_ARCHIVE_CYCLE_11.md`](TASK_LOG_ARCHIVE_CYCLE_11.md), Cycle 12 in [`TASK_LOG_ARCHIVE_CYCLE_12.md`](TASK_LOG_ARCHIVE_CYCLE_12.md), Cycle 13 in [`TASK_LOG_ARCHIVE_CYCLE_13.md`](TASK_LOG_ARCHIVE_CYCLE_13.md), and Cycle 14 in [`TASK_LOG_ARCHIVE_CYCLE_14.md`](TASK_LOG_ARCHIVE_CYCLE_14.md). This file remains the active source of truth for the current cycle.
+Historical completed cycles 1–6 are preserved in [`TASK_LOG_ARCHIVE_CYCLES_1_6.md`](TASK_LOG_ARCHIVE_CYCLES_1_6.md), Cycles 7–8 in [`TASK_LOG_ARCHIVE_CYCLES_7_8.md`](TASK_LOG_ARCHIVE_CYCLES_7_8.md), Cycle 9 in [`TASK_LOG_ARCHIVE_CYCLE_9.md`](TASK_LOG_ARCHIVE_CYCLE_9.md), Cycle 10 in [`TASK_LOG_ARCHIVE_CYCLE_10.md`](TASK_LOG_ARCHIVE_CYCLE_10.md), Cycle 11 in [`TASK_LOG_ARCHIVE_CYCLE_11.md`](TASK_LOG_ARCHIVE_CYCLE_11.md), Cycle 12 in [`TASK_LOG_ARCHIVE_CYCLE_12.md`](TASK_LOG_ARCHIVE_CYCLE_12.md), Cycle 13 in [`TASK_LOG_ARCHIVE_CYCLE_13.md`](TASK_LOG_ARCHIVE_CYCLE_13.md), Cycle 14 in [`TASK_LOG_ARCHIVE_CYCLE_14.md`](TASK_LOG_ARCHIVE_CYCLE_14.md), and Cycle 15 in [`TASK_LOG_ARCHIVE_CYCLE_15.md`](TASK_LOG_ARCHIVE_CYCLE_15.md). This file remains the active source of truth for the current cycle.
 
-## Cycle 15
+## Cycle 16
 
-- **Date/time:** 2026-07-12T00:42:31+03:00
-- **Verification completed at:** 2026-07-12T01:20:00+03:00
-- **Merge verified at:** 2026-07-12T01:26:11+03:00
-- **Status:** complete; implementation squash-merged into `main`
-- **Selected task:** Add one original three-lane dodge challenge named Lane Guard.
-- **Goal:** Add a genuinely different mechanic where the player chooses among three lanes to avoid six deterministic incoming obstacles, earns bounded points for cleared waves, receives clear collision feedback, and completes the existing result, sharing, friend-attempt, comparison, metrics, and navigation loop.
-- **Why selected:** No pull request was open, Cycle 14 was merged and closed, Roadmap Stage 10 was the earliest incomplete stage, and the previous cycle identified one lane-dodge challenge as the next smallest diversity task.
-- **Viral-loop impact:** A short “clear all six waves” score creates an immediately understandable friend target and a strong replay motive without adding identity or a separate social system.
+- **Date/time:** 2026-07-12T01:42:03+03:00
+- **Verification completed at:** 2026-07-12T01:54:00+03:00
+- **Status:** implementation complete and reviewed; awaiting squash merge
+- **Selected task:** Distinguish successful comparison re-shares from successful first-result shares in the privacy-safe session metrics.
+- **Goal:** Add one aggregate `share_again_completed` counter so the final Share Again step can be measured independently without payloads, persistence, identity, timestamps, URLs, or network delivery.
+- **Why selected:** No pull request or unfinished cycle was open and all roadmap stages were complete. The documented next step is real usage evidence, but the previous collector recorded successful first shares and successful comparison re-shares in the same `share_completed` bucket, preventing direct measurement of loop closure.
+- **Viral-loop impact:** Separating successful re-share completion exposes whether a friend actually closes the Discover → Share Again loop instead of merely pressing the final button.
 
 ### Acceptance criteria completed
 
-- Added one frozen `lane-guard` definition without changing existing challenge IDs.
-- Lane Guard differs materially from tap count, center timing, and sequence memory through three-lane movement decisions, incoming obstacle paths, collision failure, and per-wave survival scoring.
-- Added six deterministic obstacle waves; each cleared wave awards 100 points for a strict maximum of 600.
-- Added purposeful obstacle approach movement and explicit clear or hit feedback with text equivalents.
-- Added a `prefers-reduced-motion` mode using slower discrete obstacle steps without changing decisions or scoring.
-- Preserved native keyboard-accessible controls, visible focus, readable contrast, text lane announcements, and 48 CSS-pixel minimum lane controls.
-- Movement and feedback timers are cancelled on reset, replay or reconfiguration, navigation, collision, completion, and destroy.
-- Reused the existing discovery, result, strict shared-link codec, friend invitation, comparison, share-again, metrics, and navigation systems.
-- Shared Lane Guard scores above 600 are rejected while existing challenge validation remains intact.
-- Added focused tests for deterministic progression, lane choices, collision, scoring, reduced motion, timer cancellation, shared-state bounds, accessibility, and loop reuse.
-- Synchronized the new source and `docs/` preview assets exactly; unchanged `app.js` and `docs/app.js` remain identical.
+- Added exactly one allowlisted aggregate event named `share_again_completed`.
+- Successful sharing from the ordinary result increments `share_completed` only.
+- Successful sharing from comparison increments `share_again_completed` only and no longer inflates `share_completed`.
+- Repeated observer notifications for unchanged ordinary or comparison success text do not double-count completion.
+- Invalid event names remain rejected and snapshots remain frozen integer-only objects.
+- No event payload, score, URL, fragment, timestamp, identity, device data, cookie, persistence, network request, analytics SDK, or external destination was added.
+- Added focused architecture/privacy decision D-003.
+- Updated focused tests, metrics documentation, roadmap evidence, changelog, and synchronized `docs/metrics.js`.
+- Ran syntax, focused test, build, and exact metrics source/preview parity checks in a reconstructed focused workspace.
 
 ### Completed work
 
-- Added Lane Guard as the ninth curated entry and fourth genuine gameplay mechanic.
-- Added a dependency-free dodge state machine with deterministic waves, bounded lane input, survival scoring, collision failure, injected clocks, and centralized cleanup.
-- Added a compact three-lane board inside the existing game surface instead of creating another result, share, comparison, metrics, or navigation implementation.
-- Added text names for Left, Center, and Right lanes and text descriptions for obstacle distance, clear feedback, and collision feedback so play does not depend only on color or motion.
-- Added a tightly scoped catalog bootstrap that recognizes only the current frozen eight-item catalog, appends the frozen Lane Guard definition, and immediately restores native `Object.freeze`.
-- Added a focused browser adapter that maps Lane Guard state into the existing game callbacks and challenge-aware shared-result validation.
-- Updated the build to copy the two new dependency-free scripts to both output directories.
-- Updated Roadmap, README, and Changelog and marked the minimum Stage 10 diversity gate complete.
-- Archived completed Cycle 14.
+- Extended the strict metrics allowlist from ten to eleven aggregate session counters.
+- Reclassified successful comparison Web Share or clipboard feedback from `share_completed` to `share_again_completed`.
+- Preserved `share_completed` exclusively for successful ordinary-result sharing.
+- Strengthened the comparison instrumentation test with duplicate observer notification coverage and explicit separation of the two completion counters.
+- Documented the privacy and architecture rationale in D-003 and updated the metrics contract and Stage 9 evidence.
+- Archived completed Cycle 15 without modifying its historical record.
 
 ### Intentional non-goals preserved
 
-- No second mechanic, replacement of existing challenge IDs, private-creation expansion, login, identity, leaderboard, persistence, backend, analytics destination, dependency, framework, broad redesign, audio requirement, copied game identity, shared-link schema expansion, or unrelated refactor.
+- No analytics destination, persistence, consent UI, user identity, device fingerprint, score payload, URL payload, timestamp, dashboard, backend, dependency, framework, gameplay change, new mechanic, shared-link schema change, visual redesign, or motion change.
 
 ### Files changed
 
-- `catalog-bootstrap.js`
-- `lane-guard.js`
-- `index.html`
-- `scripts/build.js`
-- `docs/catalog-bootstrap.js`
-- `docs/lane-guard.js`
-- `docs/index.html`
-- `test/challenge-variety.test.js`
-- `test/dodge-mechanic.test.js`
-- `README.md`
+- `metrics.js`
+- `docs/metrics.js`
+- `test/instrumentation.test.js`
+- `DECISIONS.md`
+- `METRICS.md`
 - `ROADMAP.md`
 - `CHANGELOG.md`
 - `TASK_LOG.md`
-- `TASK_LOG_ARCHIVE_CYCLE_14.md`
+- `TASK_LOG_ARCHIVE_CYCLE_15.md`
 
 ### Tests and checks
 
-- `node --check app.js` passed in the reconstructed focused repository workspace.
-- `node --check catalog-bootstrap.js` passed.
-- `node --check lane-guard.js` passed.
-- `npm test` completed with 25 passed and 0 failed in the reconstructed focused repository workspace.
-- `npm run build` passed and copied nine required files to both `dist/` and `docs/`.
-- Focused tests cover the nine-entry frozen catalog, four genuine mechanics, native `Object.freeze` restoration, six-wave 600-point completion, collision failure, bounded lane input, reduced-motion cadence, reset and destroy cleanup, strict shared-state bounds, point-aware comparison, native controls, text feedback, build synchronization, and existing timing and memory regression behavior.
-- Chromium at 320px verified all nine discovery options, native freeze restoration, no horizontal overflow, native lane-button focus, a complete six-wave 600-point result, and a validated shared URL containing `challenge=lane-guard` and `score=600`.
-- Chromium at 400px verified a shared 400-point friend invitation, `6 waves` format, point-aware target wording, no horizontal overflow, and reduced-motion computed styles with transitions and feedback animation disabled.
-- Source/preview parity passed: `index.html` and `docs/index.html` use Git blob `65a2fcdb66fc798235b5108ea8b0fe31ded2baf2`; `catalog-bootstrap.js` and its preview copy use `e1d346ad85cbcf65ed0e5f1ac1f22623877031f2`; `lane-guard.js` and its preview copy use `e5b859878c97a36e51c5003733575d4e42084c2a`; unchanged `app.js` and `docs/app.js` use `e2a6692e864c90c25f3826723ed47a35393456b6`.
-- The implementation branch was created directly from `main` at `5ca82530cc0cf5ad0f368c4ca4673022e4edf341`, remained zero commits behind, and was limited to the 14 expected files.
-- Merge closure verification confirmed that PR #40 is closed and merged, its base is `main`, its final reviewed head is `a955e0689ebb77009953bc7f6cfb433344e1e478`, and its squash merge SHA is `3cefdd975fe2a5cb53a3e887fb4e0fa36536de8b`.
-- A complete repository checkout was unavailable because the execution environment could not resolve `github.com`; verification therefore used exact branch content reconstructed through the repository API. No broader checkout claim is made.
+- `node --version`: v22.16.0.
+- `node --check metrics.js`: passed for the exact implementation content in the reconstructed focused workspace.
+- `npm test`: passed with 4 focused instrumentation tests and 0 failures in the reconstructed focused workspace.
+- `npm run build`: passed and copied the nine required files to `dist/` and `docs/` in the reconstructed focused workspace.
+- Exact `metrics.js` / `docs/metrics.js` parity passed before build; exact source / `dist/metrics.js` parity passed after build.
+- Focused tests verify frozen allowlisted counts, invalid-event rejection, ordinary-share completion, comparison re-share completion, duplicate observer suppression, script ordering, and absence of persistence, timestamps, URL access, or network sinks.
+- The implementation branch was created directly from `main` at `b4196d5b38a32183a56a98088cfde9a1da0bc943`, remained zero commits behind during review, and changed only the nine expected files.
+- A complete repository checkout and full-suite execution were unavailable because the runtime could not resolve `github.com`; no repository-wide test count is claimed.
 - No lint or type-check command is configured. GitHub Actions and status checks remain absent by repository-owner direction.
 
 ### Mobile, accessibility, motion, security, and privacy review
 
-- Interactive browser review covered the 320px baseline and 400px mobile width with no horizontal overflow or blocked primary action.
-- The lane board uses three `minmax(0, 1fr)` columns, bounded gaps, no fixed horizontal width, and 48px native button targets.
-- Lane controls provide keyboard activation, visible focus, pressed-state semantics, explicit labels, and focus on the current Center lane at attempt start.
-- The existing polite live status exposes obstacle lane and distance, player lane, wave clear, collision, points, result, and comparison as text.
-- Color and animation are not the only channels. Reduced motion removes obstacle transitions and clear or collision animation while retaining slower static steps, text state, identical decisions, and identical scoring.
-- One centralized timeout handle is cleared before every transition and on reset, destroy, replay or reconfiguration, navigation, collision completion, and successful completion.
-- Existing challenge allowlisting, integer bounds, exact duration validation, HTTP(S)-only sharing, safe DOM APIs, fragment length limits, and privacy-safe in-memory metrics are preserved.
-- The catalog bootstrap is restricted to the exact current eight-item signature and restores native `Object.freeze` immediately; unit and Chromium checks verify restoration.
-- No secret-like string, personal data, executable shared state, copied name, protected character, artwork, sound, level, logo, or distinctive trade dress was added.
+- No HTML, CSS, controls, focus behavior, touch target, gameplay timer, animation, or reduced-motion behavior changed, so the verified mobile and accessibility presentation remains unchanged.
+- Both completion events are triggered only by the existing exact success messages `Shared.` or `Link copied.`.
+- The observer compares the next status with the previous status before tracking, preventing duplicate notifications for unchanged text from increasing counts.
+- The collector still accepts only fixed allowlisted names and stores only integer counts in page memory.
+- Static source review found no payload collection, personal data, timestamps, score recording, URL or fragment access, cookies, browser storage, network request, backend, third-party SDK, or secret-like string.
 
-### Animation evidence
+### Animation and diversity evidence
 
-- Purposeful behavior 1: the obstacle advances through named far, approaching, close, and player-row states, communicating how much decision time remains.
-- Purposeful behavior 2: clear or collision feedback communicates why the score advanced or why the attempt ended.
-- Reduced-motion behavior uses 650ms discrete obstacle steps, removes transitions and feedback animation, and preserves text announcements and scoring.
-- Input remains available throughout obstacle approach and disabled only during short deterministic feedback; animation does not alter scoring.
-
-### Diversity evidence
-
-- Tap challenges reward repeated input quantity during a countdown.
-- Center Snap rewards three spatial timing decisions against a moving marker.
-- Signal Echo rewards observation and ordered recall through four choices and immediate failure on an incorrect sequence input.
-- Lane Guard rewards repeated spatial lane decisions against six incoming obstacles, uses collision as its failure condition, and scores cleared waves.
-- Lane Guard’s player decisions, input pattern, failure condition, scoring progression, motion, and wave lifecycle differ materially rather than cosmetically.
-- The catalog now has four genuine mechanics and satisfies the minimum Stage 10 completion gate while retaining nine playable challenges, six categories or labels, and two difficulty levels.
+- No gameplay mechanic, catalog definition, animation, or reduced-motion code changed.
+- The existing nine challenges and four genuine mechanics remain intact; this cycle protects measurement of their shared social loop rather than adding cosmetic or mechanical variety.
 
 ### Review findings and resolutions
 
-- Blocking global-state risk reviewed: temporarily intercepting `Object.freeze` could affect unrelated values or remain installed.
-- Resolution: the bootstrap recognizes only the exact eight-item curated catalog signature, restores native freeze before returning, has a defensive restore hook, and is covered by unit and Chromium restoration checks.
-- Blocking lifecycle risk reviewed: queued obstacle or feedback callbacks could survive replay, navigation, collision, or completion.
-- Resolution: all transitions use one timeout handle and cleanup tests cover reset and destroy from movement and feedback states.
-- Blocking accessibility risk reviewed: obstacle position and collision could be visual-only.
-- Resolution: lane names, obstacle distance, player lane, clear, collision, points, and completion are all written to existing text and live-status surfaces.
-- Blocking reduced-motion risk reviewed: slower timing alone would leave CSS movement and hit animation active.
-- Resolution: reduced-motion CSS explicitly removes obstacle transitions and all clear or hit animation; Chromium computed-style checks pass.
-- Blocking social-loop duplication risk reviewed: a separate result or sharing system would broaden scope and fragment validation.
-- Resolution: the adapter maps the dodge score into the existing completion callbacks, strict challenge allowlist, share codec, friend invitation, comparison, metrics, and navigation paths.
-- Complete PR scope, changed filenames, source and preview parity, code paths, tests, documentation, mobile behavior, accessibility, motion safety, security, privacy, originality, strict score bounds, and secrets were reviewed. No unresolved blocking finding remained at merge.
-- No independent approval is claimed; this is a documented self-review.
+- Blocking measurement ambiguity reviewed: comparison success previously incremented the same counter as ordinary result success.
+- Resolution: the comparison status observer now increments only `share_again_completed`, with focused regression assertions that `share_completed` remains zero in the friend loop.
+- Blocking duplicate-count risk reviewed: MutationObserver may notify more than once for the same text.
+- Resolution: the existing previous-status comparison is retained and the focused test now sends a duplicate comparison notification while expecting one completion.
+- Blocking privacy-expansion risk reviewed: adding a metric could introduce payloads or a destination.
+- Resolution: D-003 limits the change to one session-local integer; static tests continue rejecting persistence and network sinks.
+- Complete diff, changed filenames, branch ancestry, tests, build behavior, source/preview parity, documentation, privacy, security, scope, and secrets were reviewed. No unresolved blocking finding remained before merge.
+- No independent approval is claimed; this is a factual self-review.
 
-### Git and merge outcome
+### Git and merge status
 
-- Implementation branch: `agent/cycle-15-lane-guard`, created directly from `main` at `5ca82530cc0cf5ad0f368c4ca4673022e4edf341`.
-- Pull request: #40 — `feat(challenges): add Lane Guard dodge mechanic`, targeting `main`.
-- Final reviewed head SHA: `a955e0689ebb77009953bc7f6cfb433344e1e478`.
-- Squash merge completed at 2026-07-12T01:25:59+03:00.
-- Merge SHA: `3cefdd975fe2a5cb53a3e887fb4e0fa36536de8b`.
-- GitHub reports PR #40 as closed and merged with no remaining conflict or open review requirement.
+- Implementation branch: `agent/cycle-16-track-share-again-completion`, created directly from `main` at `b4196d5b38a32183a56a98088cfde9a1da0bc943`.
+- Pull request: #42 — `fix(metrics): track successful share-again separately`, targeting `main`.
+- Reviewed head before the final task-log evidence commit: `287dfde128e58d40f416c558ea2cda6ef23f6a0a`.
+- Final head, squash merge result, and merge SHA will be verified and recorded after merge.
 
 ### Preview status
 
-Repository preview output verified for the relevant implementation commit through exact source/`docs/` Git blob parity, a passing build, and focused Chromium checks at 320px and 400px. Live deployed behavior is not claimed.
+Repository preview output verified for the relevant implementation content through exact `metrics.js` / `docs/metrics.js` parity and a passing focused build. No live deployed behavior is claimed.
 
 ### Decision
 
-No framework, dependency, backend, schema, or external-service decision. Lane Guard is a dependency-free mechanic adapter within the existing static application and social competition loop.
+D-003 keeps successful ordinary sharing and successful comparison re-sharing as separate allowlisted session-local integer counters. No framework, dependency, backend, schema, identity, persistence, or external-service decision was introduced.
 
 ### Strategic review
 
-- The direction remains aligned with the discover-to-share-again north star.
-- The largest product bottleneck was the missing fourth genuinely different mechanic; this cycle satisfies the minimum diversity gate.
-- The largest delivery risks were stale timers, visual-only state, reduced-motion leakage, and global freeze restoration; all were addressed within the selected task.
-- No new evidence invalidated the reopened Stage 10 plan.
-- One deterministic lane-dodge challenge was the highest-impact small task and no second mechanic was started.
+- The MVP loop and minimum mechanic variety are complete; adding another game without evidence would broaden scope prematurely.
+- The smallest evidence-readiness defect was the inability to distinguish a successful first share from a successful re-share.
+- The correction remains local, dependency-free, and invisible to the player.
+- The privacy boundary remains unchanged because only one additional session-local integer counter was introduced.
 
 ### Product thinking
 
-1. Mechanical repetition was the remaining blocker to the minimum curated-variety gate.
-2. Six short waves give the original player an obvious perfect-clear replay goal.
-3. A friend can understand “switch lanes and beat 400 points” within seconds.
-4. The smallest proof was one data-driven Lane Guard definition and one reusable dodge state machine integrated into the current loop.
-5. Parked idea: a future rhythm mechanic could replace one cosmetic tap variant only after product evidence justifies another cycle.
+1. The final loop step is successful re-sharing, not merely pressing the Share Again button.
+2. `share_again_attempted` alone cannot show whether Web Share or clipboard completion succeeded.
+3. Mixing comparison success into `share_completed` obscured both initial-share and re-share conversion.
+4. One separate allowlisted integer counter is the minimum useful correction.
+5. Parked idea: define a manual experiment and conversion formulas after this metric can distinguish final-loop completion.
 
 ### Remaining limitation
 
-The catalog meets the minimum four-mechanic gate but remains below the optional five-to-six mechanic target. Full repository checkout and live deployed-preview verification were unavailable in this runtime.
+The collector remains page-session-only and cannot produce cross-user or cross-session real usage evidence without a future explicit privacy and architecture decision. Full repository checkout, full-suite execution, live deployed preview, and GitHub Actions were unavailable in this runtime.
 
 ### Next task
 
-No additional MVP stage is selected. Gather real usage evidence for the completed loop before expanding mechanics or reopening product scope.
+Define one manual, privacy-safe loop-validation experiment using the eleven aggregate counters before considering another mechanic or analytics destination.

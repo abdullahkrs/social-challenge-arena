@@ -8,7 +8,8 @@ const privacySafeEventNames = Object.freeze([
   'shared_link_opened',
   'friend_completed',
   'comparison_viewed',
-  'share_again_attempted'
+  'share_again_attempted',
+  'share_again_completed'
 ]);
 
 function createPrivacySafeMetrics() {
@@ -96,7 +97,7 @@ function attachPrivacySafeInstrumentation(documentObject, options = {}) {
       metrics.track('share_completed');
     }
     if (nextComparisonStatus !== comparisonShareStatus && successful(nextComparisonStatus)) {
-      metrics.track('share_completed');
+      metrics.track('share_again_completed');
     }
 
     resultShareStatus = nextResultStatus;

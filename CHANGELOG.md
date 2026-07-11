@@ -11,16 +11,19 @@
 - Lane Guard, an original six-wave three-lane dodge challenge with deterministic incoming obstacles and bounded scoring up to 600 points.
 - Purposeful obstacle approach movement, safe-lane choices, and clear or collision feedback using three native keyboard-accessible buttons.
 - Focused tests for timing, memory, and dodge scoring, reduced motion, timer cancellation, strict shared-state bounds, accessibility, and social-loop reuse.
+- A privacy-safe `share_again_completed` session counter for successful comparison Web Share or clipboard completion.
 
 ### Changed
 
 - Curated discovery now contains nine playable entries and four genuinely different gameplay mechanics, meeting the minimum Stage 10 diversity gate.
 - Result, friend invitation, comparison, and sharing use challenge-aware score units and round or wave formats without changing the shared-link schema.
 - Reduced-motion users receive discrete Center Snap movement, longer still Signal Echo states, and slower stepped Lane Guard obstacles with decorative transforms and feedback animation disabled.
+- Successful first-result sharing and successful comparison re-sharing are now measured in separate aggregate counters.
 
 ### Privacy and scope
 
 - Center Snap, Signal Echo, and Lane Guard reuse the existing strict shared-link codec, result, friend-attempt, comparison, share-again, metrics, and navigation flows.
+- The new re-share completion counter remains an allowlisted integer in page memory and adds no payload, identity, timestamp, URL, persistence, cookie, network request, or analytics destination.
 - No login, identity, persistence, backend, cookie, analytics destination, dependency, framework, copied game identity, private-creation change, or shared-link schema expansion was added.
 
 ## 0.11.0 — 2026-07-11
