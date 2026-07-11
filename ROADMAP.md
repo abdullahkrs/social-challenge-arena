@@ -2,7 +2,7 @@
 
 ## Current repository state
 
-Active MVP development with the ordered no-login MVP stages complete.
+Active MVP development. The no-login social loop and lightweight private creation are implemented, but curated challenge variety is reopened because all six curated entries still use one timed tap mechanic.
 
 ## MVP stages
 
@@ -15,7 +15,7 @@ Active MVP development with the ordered no-login MVP stages complete.
 7. Original-player and friend comparison — complete.
 8. Share-again action from the comparison — complete.
 9. Basic privacy-safe MVP event instrumentation — complete.
-10. Curated challenge variety — complete.
+10. Curated challenge variety — reopened; in progress.
 11. Lightweight private challenge creation — complete.
 
 ## Completed stage evidence
@@ -93,14 +93,30 @@ Active MVP development with the ordered no-login MVP stages complete.
 - Share completion is counted only after successful Web Share or clipboard copy feedback.
 - No payloads, scores, URLs, timestamps, identities, cookies, persistence, network requests, or third-party analytics were added.
 
-### Stage 10
+### Stage 10 — reopened
 
-- Six frozen data-driven curated definitions cover Speed, Rhythm, and Endurance.
+Current implementation evidence:
+
+- Six frozen data-driven curated definitions cover Speed, Rhythm, and Endurance labels.
 - Each category includes Easy and Hard entries with unique allowlisted IDs and bounded durations.
 - A compact keyboard-accessible selector preserves one primary play action on discovery.
-- All entries reuse the validated timed tap engine and complete the existing result and social loop.
 - Shared links preserve the selected challenge and exact duration while rejecting unknown IDs and mismatches.
 - Source and GitHub Pages preview files remain synchronized without dependencies, login, storage, or backend changes.
+
+Current gap:
+
+- All six entries reuse the same timed tap-count engine.
+- Differences in title, category, duration, difficulty, description, or tap target are cosmetic and do not count as different mechanics.
+- The previous Stage 10 completion claim is therefore invalid under the current product policy.
+
+Completion gate:
+
+- Keep at least 6 playable curated challenges.
+- Reach at least 4 genuinely different gameplay mechanics; target 5–6 when practical.
+- A mechanic must differ materially in player decisions, timing, input pattern, failure conditions, or scoring.
+- Every added mechanic must reuse the shared discovery, result, sharing, friend-attempt, comparison, and navigation flows.
+- Every added mechanic must include purposeful state or feedback motion and a safe `prefers-reduced-motion` equivalent.
+- Add or replace only one mechanic per focused cycle.
 
 ### Stage 11
 
