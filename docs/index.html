@@ -51,9 +51,27 @@
       <button class="tap-action" id="tap-button" type="button">Tap!</button>
       <p class="game-status" id="game-status" aria-live="polite">Ready</p>
 
-      <div class="game-controls">
-        <button class="primary-action" id="replay-challenge" type="button" hidden>Play again</button>
-        <button class="secondary-action" id="back-to-challenges" type="button">Back</button>
+      <button class="secondary-action" id="back-to-challenges" type="button">Back</button>
+    </section>
+
+    <section class="view result-view" id="result-view" aria-labelledby="result-title" hidden>
+      <header class="result-header">
+        <p class="eyebrow">Challenge complete</p>
+        <h1 id="result-title">Tap Sprint</h1>
+      </header>
+
+      <div class="result-card">
+        <p class="result-label">Your score</p>
+        <p class="result-score">
+          <strong id="result-score">0</strong>
+          <span id="result-unit">taps</span>
+        </p>
+        <p class="result-message" id="result-message" aria-live="polite"></p>
+      </div>
+
+      <div class="result-controls">
+        <button class="primary-action" id="replay-challenge" type="button">Play again</button>
+        <button class="secondary-action" id="result-back-to-challenges" type="button">Challenges</button>
       </div>
     </section>
   </main>
