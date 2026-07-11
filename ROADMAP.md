@@ -8,8 +8,8 @@ Active MVP development.
 
 1. Repository bootstrap and quality baseline — complete.
 2. Mobile-first landing/discovery state — complete.
-3. First playable curated challenge — next.
-4. Focused score/result state.
+3. First playable curated challenge — complete.
+4. Focused score/result state — next.
 5. Share or copy challenge/result link.
 6. Friend attempt opened from the shared link.
 7. Original-player and friend comparison.
@@ -34,3 +34,11 @@ Active MVP development.
 - One visible curated challenge with category, difficulty, and duration.
 - One working, accessible discovery action.
 - No gameplay or later viral-loop features introduced early.
+
+### Stage 3
+
+- The Tap Sprint discovery action opens a real 20-second attempt.
+- A deterministic state machine manages start, taps, countdown, completion, reset, and replay.
+- Live timer and tap count provide immediate feedback.
+- Taps after completion are ignored and the active timer is cancelled safely.
+- Gameplay remains dependency-free and reusable by the next result stage.
