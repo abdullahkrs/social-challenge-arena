@@ -12,8 +12,8 @@ Active MVP development.
 4. Focused score/result state — complete.
 5. Share or copy challenge/result link — complete.
 6. Friend attempt opened from the shared link — complete.
-7. Original-player and friend comparison — next.
-8. Share-again action from the comparison.
+7. Original-player and friend comparison — complete.
+8. Share-again action from the comparison — next.
 9. Basic privacy-safe MVP event instrumentation.
 10. Curated challenge variety.
 11. Lightweight private challenge creation.
@@ -65,4 +65,13 @@ Active MVP development.
 - The validated challenge title, target score, and duration are rendered through safe DOM text properties.
 - One primary action starts the same 20-second challenge while retaining the target context in memory.
 - Dismissing or leaving the invitation removes the shared fragment and returns to ordinary discovery.
-- Completing the friend attempt uses the existing result state; comparison and share-again behavior remain deferred.
+- Completing the friend attempt reuses the existing gameplay state while retaining comparison context.
+
+### Stage 7
+
+- Completing a friend attempt opens a dedicated score comparison instead of the ordinary result view.
+- The sharer's validated target and the friend's completed score are shown side by side.
+- Beat, tie, and short outcomes are deterministic and avoid fabricated rankings or social proof.
+- Replaying from comparison retains the same validated target; returning to challenges clears shared context.
+- Comparison values use safe DOM text properties and are announced after the view becomes visible.
+- Share-again remains deferred to Stage 8.

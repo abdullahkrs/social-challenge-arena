@@ -104,6 +104,35 @@
         <button class="secondary-action" id="result-back" type="button">Challenges</button>
       </div>
     </section>
+
+    <section class="view comparison-view" id="comparison-view" aria-labelledby="comparison-title" hidden>
+      <header class="comparison-header">
+        <p class="eyebrow">Friend attempt complete</p>
+        <h1 id="comparison-title">Score comparison</h1>
+      </header>
+
+      <div class="comparison-card">
+        <div class="comparison-scores" aria-label="Tap Sprint score comparison">
+          <p class="comparison-score">
+            <span>Target</span>
+            <strong id="comparison-target-score">0</strong>
+          </p>
+          <p class="comparison-score">
+            <span>Your score</span>
+            <strong id="comparison-friend-score">0</strong>
+          </p>
+        </div>
+        <p class="comparison-outcome" id="comparison-outcome">Attempt complete</p>
+        <p class="comparison-message" id="comparison-message">Scores ready.</p>
+      </div>
+
+      <p class="sr-only" id="comparison-announcement" aria-live="polite"></p>
+
+      <div class="comparison-controls">
+        <button class="primary-action" id="comparison-replay" type="button">Try again</button>
+        <button class="secondary-action" id="comparison-back" type="button">Challenges</button>
+      </div>
+    </section>
   </main>
 </body>
 </html>

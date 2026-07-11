@@ -32,7 +32,8 @@ button { font: inherit; }
 .friend-view,
 .discovery-view,
 .game-view,
-.result-view {
+.result-view,
+.comparison-view {
   display: grid;
   align-content: center;
   gap: 1.15rem;
@@ -43,7 +44,8 @@ button { font: inherit; }
 .hero,
 .friend-header,
 .game-header,
-.result-header { display: grid; gap: 0.65rem; }
+.result-header,
+.comparison-header { display: grid; gap: 0.65rem; }
 
 .eyebrow,
 .intro,
@@ -56,7 +58,10 @@ button { font: inherit; }
 .game-status,
 .result-score,
 .result-message,
-.share-status { margin: 0; }
+.share-status,
+.comparison-score,
+.comparison-outcome,
+.comparison-message { margin: 0; }
 
 .eyebrow {
   color: #c4b5fd;
@@ -84,14 +89,16 @@ h1 {
 .game-instruction,
 .game-status,
 .result-message,
-.share-status {
+.share-status,
+.comparison-message {
   color: #cbd5e1;
   line-height: 1.5;
 }
 
 .challenge-card,
 .friend-card,
-.result-card {
+.result-card,
+.comparison-card {
   display: grid;
   gap: 1rem;
   padding: 1.25rem;
@@ -156,7 +163,8 @@ h2 {
 }
 
 .friend-card,
-.result-card {
+.result-card,
+.comparison-card {
   justify-items: center;
   text-align: center;
 }
@@ -177,7 +185,8 @@ h2 {
 
 .friend-target span,
 .stat span,
-.result-score span {
+.result-score span,
+.comparison-score span {
   color: #cbd5e1;
   font-size: 0.82rem;
   font-weight: 700;
@@ -241,7 +250,8 @@ h2 {
 
 .friend-controls,
 .game-controls,
-.result-controls {
+.result-controls,
+.comparison-controls {
   display: grid;
   gap: 0.65rem;
 }
@@ -276,6 +286,41 @@ h2 {
   text-align: center;
 }
 
+.comparison-scores {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.comparison-score {
+  min-width: 0;
+  display: grid;
+  gap: 0.35rem;
+  padding: 0.85rem;
+  border: 1px solid rgba(196, 181, 253, 0.26);
+  border-radius: 1rem;
+  background: rgba(15, 23, 42, 0.72);
+}
+
+.comparison-score strong {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  font-size: clamp(2.5rem, 14vw, 4rem);
+  line-height: 0.95;
+  letter-spacing: -0.05em;
+}
+
+.comparison-outcome {
+  font-size: clamp(1.5rem, 7vw, 2rem);
+  font-weight: 900;
+}
+
+.comparison-message {
+  min-height: 1.5rem;
+  font-weight: 700;
+}
+
 .sr-only {
   position: absolute;
   width: 1px;
@@ -293,7 +338,8 @@ h2 {
   .view { min-height: calc(100vh - 3.5rem); }
   .challenge-card,
   .friend-card,
-  .result-card { padding: 1.5rem; }
+  .result-card,
+  .comparison-card { padding: 1.5rem; }
 }
 
 @media (prefers-reduced-motion: reduce) {

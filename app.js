@@ -197,6 +197,55 @@ function createFriendAttemptInvitation(sharedResult) {
   });
 }
 
+function createComparisonSummary(friendTaps, invitation) {
+  if (!invitation || typeof invitation !== 'object') {
+    throw new TypeError('Friend invitation is required.');
+  }
+
+  const expectedKeys = ['challengeId', 'challengeTitle', 'targetTaps', 'durationSeconds'];
+  const keys = Object.keys(invitation);
+  if (keys.length !== expectedKeys.length || keys.some(key => !expectedKeys.includes(key))) {
+    throw new TypeError('Friend invitation has an invalid shape.');
+  }
+  if (
+    invitation.challengeId !== featuredChallenge.id
+    || invitation.challengeTitle !== featuredChallenge.title
+  ) {
+    throw new TypeError('Friend invitation challenge is unsupported.');
+  }
+
+  const target = validateSharedResult(invitation.targetTaps, invitation.durationSeconds);
+  const friend = validateSharedResult(friendTaps, invitation.durationSeconds);
+  const difference = friend.taps - target.taps;
+
+  let outcome = 'tie';
+  let headline = 'It is a tie';
+  let message = `Both scored ${target.taps} taps.`;
+
+  if (difference > 0) {
+    outcome = 'beat';
+    headline = 'You beat it';
+    message = `${difference} tap${difference === 1 ? '' : 's'} ahead.`;
+  } else if (difference < 0) {
+    const shortBy = Math.abs(difference);
+    outcome = 'short';
+    headline = 'So close';
+    message = `${shortBy} tap${shortBy === 1 ? '' : 's'} short.`;
+  }
+
+  return Object.freeze({
+    challengeId: featuredChallenge.id,
+    challengeTitle: featuredChallenge.title,
+    targetTaps: target.taps,
+    friendTaps: friend.taps,
+    durationSeconds: friend.durationSeconds,
+    difference,
+    outcome,
+    headline,
+    message
+  });
+}
+
 function clearSharedResultHash(locationObject, historyObject) {
   if (!locationObject || !historyObject || typeof historyObject.replaceState !== 'function') {
     return false;
@@ -266,6 +315,7 @@ if (typeof module !== 'undefined') {
     createSharedResultUrl,
     parseSharedResultHash,
     createFriendAttemptInvitation,
+    createComparisonSummary,
     clearSharedResultHash,
     shareResultLink
   };
@@ -276,6 +326,7 @@ if (typeof document !== 'undefined') {
   const discoveryView = document.querySelector('#discovery-view');
   const challengeView = document.querySelector('#challenge-view');
   const resultView = document.querySelector('#result-view');
+  const comparisonView = document.querySelector('#comparison-view');
   const friendChallengeName = document.querySelector('#friend-challenge-name');
   const friendDuration = document.querySelector('#friend-duration');
   const friendTargetScore = document.querySelector('#friend-target-score');
@@ -288,6 +339,13 @@ if (typeof document !== 'undefined') {
   const shareButton = document.querySelector('#share-result');
   const resultReplayButton = document.querySelector('#result-replay');
   const resultBackButton = document.querySelector('#result-back');
+  const comparisonTargetScore = document.querySelector('#comparison-target-score');
+  const comparisonFriendScore = document.querySelector('#comparison-friend-score');
+  const comparisonOutcome = document.querySelector('#comparison-outcome');
+  const comparisonMessage = document.querySelector('#comparison-message');
+  const comparisonAnnouncement = document.querySelector('#comparison-announcement');
+  const comparisonReplayButton = document.querySelector('#comparison-replay');
+  const comparisonBackButton = document.querySelector('#comparison-back');
   const timeValue = document.querySelector('#time-value');
   const tapCount = document.querySelector('#tap-count');
   const gameStatus = document.querySelector('#game-status');
@@ -303,6 +361,7 @@ if (typeof document !== 'undefined') {
     discoveryView,
     challengeView,
     resultView,
+    comparisonView,
     friendChallengeName,
     friendDuration,
     friendTargetScore,
@@ -315,6 +374,13 @@ if (typeof document !== 'undefined') {
     shareButton,
     resultReplayButton,
     resultBackButton,
+    comparisonTargetScore,
+    comparisonFriendScore,
+    comparisonOutcome,
+    comparisonMessage,
+    comparisonAnnouncement,
+    comparisonReplayButton,
+    comparisonBackButton,
     timeValue,
     tapCount,
     gameStatus,
@@ -350,9 +416,24 @@ if (typeof document !== 'undefined') {
       discoveryView.hidden = true;
       challengeView.hidden = true;
       resultView.hidden = true;
+      comparisonView.hidden = true;
       friendView.hidden = false;
       friendAnnouncement.textContent = `${invitation.challengeTitle} challenge. Beat ${invitation.targetTaps} taps in ${invitation.durationSeconds} seconds.`;
       startFriendButton.focus();
+    }
+
+    function showComparison(comparison) {
+      comparisonTargetScore.textContent = String(comparison.targetTaps);
+      comparisonFriendScore.textContent = String(comparison.friendTaps);
+      comparisonOutcome.textContent = comparison.headline;
+      comparisonMessage.textContent = comparison.message;
+      friendView.hidden = true;
+      discoveryView.hidden = true;
+      challengeView.hidden = true;
+      resultView.hidden = true;
+      comparisonView.hidden = false;
+      comparisonAnnouncement.textContent = `${comparison.headline}. Target ${comparison.targetTaps} taps. You scored ${comparison.friendTaps} taps. ${comparison.message}`;
+      comparisonReplayButton.focus();
     }
 
     const game = createTapSprintGame({
@@ -367,9 +448,16 @@ if (typeof document !== 'undefined') {
       },
       onComplete(state) {
         completedResult = createResultSummary(state.taps, state.durationSeconds);
+        challengeView.hidden = true;
+
+        if (activeFriendInvitation) {
+          showComparison(createComparisonSummary(completedResult.taps, activeFriendInvitation));
+          return;
+        }
+
         resultScore.textContent = String(completedResult.taps);
         resultMessage.textContent = completedResult.message;
-        challengeView.hidden = true;
+        comparisonView.hidden = true;
         resultView.hidden = false;
         resultAnnouncement.textContent = `You scored ${completedResult.taps} taps.`;
         shareButton.focus();
@@ -380,10 +468,12 @@ if (typeof document !== 'undefined') {
       completedResult = null;
       friendAnnouncement.textContent = '';
       resultAnnouncement.textContent = '';
+      comparisonAnnouncement.textContent = '';
       resetShareState();
       friendView.hidden = true;
       discoveryView.hidden = true;
       resultView.hidden = true;
+      comparisonView.hidden = true;
       challengeView.hidden = false;
       game.start();
       tapButton.focus();
@@ -395,11 +485,13 @@ if (typeof document !== 'undefined') {
       game.reset();
       friendAnnouncement.textContent = '';
       resultAnnouncement.textContent = '';
+      comparisonAnnouncement.textContent = '';
       resetShareState();
       clearSharedResultHash(window.location, window.history);
       friendView.hidden = true;
       challengeView.hidden = true;
       resultView.hidden = true;
+      comparisonView.hidden = true;
       discoveryView.hidden = false;
       startButton.focus();
     }
@@ -440,8 +532,10 @@ if (typeof document !== 'undefined') {
     tapButton.addEventListener('click', () => game.tap());
     shareButton.addEventListener('click', shareCompletedResult);
     resultReplayButton.addEventListener('click', startAttempt);
+    comparisonReplayButton.addEventListener('click', startAttempt);
     backButton.addEventListener('click', returnToDiscovery);
     resultBackButton.addEventListener('click', returnToDiscovery);
+    comparisonBackButton.addEventListener('click', returnToDiscovery);
 
     if (incomingShare) {
       showFriendInvitation(createFriendAttemptInvitation(incomingShare));
