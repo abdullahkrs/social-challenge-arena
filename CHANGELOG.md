@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.7.0 — 2026-07-11
+
+### Added
+
+- Dedicated mobile-first original-player versus friend score comparison.
+- Side-by-side validated target and friend scores.
+- Deterministic beat, tie, and short outcome feedback.
+- Focused comparison validation, routing, accessibility, and mobile-layout tests.
+
+### Changed
+
+- Completed friend attempts now open comparison instead of the ordinary result view.
+- Replaying from comparison retains the validated shared target.
+- Returning to challenges clears shared context; share-again remains deferred.
+
 ## 0.6.0 — 2026-07-11
 
 ### Added

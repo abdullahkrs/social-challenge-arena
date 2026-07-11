@@ -73,7 +73,7 @@ test('shared result cleanup removes only the fragment and preserves a safe path 
   }), false);
 });
 
-test('friend entry is accessible, mobile-safe, and stops before comparison', () => {
+test('friend entry is accessible, mobile-safe, and retains validated context for completion', () => {
   const html = readFileSync('index.html', 'utf8');
   const css = readFileSync('styles.css', 'utf8');
   const app = readFileSync('app.js', 'utf8');
@@ -85,8 +85,7 @@ test('friend entry is accessible, mobile-safe, and stops before comparison', () 
   assert.match(html, /id="dismiss-friend-attempt"[^>]*>Browse challenges</);
   assert.match(css, /\.friend-target strong[\s\S]*overflow-wrap: anywhere/);
   assert.match(css, /\.primary-action,[\s\S]*min-height: 3rem/);
-  assert.match(app, /friendTargetScore\.textContent = String\(invitation\.targetTaps\)/);
+  assert.match(app, /activeFriendInvitation = invitation/);
   assert.match(app, /startFriendButton\.addEventListener\('click', startAttempt\)/);
   assert.match(app, /dismissFriendButton\.addEventListener\('click', returnToDiscovery\)/);
-  assert.doesNotMatch(app, /\b(winner|winMessage|lossMessage|comparisonView)\b/);
 });
