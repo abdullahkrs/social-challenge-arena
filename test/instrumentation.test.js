@@ -125,11 +125,12 @@ test('ordinary loop instrumentation counts views, completion, and successful sha
     shared_link_opened: 0,
     friend_completed: 0,
     comparison_viewed: 0,
-    share_again_attempted: 0
+    share_again_attempted: 0,
+    share_again_completed: 0
   });
 });
 
-test('friend loop instrumentation counts shared entry, comparison, and share-again without identity data', () => {
+test('friend loop instrumentation counts successful share-again separately without identity data', () => {
   FakeMutationObserver.reset();
   const { elements, documentObject } = createFakeDocument({ friendVisible: true });
   const metrics = attachPrivacySafeInstrumentation(documentObject, {
@@ -141,6 +142,7 @@ test('friend loop instrumentation counts shared entry, comparison, and share-aga
   FakeMutationObserver.notify(elements['#comparison-view']);
   elements['#share-again'].click();
   elements['#comparison-share-status'].textContent = 'Shared.';
+  FakeMutationObserver.notify(elements['#comparison-share-status'], 'childList');
   FakeMutationObserver.notify(elements['#comparison-share-status'], 'childList');
 
   elements['#comparison-view'].hidden = true;
@@ -155,11 +157,12 @@ test('friend loop instrumentation counts shared entry, comparison, and share-aga
     challenge_completed: 2,
     result_viewed: 0,
     share_attempted: 0,
-    share_completed: 1,
+    share_completed: 0,
     shared_link_opened: 1,
     friend_completed: 2,
     comparison_viewed: 2,
-    share_again_attempted: 1
+    share_again_attempted: 1,
+    share_again_completed: 1
   });
 });
 
