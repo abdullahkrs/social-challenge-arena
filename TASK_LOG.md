@@ -5,8 +5,9 @@ Historical completed cycles 1–6 are preserved in [`TASK_LOG_ARCHIVE_CYCLES_1_6
 ## Cycle 10
 
 - **Date/time:** 2026-07-11T19:40:23+03:00
-- **Verification completed at:** 2026-07-11T20:24:00+03:00
-- **Status:** ready for final pull-request review and merge
+- **Verification completed at:** 2026-07-11T20:17:30+03:00
+- **Completed at:** 2026-07-11T20:18:59+03:00
+- **Status:** completed
 - **Selected task:** Add a compact curated challenge catalog backed by reusable data-driven definitions.
 - **Goal:** Let a player select and complete any of six safe tap challenges while preserving the existing result, sharing, friend-attempt, comparison, share-again, and privacy-safe metrics loop.
 - **Why selected:** Cycle 9 was complete on `main`, no pull request was open, and curated challenge variety was the earliest incomplete roadmap stage.
@@ -69,9 +70,9 @@ Historical completed cycles 1–6 are preserved in [`TASK_LOG_ARCHIVE_CYCLES_1_6
 - Static 320px and 390px review: two `minmax(0, 1fr)` catalog columns, overflow-safe labels, responsive selected summary, full-width 48px primary action, and no horizontal-scroll source.
 - Accessibility review: semantic challenge buttons are exposed as one labelled group, selected state uses `aria-pressed`, dynamic state is announced, focus continues to move to each primary state action, and visible focus is retained.
 - Security/privacy review: only frozen allowlisted IDs and exact configured durations are accepted; dynamic values use safe DOM text APIs; no executable input, identity, storage, network sink, secret, or personal data was introduced.
-- GitHub Actions/status checks are unavailable because the repository workflow was removed by owner direction; no CI success is claimed.
+- GitHub Actions/status checks were unavailable because the repository workflow was removed by owner direction; no CI success is claimed.
 - Interactive Chromium screenshots at 320px and 390px could not be completed because the available headless browser process stalled on sandbox DBus/inotify/netlink restrictions.
-- **Preview status:** repository preview output verified for the current source blobs.
+- **Preview status:** repository preview output verified for the merged source blobs.
 
 ### Review findings and resolution
 
@@ -80,15 +81,19 @@ Historical completed cycles 1–6 are preserved in [`TASK_LOG_ARCHIVE_CYCLES_1_6
 - Resolution: changed the selector container to one labelled `role="group"`, strengthened the focused test, synchronized `docs/index.html`, and reran all 37 tests and build checks successfully.
 - Documentation mismatch finding: the active log still reported 33 tests after adding four preview-parity tests.
 - Resolution: corrected the verified total to 37 and listed the parity test file.
-- No blocking finding remains before the final PR metadata, comments, threads, status, conflict, and mergeability check.
+- Final factual self-review at head `7a188be23c36334ed3f0dd4d2cbf5e8d82eded00` found no remaining blocking or non-blocking issue; no independent approval was claimed.
+- Final merge gate confirmed PR #29 targeted `main`, was mergeable, had no conflicts, comments, submitted reviews, unresolved threads, requested reviewers, or commit statuses.
 
 ### Git and merge outcome
 
-- Branch: `agent/cycle-10-curated-variety`, created from `main` at `4cde43ec4e48a8dec4d6cb81fc2f8559c75e7e97`.
+- Product branch: `agent/cycle-10-curated-variety`, created from `main` at `4cde43ec4e48a8dec4d6cb81fc2f8559c75e7e97`.
 - Planning commit: `b3de9c558bb0c21fe23dd39d0baa412a5d6db274`.
+- Final reviewed product head SHA: `7a188be23c36334ed3f0dd4d2cbf5e8d82eded00`.
 - Pull request: #29 — `feat(challenges): add curated challenge variety`, targeting `main`.
-- Current implementation branch head before this factual log update: `5cd346c7649bbb2d845e2a16d5c8ea800666a533`.
-- Final reviewed head, merge method, outcome, and merge SHA: pending final merge gate.
+- Merge method: squash using the expected final head SHA.
+- Merge outcome: successfully merged and verified on 2026-07-11T20:18:59+03:00.
+- Merge SHA: `e007d83154570f5497026d0fc5cbf2190b881857`.
+- Cycle-close branch: `agent/cycle-10-close-curated-variety`, created from the updated `main` merge SHA solely because the implementation PR necessarily could not contain its own final merge SHA.
 
 ### Decision
 
