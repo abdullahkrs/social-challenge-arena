@@ -9,8 +9,8 @@ Active MVP development.
 1. Repository bootstrap and quality baseline — complete.
 2. Mobile-first landing/discovery state — complete.
 3. First playable curated challenge — complete.
-4. Focused score/result state — next.
-5. Share or copy challenge/result link.
+4. Focused score/result state — complete.
+5. Share or copy challenge/result link — next.
 6. Friend attempt opened from the shared link.
 7. Original-player and friend comparison.
 8. Share-again action from the comparison.
@@ -42,3 +42,11 @@ Active MVP development.
 - Live timer and tap count provide immediate feedback.
 - Taps after completion are ignored and the active timer is cancelled safely.
 - Gameplay remains dependency-free and reusable by the next result stage.
+
+### Stage 4
+
+- Completion transitions into a dedicated mobile-first result view.
+- The validated final tap count is the dominant result information.
+- Concise deterministic feedback avoids fabricated rankings or records.
+- Replay begins a clean attempt and the secondary action resets to discovery.
+- Result values are written with safe DOM text APIs and announced accessibly.

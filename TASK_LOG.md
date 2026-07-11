@@ -198,3 +198,61 @@ Live deployed-preview verification, interactive browser exercise, and automated 
 ### Next suggested task
 
 Implement the focused score/result state using the validated Tap Sprint completion snapshot. Do not add sharing until the result state is complete.
+
+## Cycle 4
+
+- **Date/time:** 2026-07-11T13:39:57+03:00
+- **Status:** in progress
+- **Selected task:** Add a focused Tap Sprint score/result state after a completed attempt.
+- **Goal:** Replace the inline completion sentence with a distinct mobile-first result view that makes the validated tap score immediately understandable and offers replay or return to discovery.
+- **Why selected:** Cycles 1–3 are complete on `main`, no continuity pull request is open, and the focused result state is the earliest incomplete roadmap stage.
+- **Viral-loop impact:** Completes the Result step and creates a stable, validated score surface for the next share-link cycle.
+
+### Acceptance criteria
+
+- A completed Tap Sprint attempt transitions from gameplay to a dedicated result view.
+- The final validated tap count is the dominant result information and is rendered with safe DOM text APIs.
+- Result feedback is concise, deterministic, and does not fabricate rankings, records, or social proof.
+- The result view has one obvious primary action to play again and a secondary action to return to discovery.
+- Replay starts a clean 20-second attempt; return resets state and restores discovery focus.
+- The result view is keyboard accessible, announces the completed score, and keeps controls at least 48px high.
+- The layout has no fixed-width overflow source or blocked primary action at 320px and 390px.
+- Focused tests cover result-summary validation and the result page structure in addition to existing gameplay lifecycle tests.
+- Source and `docs/` preview files are synchronized.
+
+### Expected files
+
+- `index.html`
+- `styles.css`
+- `app.js`
+- `test/landing.test.js`
+- `test/result.test.js`
+- `docs/index.html`
+- `docs/styles.css`
+- `docs/app.js`
+- `README.md`
+- `ROADMAP.md`
+- `CHANGELOG.md`
+- `TASK_LOG.md`
+
+### Explicit non-goals
+
+- No share, copy-link, URL state, friend attempt, comparison, share-again, analytics, challenge variety, or challenge creation.
+- No dependency, framework, backend, login, workflow restoration, architecture migration, or broad visual redesign.
+- No fabricated benchmark, percentile, leaderboard, record, or popularity claim.
+
+### Strategic review
+
+- The direction remains aligned with the Discover → Play → Result sequence of the north star.
+- The largest product bottleneck is that completion currently leaves the score inside the gameplay screen rather than giving it a clear result state.
+- The largest delivery risk remains unavailable automated CI and interactive deployed-preview verification.
+- No new evidence invalidates the static HTML/CSS/JavaScript architecture or the Tap Sprint state machine.
+- A dedicated result view is still the highest-impact narrow task and should precede all sharing behavior.
+
+### Product thinking
+
+1. The missing dedicated Result step blocks a clear handoff from play to future sharing.
+2. A large score plus immediate replay makes the original player more likely to continue and later share a result.
+3. A stable result model gives a friend a clear target once shared-link behavior exists.
+4. The smallest proof is one hidden result section populated from the game completion snapshot, plus replay and discovery actions.
+5. Parked idea: add a personal-best comparison only after safe local persistence is explicitly selected in a later cycle.
