@@ -11,8 +11,8 @@ Active MVP development.
 3. First playable curated challenge — complete.
 4. Focused score/result state — complete.
 5. Share or copy challenge/result link — complete.
-6. Friend attempt opened from the shared link — next.
-7. Original-player and friend comparison.
+6. Friend attempt opened from the shared link — complete.
+7. Original-player and friend comparison — next.
 8. Share-again action from the comparison.
 9. Basic privacy-safe MVP event instrumentation.
 10. Curated challenge variety.
@@ -58,3 +58,11 @@ Active MVP development.
 - Strict parsing rejects malformed, duplicate, extra, unsupported, mismatched, or oversized state.
 - Web Share is preferred, clipboard is the fallback, and a visible validated link remains available when neither succeeds.
 - Friend-attempt presentation and comparison remain deferred to their roadmap stages.
+
+### Stage 6
+
+- A valid shared Tap Sprint result opens a dedicated mobile-first friend invitation.
+- The validated challenge title, target score, and duration are rendered through safe DOM text properties.
+- One primary action starts the same 20-second challenge while retaining the target context in memory.
+- Dismissing or leaving the invitation removes the shared fragment and returns to ordinary discovery.
+- Completing the friend attempt uses the existing result state; comparison and share-again behavior remain deferred.
