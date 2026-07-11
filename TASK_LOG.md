@@ -311,3 +311,62 @@ Live deployed-preview verification, interactive browser exercise, and automated 
 ### Next suggested task
 
 Implement one safe share-or-copy challenge/result link from the focused result state. Validate all encoded URL state and do not implement the friend attempt until sharing is complete.
+
+## Cycle 5
+
+- **Date/time:** 2026-07-11T14:40:00+03:00
+- **Status:** in progress
+- **Selected task:** Add one safe share-or-copy Tap Sprint result link from the focused result state.
+- **Goal:** Let the original player share a validated result URL with one action while preserving a reliable clipboard or visible-link fallback.
+- **Why selected:** Cycles 1–4 are complete on `main`, no continuity pull request is open, and share/copy is the earliest incomplete roadmap stage.
+- **Viral-loop impact:** Completes the Share handoff so the next cycle can let a friend open the link and compete against the encoded target.
+
+### Acceptance criteria
+
+- The result view exposes one obvious primary `Share score` action.
+- A generated canonical HTTP(S) URL encodes only version, challenge ID, validated score, and duration.
+- Shared state parsing rejects malformed numbers, unsupported versions or challenges, duplicate keys, extra keys, mismatched duration, oversized scores, and overlong hashes.
+- The action prefers the Web Share API, falls back to clipboard copy, and exposes a safe visible link when neither succeeds.
+- Share status is announced accessibly and all dynamic text or URLs are assigned through safe DOM properties.
+- Invalid incoming shared hashes are removed without executing or rendering their values; valid state is retained for the next friend-attempt cycle but not consumed in this cycle.
+- The result layout remains usable without horizontal overflow at 320px and 390px.
+- Focused tests cover URL round-tripping, strict rejection, Web Share, clipboard fallback, cancellation, and page structure.
+- Source and `docs/` preview files remain synchronized.
+
+### Expected files
+
+- `index.html`
+- `styles.css`
+- `app.js`
+- `test/landing.test.js`
+- `test/result.test.js`
+- `test/share.test.js`
+- `docs/index.html`
+- `docs/styles.css`
+- `docs/app.js`
+- `README.md`
+- `ROADMAP.md`
+- `CHANGELOG.md`
+- `TASK_LOG.md`
+
+### Explicit non-goals
+
+- No friend attempt, incoming target presentation, result comparison, share-again behavior, analytics, challenge variety, or challenge creation.
+- No backend, login, storage, third-party sharing SDK, dependency, framework, workflow restoration, or architecture change.
+- No generated image card, social preview metadata personalization, leaderboard, ranking, or personal-best persistence.
+
+### Strategic review
+
+- The current direction remains aligned with the Discover → Play → Result → Share sequence.
+- The largest product bottleneck is the absence of a portable result handoff.
+- The largest delivery risk remains unavailable automated CI and interactive deployed-preview verification.
+- No new evidence invalidates the static architecture; URL fragments provide a backend-free, privacy-safe transport for bounded state.
+- A strict share-link codec plus one result action is the highest-impact narrow task.
+
+### Product thinking
+
+1. The missing Share step blocks the next friend-competition step.
+2. One prominent share action immediately after a clear score should increase continuation from result to sharing.
+3. A short challenge identity plus score target makes the link understandable enough for a friend to open later.
+4. The smallest proof is a bounded URL codec, Web Share/clipboard fallback, accessible status, and focused tests.
+5. Parked idea: generate a branded score image only after the text-link loop is measurable and complete.
