@@ -2,7 +2,7 @@
 
 ## Current repository state
 
-Active MVP development. The no-login social loop and lightweight private creation are implemented. Curated challenge variety remains in progress with eight playable entries and three genuinely different mechanics: timed tap count, three-stop center timing, and growing visual-sequence recall.
+Active MVP development. The no-login social loop, lightweight private creation, and minimum curated challenge variety are implemented. The catalog has nine playable entries and four genuinely different mechanics: timed tap count, three-stop center timing, growing visual-sequence recall, and three-lane obstacle avoidance.
 
 ## MVP stages
 
@@ -15,7 +15,7 @@ Active MVP development. The no-login social loop and lightweight private creatio
 7. Original-player and friend comparison — complete.
 8. Share-again action from the comparison — complete.
 9. Basic privacy-safe MVP event instrumentation — complete.
-10. Curated challenge variety — reopened; in progress.
+10. Curated challenge variety — complete.
 11. Lightweight private challenge creation — complete.
 
 ## Completed stage evidence
@@ -93,34 +93,20 @@ Active MVP development. The no-login social loop and lightweight private creatio
 - Share completion is counted only after successful Web Share or clipboard copy feedback.
 - No payloads, scores, URLs, timestamps, identities, cookies, persistence, network requests, or third-party analytics were added.
 
-### Stage 10 — reopened
+### Stage 10
 
-Current implementation evidence:
-
-- Eight frozen data-driven curated definitions cover Speed, Rhythm, Endurance, Timing, and Memory labels.
-- The existing six definitions continue to use the timed tap-count engine.
-- Center Snap adds a genuinely different three-stop timing mechanic with a moving marker and distance-based points scoring up to 3,000.
-- Signal Echo adds a genuinely different visual-memory mechanic: watch and repeat patterns of 2, 3, 4, and 5 signals with immediate failure on a wrong ordered input and bounded scoring up to 1,400.
-- Center Snap and Signal Echo both reuse the existing result, strict shared-link codec, friend invitation, comparison, share-again, metrics, and navigation flows.
-- Center Snap provides purposeful marker movement and centered/near/missed feedback; Signal Echo provides purposeful sequence playback and correct/incorrect feedback.
-- `prefers-reduced-motion` uses slower discrete timing steps for Center Snap and longer still signal states with transform/shake suppression for Signal Echo.
-- A compact keyboard-accessible selector preserves one primary play action on discovery, and Signal Echo uses four native buttons with text announcements.
-- Shared links preserve the selected challenge and configured format while rejecting unknown IDs, mismatches, Center Snap scores above 3,000, and Signal Echo scores above 1,400.
+- Nine frozen data-driven curated definitions cover Speed, Rhythm, Endurance, Timing, Memory, and Dodge labels.
+- Six definitions continue to use the timed tap-count engine without being miscounted as separate mechanics.
+- Center Snap adds three spatial timing decisions with moving-marker and distance-based scoring up to 3,000.
+- Signal Echo adds ordered visual recall through four growing sequences and bounded scoring up to 1,400.
+- Lane Guard adds three-lane movement decisions, six deterministic incoming obstacle waves, collision failure, and bounded scoring up to 600.
+- All four mechanics reuse the existing result, strict shared-link codec, friend invitation, comparison, share-again, metrics, and navigation flows.
+- Purposeful marker movement, sequence playback, obstacle approach, and immediate success/failure feedback each have text equivalents.
+- `prefers-reduced-motion` uses discrete or still states without changing scoring or required decisions.
+- Native keyboard-accessible controls, visible focus, readable contrast, and touch targets of at least 44×44 CSS pixels are preserved.
+- Shared links preserve the selected challenge and reject unknown IDs, mismatches, and mechanic-specific scores above their strict maximum.
 - Source and GitHub Pages preview files remain synchronized without dependencies, login, storage, or backend changes.
-
-Current gap:
-
-- The curated catalog now has three genuinely different mechanics, below the required minimum of four.
-- The six tap definitions remain cosmetic variants of one mechanic despite their different names, labels, and durations.
-
-Completion gate:
-
-- Keep at least 6 playable curated challenges.
-- Reach at least 4 genuinely different gameplay mechanics; target 5–6 when practical.
-- A mechanic must differ materially in player decisions, timing, input pattern, failure conditions, or scoring.
-- Every added mechanic must reuse the shared discovery, result, sharing, friend-attempt, comparison, and navigation flows.
-- Every added mechanic must include purposeful state or feedback motion and a safe `prefers-reduced-motion` equivalent.
-- Add or replace only one mechanic per focused cycle.
+- The completion gate is met: at least six playable challenges, at least four materially different mechanics, at least three categories, at least two difficulty levels, shared product-loop systems, purposeful feedback motion, and reduced-motion-safe equivalents.
 
 ### Stage 11
 
