@@ -1,244 +1,140 @@
 # Task Log
 
-Historical completed cycles 1–6 are preserved byte-for-byte in [`TASK_LOG_ARCHIVE_CYCLES_1_6.md`](TASK_LOG_ARCHIVE_CYCLES_1_6.md). This file remains the active source of truth for the current and subsequent development cycle.
+Historical completed cycles 1–6 are preserved byte-for-byte in [`TASK_LOG_ARCHIVE_CYCLES_1_6.md`](TASK_LOG_ARCHIVE_CYCLES_1_6.md). Completed cycles 7–8 are preserved byte-for-byte in [`TASK_LOG_ARCHIVE_CYCLES_7_8.md`](TASK_LOG_ARCHIVE_CYCLES_7_8.md). This file remains the active source of truth for the current and subsequent development cycle.
 
-## Cycle 7
+## Cycle 9
 
-- **Date/time:** 2026-07-11T15:40:24+03:00
-- **Completed at:** 2026-07-11T16:38:39+03:00
-- **Status:** completed
-- **Selected task:** Add a focused original-player versus friend score comparison after a friend completes Tap Sprint.
-- **Goal:** Use the retained validated target to show the friend’s score beside the sharer’s score with deterministic beat, tie, or short feedback and clear replay or exit actions.
-- **Why selected:** Cycles 1–6 were complete on `main`, no continuity pull request was open, and original-player versus friend comparison was the earliest incomplete roadmap stage.
-- **Viral-loop impact:** Completes the Compare step and creates the stable comparison surface required for the next share-again cycle.
+- **Date/time:** 2026-07-11T18:42:06+03:00
+- **Status:** ready for final pull-request review and merge
+- **Selected task:** Add basic privacy-safe in-memory event instrumentation for the completed viral loop.
+- **Goal:** Record allowlisted aggregate funnel counts in memory only so the completed loop can be measured without identity, cookies, persistence, personal data, or a third-party destination.
+- **Why selected:** Cycle 8 was complete on `main`, no continuity pull request was open, and privacy-safe instrumentation was the earliest incomplete roadmap stage.
+- **Viral-loop impact:** Makes Discover → Play → Result → Share → Friend Competes → Compare → Share Again measurable while preserving the no-login, privacy-first MVP.
 
-### Acceptance criteria completed
+### Acceptance criteria
 
-- A completed friend attempt opens a dedicated comparison view instead of the ordinary result view.
-- The comparison uses only the retained validated invitation and the completed friend score.
-- Target and friend scores are both visible and rendered with safe DOM text properties.
-- Beat, tie, and short outcomes are deterministic, concise, and do not fabricate rankings, records, or social proof.
-- The primary replay action retains the validated target; the secondary action clears shared context and returns to discovery.
-- The comparison is announced after it becomes visible, focus moves to replay, and controls remain keyboard-native and at least 48px high.
-- Static review found no fixed-width overflow source or blocked primary action at 320px and 390px.
-- Focused tests cover comparison validation, beat/tie/short outcomes, UI structure, friend-completion routing, replay target retention, and the absence of share-again behavior.
-- Source and generated `docs/` preview files are synchronized.
+- Instrument only the planned allowlisted funnel events: `challenge_viewed`, `challenge_started`, `challenge_completed`, `result_viewed`, `share_attempted`, `share_completed`, `shared_link_opened`, `friend_completed`, `comparison_viewed`, and `share_again_attempted`.
+- Store only aggregate integer counts in memory; do not record event payloads, scores, URLs, fragments, timestamps, identities, device data, or personal data.
+- Add no network request, analytics SDK, cookie, local storage, session storage, backend, or third-party destination.
+- Count ordinary discovery and validated shared-link entry separately, then count the existing gameplay, result, friend-completion, comparison, share, and share-again transitions.
+- Count `share_completed` only after the existing UI reports a successful Web Share or clipboard copy; cancellation and unavailable fallbacks must not count as completion.
+- Load instrumentation after the existing application script without changing product behavior or the visible interface.
+- Include the instrumentation module in the existing build and synchronize generated `docs/` preview files.
+- Add focused behavior and privacy tests, run the complete test/build commands, and inspect the full diff.
+- Preserve the current mobile layout and primary actions at 320px and 390px because this task introduces no visual element.
 
-### Completed work
+### Expected files
 
-- Added a dedicated hidden comparison view with side-by-side target and friend scores.
-- Added a frozen comparison-summary model that revalidates exact invitation shape, challenge identity, bounded target, bounded friend score, and matching duration.
-- Added deterministic beat, tie, and short feedback with correct singular and plural tap wording.
-- Routed only completed friend attempts to comparison while preserving the existing ordinary result and sharing flow for non-friend attempts.
-- Kept the validated target in memory when replaying from comparison and cleared it when returning to discovery.
-- Added post-reveal live-region announcement and focus transfer to the primary replay action.
-- Added mobile-safe score columns using `minmax(0, 1fr)` and wrapping for bounded long scores.
-- Added focused comparison tests and updated friend-entry and landing structure coverage.
-- Updated README, roadmap, changelog, and synchronized repository preview files.
-- Rolled completed Cycle 1–6 history into `TASK_LOG_ARCHIVE_CYCLES_1_6.md` using the exact previous blob while keeping this file as the active task log.
-
-### Intentional non-goals preserved
-
-- No share-again action or comparison link.
-- No analytics, storage, login, backend, identities, leaderboard, ranking, challenge variety, or challenge creation.
-- No dependency, framework, workflow restoration, architecture migration, broad redesign, or unrelated cleanup.
-- No change to the existing validated shared-link format.
-
-### Files changed
-
-- `index.html`
-- `styles.css`
-- `app.js`
-- `test/comparison.test.js`
-- `test/friend-attempt.test.js`
-- `test/landing.test.js`
-- `docs/index.html`
-- `docs/styles.css`
-- `docs/app.js`
-- `README.md`
-- `ROADMAP.md`
-- `CHANGELOG.md`
 - `TASK_LOG.md`
-- `TASK_LOG_ARCHIVE_CYCLES_1_6.md`
-
-### Verification
-
-- `npm test`: passed using Node.js `v22.16.0`; 23 tests passed, 0 failed.
-- `npm run build`: passed; 3 files copied to `dist/` and `docs/`.
-- `node --check app.js`: passed.
-- Product source blobs were `3eafd83ee4c724ccc8ec9d2838ac90d651ec7842` for `index.html`, `e234c53c78930a106396538c8080fba8b37915bc` for `styles.css`, and `ff29ef7f41d8fe54db87dd5a94ce4f771f8ea5d2` for `app.js`.
-- Focused test blobs were `4652a2e991fd60f57a30cd5c4bcc4287c8c14651` for `test/comparison.test.js`, `4dfa3877f5441e09f9635f256595fe418b766a47` for `test/friend-attempt.test.js`, and `1d1cb9f5a5b3349bd16b5624aa8622d9213fa4af` for `test/landing.test.js`.
-- Source/output comparison: `index.html`, `styles.css`, and `app.js` matched their corresponding generated `docs/` blobs exactly.
-- Static mobile review: 320px body minimum, fluid `min(100%, 30rem)` shell, two `minmax(0, 1fr)` score columns, bounded card content, score wrapping, full-width 48px controls, and no fixed-width overflow source at 320px or 390px.
-- Accessibility review: labelled comparison section, semantic heading, visible score labels, keyboard-native controls, visible focus, post-reveal polite announcement, and focus transfer to replay.
-- Security/privacy review: exact invitation shape and challenge identity are revalidated; both scores remain bounded integers; dynamic values use `textContent`; no untrusted HTML, executable state, storage, secrets, tokens, analytics, personal data, or backend was added.
-- GitHub Actions/status checks: no workflow runs or commit statuses existed because the owner removed the workflow; no automated CI success was claimed.
-- **Preview status:** repository preview output verified for the merged comparison content; live deployed and interactive browser preview were unavailable in the execution environment.
-
-### Review findings and resolution
-
-- Reviewed the complete 14-file product pull-request diff, including source, focused tests, generated preview files, documentation, the active task log, and the byte-for-byte historical task-log archive.
-- Confirmed one-task scope, acceptance-criteria alignment, deterministic state handling, replay and exit behavior, accessibility, mobile layout, security, privacy, source/preview synchronization, base branch, dependency order, mergeability, and the recorded fresh test/build evidence.
-- Confirmed the archived Cycle 1–6 file uses the exact prior `TASK_LOG.md` blob `05d0ea8d9dedbb9d5b643d8dd5cc41e77fcbb097`; no historical content was lost.
-- No blocking or non-blocking findings remained after final review.
-- No external comments, requested changes, unresolved review threads, merge conflicts, workflow runs, or commit statuses existed.
-- Recorded a factual self-review comment and did not claim independent approval.
-
-### Git and merge outcome
-
-- Product branch: `agent/cycle-7-comparison-main`.
-- Planning commit: `becbc30a37be2df2f73c75026b7d6237dfbc0cbd`.
-- Product branch head SHA: `89714c09c5d6fd78467d0d8280ab8c5b6df8fc70`.
-- Pull request: #21 — `feat(compare): add friend score comparison`.
-- Base branch: `main` at `1b2a1cd837e9a9a9cc7415626a27b2a9ede75f55`.
-- Merge method: squash using the expected head SHA.
-- Merge outcome: successfully merged on 2026-07-11T16:38:39+03:00 and verified as merged.
-- Merge SHA: `a2a5552fc40fb878827e808193add1eb66f73103`.
-- Cycle-close branch: `agent/cycle-7-close-comparison`.
-
-### Decision
-
-No new product or architecture decision. The existing static HTML, CSS, and JavaScript architecture plus bounded URL-fragment state remain sufficient for the next share-again cycle. The task-log rollover is a history-preserving file-size measure, not a product architecture change.
-
-### Strategic review
-
-- The direction now reaches Discover → Play → Result → Share → Friend Competes → Compare.
-- The missing comparison bottleneck is resolved; the next product bottleneck is the absence of a share-again action from comparison.
-- Unavailable automated CI and interactive deployed-preview verification remain the largest delivery risk.
-- No evidence invalidated the static architecture, gameplay state machine, or bounded URL-fragment model.
-- One focused share-again action from comparison is now the highest-impact narrow task.
-
-### Product thinking
-
-1. The friend now sees immediately whether the shared target was beaten, tied, or missed.
-2. Side-by-side scores make the original share meaningful and provide a clear reason to retry.
-3. Target-preserving replay keeps competition coherent without login or persistence.
-4. The minimum proof was one validated comparison model, one focused view, and friend-only completion routing.
-5. The next useful idea remains a single share-again action that carries the friend’s validated score forward without adding identity or storage.
-
-### Remaining limitation
-
-Live deployed-preview verification, interactive browser exercise, and automated GitHub Actions validation remain unavailable. Comparison intentionally has no share-again action yet.
-
-### Next suggested task
-
-Add one safe share-again action from the completed comparison using the friend’s validated score as the next target. Reuse the existing strict link codec and sharing fallbacks; do not add analytics, identity, persistence, or challenge variety.
-
-## Cycle 8
-
-- **Date/time:** 2026-07-11T17:43:15+03:00
-- **Verification completed at:** 2026-07-11T18:00:47+03:00
-- **Completed at:** 2026-07-11T18:03:56+03:00
-- **Status:** completed
-- **Selected task:** Add one safe share-again action from the completed comparison.
-- **Goal:** Let the friend share their validated completed score as the next Tap Sprint target using the existing strict URL codec and share/copy fallbacks.
-- **Why selected:** Cycle 7 was complete on `main`, no continuity pull request was open, and share-again was the earliest incomplete roadmap stage.
-- **Viral-loop impact:** Completes the first end-to-end loop by turning the friend’s result into a new challenge link for another person.
-
-### Acceptance criteria completed
-
-- The comparison view exposes one obvious primary `Share your score` action.
-- Share-again uses only the revalidated friend score and challenge duration from the completed comparison.
-- The generated URL reuses the existing strict versioned fragment format and canonical base URL.
-- Web Share remains preferred, clipboard remains the fallback, and a visible validated link appears only when neither succeeds.
-- Share status is announced accessibly; cancelled sharing keeps the fallback link hidden.
-- Replay retains the original validated target and remains secondary; returning to challenges clears shared context.
-- Focused tests cover share-again URL generation, friend-score selection, malformed and inconsistent comparison rejection, fallback wiring, and structure.
-- Static review found no blocked primary action or fixed-width overflow source at 320px and 390px.
-- Source and generated `docs/` preview files are byte-for-byte synchronized by Git blob SHA.
-
-### Completed work
-
-- Added the primary comparison `Share your score` action plus an accessible status region and validated visible-link fallback.
-- Added `createComparisonShareUrl`, which accepts only the exact completed-comparison shape, re-derives the comparison from bounded values, rejects inconsistent data, and promotes only the friend score into the existing result-link codec.
-- Reused the existing HTTP(S)-only Web Share, clipboard, cancellation, and unavailable-API behavior without changing the URL schema.
-- Kept comparison replay tied to the original validated invitation while clearing all shared context on return to discovery.
-- Added focused model, URL, rejection, structure, and event-wiring tests.
-- Corrected the stale baseline accessibility assertion discovered by the fresh test run so it checks the labelled discovery view rather than requiring an obsolete label on the `main` landmark.
-- Updated README, roadmap, changelog, and synchronized repository preview files.
-
-### Intentional non-goals preserved
-
-- No analytics or instrumentation.
-- No identity, login, storage, backend, leaderboard, ranking, challenge variety, or challenge creation.
-- No change to the shared-link schema or score bounds.
-- No framework, dependency, workflow, architecture, broad design, or unrelated cleanup.
-
-### Files changed
-
+- `TASK_LOG_ARCHIVE_CYCLES_7_8.md`
+- `metrics.js`
 - `index.html`
-- `app.js`
-- `test/comparison.test.js`
-- `test/landing.test.js`
+- `scripts/build.js`
+- `test/instrumentation.test.js`
 - `tests/baseline.test.js`
 - `docs/index.html`
-- `docs/app.js`
+- `docs/metrics.js`
 - `README.md`
 - `ROADMAP.md`
+- `METRICS.md`
 - `CHANGELOG.md`
-- `TASK_LOG.md`
 
-`styles.css` and `docs/styles.css` required no change because the existing full-width control, live-status, focus, and fallback-link rules already cover the new action.
+### Explicit non-goals
 
-### Verification
-
-- `node --version`: `v22.16.0`.
-- `npm test`: passed in a fresh verification workspace; 25 tests passed, 0 failed after the stale baseline assertion was corrected.
-- `npm run build`: passed; 3 files copied to `dist/` and `docs/`.
-- `node --check app.js`: passed.
-- Product source blobs are `c86f03726fa0975843dd9d280c757502c9a56e00` for `index.html`, `e234c53c78930a106396538c8080fba8b37915bc` for unchanged `styles.css`, and `ee38b6e46c31ba0b156fbe2ebf478452065891c2` for `app.js`.
-- Source/output comparison: each source blob matches its generated `docs/` blob exactly.
-- Static mobile review: the fluid `min(100%, 30rem)` shell, 320px body minimum, full-width 48px controls, grid-based action stack, bounded comparison columns, and wrapping fallback link introduce no fixed-width overflow or blocked primary action at 320px or 390px.
-- Accessibility review: one obvious primary comparison share button, keyboard-native controls, visible focus, polite share status, focus transfer to share after comparison reveal, and focusable visible fallback.
-- Security/privacy review: exact comparison shape is enforced, computed fields are re-derived, bounded score and duration validation is reused, non-HTTP(S) URLs remain rejected, dynamic values use safe DOM properties, and no HTML injection, storage, identity, secrets, analytics, personal data, or backend was added.
-- GitHub Actions/status checks remain unavailable because the owner removed the workflow; no automated CI success is claimed.
-- **Preview status:** repository preview output verified for the merged share-again source blobs.
-
-### Review findings and resolution
-
-- Blocking finding during fresh verification: the pre-existing baseline test expected an obsolete `aria-labelledby` attribute on the `main` element and failed against the already-labelled view structure on `main`.
-- Resolution: updated only that stale assertion to verify the `main` landmark and the discovery view’s existing `aria-labelledby="page-title"`; then reran the complete test and build commands successfully.
-- Reviewed the complete 11-file PR diff covering source, generated preview output, focused tests, baseline correction, roadmap, changelog, README, and the active task log.
-- Confirmed one-task scope, Stage 8 acceptance criteria, exact comparison-state validation, friend-score promotion, unchanged shared-link bounds and schema, Web Share and fallback behavior, replay and exit state, accessibility, mobile layout, security, privacy, source/preview synchronization, base branch, dependency order, and mergeability.
-- No external requested changes, unresolved review threads, merge conflicts, workflow runs, or commit statuses existed.
-- No blocking or non-blocking findings remained after final review.
-- Recorded a factual self-review comment and did not claim independent approval.
-
-### Git and merge outcome
-
-- Product branch: `agent/cycle-8-share-again` created from `main` at `2c31f13a56c6c3cae4499172a3a44439b9476efa`.
-- Planning commit: `853a11ddfbea984182026ae0a76959de565555fe`.
-- Product branch head SHA: `fa738244b42a6237a1977bcb1aa7465c77b1e2b8`.
-- Pull request: #23 — `feat(share): add comparison share-again action`.
-- Base branch: `main` at `2c31f13a56c6c3cae4499172a3a44439b9476efa`.
-- Merge method: squash using the expected head SHA.
-- Merge outcome: successfully merged on 2026-07-11T18:03:56+03:00 and verified as merged.
-- Merge SHA: `71c8d38423ac621296df7258ad255d9c4d70332b`.
-- Cycle-close branch: `agent/cycle-8-close-share-again`.
-
-### Decision
-
-No new product or architecture decision. The existing static architecture, strict fragment codec, and browser-sharing fallbacks are sufficient to close the first viral loop.
+- No external analytics destination, network delivery, persistent storage, cookies, identifiers, login, backend, score or URL recording, user-facing metrics panel, challenge variety, challenge creation, dependency, framework, redesign, refactor, or unrelated cleanup.
 
 ### Strategic review
 
-- The product now completes Discover → Play → Result → Share → Friend Competes → Compare → Share Again.
-- The share-again bottleneck is resolved; privacy-safe instrumentation is the next roadmap stage.
-- Unavailable automated CI and interactive deployed-preview verification remain the largest delivery risk.
-- No evidence invalidated the static architecture or bounded fragment transport.
+- The direction remains aligned with the north star because the first complete viral loop is now available and the next need is evidence about where users continue or stop.
+- The largest product bottleneck is the absence of any privacy-safe loop measurement.
+- The largest technical risk is accidentally collecting or persisting sensitive context; unavailable CI and interactive browser verification remain delivery limitations.
+- No new evidence invalidated the static architecture, strict fragment state, or browser-sharing fallbacks.
+- A small allowlisted in-memory counter is the highest-impact narrow implementation for Stage 9.
 
 ### Product thinking
 
-1. The comparison now has a clear continuation action instead of ending the loop.
-2. The friend’s own validated score becomes the next meaningful target without identity or persistence.
-3. The shared message directly invites the next recipient to beat that score.
-4. The minimum proof was one share button and one strict comparison-to-existing-link adapter.
-5. Parked idea: instrument share-again attempts and completions in the next stage without adding a third-party destination.
+1. Measurement is the remaining blocker to learning which completed-loop step needs improvement.
+2. The original player experience should remain unchanged; invisible aggregate counters avoid adding friction before sharing.
+3. A friend is more likely to trust and compete when the shared URL and score are not copied into analytics or persistent storage.
+4. The smallest proof is one dependency-free allowlisted counter attached to existing DOM transitions and share outcomes.
+5. Parked idea: consider an explicit privacy-reviewed analytics destination only after a separate product and architecture decision.
+
+### Completed work
+
+- Added a frozen allowlist for the ten planned funnel events and an in-memory aggregate-only counter with immutable snapshots.
+- Added dependency-free DOM instrumentation that distinguishes ordinary discovery from validated shared-link entry and observes existing result, comparison, share, and share-again transitions.
+- Counted successful sharing only when the existing UI status becomes `Shared.` or `Link copied.`; cancellation and unavailable fallback states do not increment completion.
+- Exposed only a non-enumerable, read-only `window.socialChallengeMetrics` aggregate collector for local session inspection.
+- Loaded `metrics.js` after `app.js`, included it in the existing build, and generated synchronized `docs/` preview output.
+- Added focused tests for allowlist enforcement, frozen aggregate snapshots, ordinary and friend loop transitions, successful-share deduplication, script order, and forbidden persistence/network/time/location sinks.
+- Updated README, roadmap, metrics documentation, changelog, and the active task log.
+- Preserved completed Cycles 7–8 byte-for-byte in `TASK_LOG_ARCHIVE_CYCLES_7_8.md` using the exact previous active-log blob.
+
+### Intentional non-goals preserved
+
+- No external analytics destination, network delivery, persistent storage, cookies, identifiers, login, backend, score or URL recording, user-facing metrics panel, challenge variety, challenge creation, dependency, framework, visual redesign, app-state refactor, or unrelated cleanup.
+
+### Files changed
+
+- `metrics.js`
+- `index.html`
+- `scripts/build.js`
+- `test/instrumentation.test.js`
+- `tests/baseline.test.js`
+- `docs/index.html`
+- `docs/metrics.js`
+- `README.md`
+- `ROADMAP.md`
+- `METRICS.md`
+- `CHANGELOG.md`
+- `TASK_LOG.md`
+- `TASK_LOG_ARCHIVE_CYCLES_7_8.md`
+
+`app.js`, `styles.css`, `docs/app.js`, and `docs/styles.css` remain unchanged.
+
+### Verification
+
+- **Verification completed at:** 2026-07-11T19:15:19+03:00.
+- `node --version`: `v22.16.0`.
+- `npm test`: passed in a fresh verification workspace; 29 tests passed, 0 failed.
+- `npm run build`: passed; 4 files copied to `dist/` and `docs/`.
+- `node --check app.js`: passed.
+- `node --check metrics.js`: passed.
+- Product source blobs are `f8a729ae9a3cd571aa188b259da5687f3060ca08` for `index.html`, unchanged `e234c53c78930a106396538c8080fba8b37915bc` for `styles.css`, unchanged `ee38b6e46c31ba0b156fbe2ebf478452065891c2` for `app.js`, and `308e93935636c584dc80b84ecbf5f787673ffa16` for `metrics.js`.
+- Focused test blobs are `4a5c6c2c3a723aae9e48d9b164641984e159d1bc` for `test/instrumentation.test.js` and `d25f5e5a075fe8b528f5d7f6437ae80f61c90cf6` for `tests/baseline.test.js`.
+- Source/output comparison: `index.html`, `styles.css`, `app.js`, and `metrics.js` match their generated `docs/` files byte-for-byte.
+- Static mobile review: no markup or style visible to users changed beyond a deferred script tag; the existing fluid 320px minimum, 390px review width, full-width controls, bounded content, and no-horizontal-overflow behavior remain unchanged.
+- Accessibility review: product structure, focus order, labels, live regions, and keyboard controls are unchanged; instrumentation only observes existing transitions.
+- Security/privacy review: the allowlist accepts only fixed event names; snapshots contain integers only; no payload, score, URL, fragment, timestamp, identity, device data, personal data, cookie, storage, network API, backend, token, or secret is collected or transmitted.
+- GitHub Actions/status checks remain unavailable because the owner removed the workflow; no automated CI success is claimed.
+- **Preview status:** repository preview output verified for the current instrumentation source blobs.
+
+### Review findings and resolution
+
+- Reviewed the complete candidate diff for one-task scope, Stage 9 acceptance criteria, event semantics, transition deduplication, successful-share counting, privacy boundaries, security, accessibility, mobile behavior, build inclusion, source/preview synchronization, documentation accuracy, and secret-like strings.
+- The task-log rollover preserves the exact prior `TASK_LOG.md` blob `4f59dc986cdc2067e08fb96ac67ad0f16c99bb6b`; no Cycle 7–8 history is lost.
+- Blocking review finding: replay actions were not counted as `challenge_started`, which could make repeat completions exceed starts and distort attempt rates.
+- Resolution: instrumented both result and comparison replay buttons, expanded ordinary and friend-loop tests to cover repeat starts and completions, regenerated `docs/`, and reran all checks successfully.
+- The earlier factual self-review comment was superseded by this review finding; a new final self-review will be recorded after the fix is committed and re-reviewed.
+- PR #25 remains targeted at `main`; comments, reviews, threads, mergeability, conflicts, and current-head statuses will be rechecked before merge.
+
+### Git and merge outcome
+
+- Product branch: `agent/cycle-9-privacy-safe-metrics` created from `main` at `0b8183eab23d6458f1116957c932a4c5aad4696e`.
+- Planning commit: `f5cbb1342ecb0d5506ac16fec3cf44da36961df2`.
+- Implementation commit: `3c70b87dac571601247cde737f25e2f2f4c4a0a8`.
+- Pull request: #25 — `feat(metrics): add privacy-safe loop instrumentation`.
+- Base branch: `main` at `0b8183eab23d6458f1116957c932a4c5aad4696e`.
+- Merge method: squash using the expected final head SHA after this factual log update.
+
+### Decision
+
+No new external-service or architecture decision. A dependency-free in-memory collector is an implementation of the already documented privacy-safe metrics plan and does not establish a persistent analytics destination.
 
 ### Remaining limitation
 
-Live deployed-preview interaction and automated GitHub Actions validation remain unavailable. Repository preview output and fresh local test/build evidence were verified instead.
+The counters are intentionally session-local and disappear on reload, so they prove event semantics and privacy boundaries but do not yet support cross-session product analysis. Live deployed-preview interaction and automated GitHub Actions validation remain unavailable.
 
 ### Next suggested task
 
-Add basic privacy-safe MVP event instrumentation for the completed loop without a third-party analytics destination, identity, cookies, or persistent personal data.
+Add curated challenge variety using reusable data-driven definitions, with at least six playable challenges across three meaningful categories and two difficulty levels. Keep the completed sharing loop and instrumentation generic; do not add private creation yet.

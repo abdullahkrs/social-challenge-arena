@@ -16,4 +16,5 @@ test('application remains mobile-first and accessible', () => {
 test('application loads its local assets', () => {
   assert.match(html, /href="styles\.css"/i);
   assert.match(html, /src="app\.js"/i);
+  assert.match(html, /src="metrics\.js"/i);
 });
