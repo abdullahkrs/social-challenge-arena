@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="Discover quick social challenges and compete with friends.">
   <title>Social Challenge Arena</title>
+  <link rel="canonical" href="https://abdullahkrs.github.io/social-challenge-arena/">
   <link rel="stylesheet" href="styles.css">
   <script src="app.js" defer></script>
 </head>
@@ -71,9 +72,12 @@
       </div>
 
       <p class="sr-only" id="result-announcement" aria-live="polite"></p>
+      <p class="share-status" id="share-status" aria-live="polite"></p>
+      <a class="share-fallback" id="share-fallback" href="" hidden>Open score link</a>
 
       <div class="result-controls">
-        <button class="primary-action" id="result-replay" type="button">Play again</button>
+        <button class="primary-action" id="share-result" type="button">Share score</button>
+        <button class="secondary-action" id="result-replay" type="button">Play again</button>
         <button class="secondary-action" id="result-back" type="button">Challenges</button>
       </div>
     </section>
