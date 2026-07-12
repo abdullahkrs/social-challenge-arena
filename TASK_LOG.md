@@ -4,8 +4,8 @@ Historical completed cycles 1–6 are preserved in [`TASK_LOG_ARCHIVE_CYCLES_1_6
 
 ## Cycle 18
 
-- **Date/time:** 2026-07-12T09:13:00+03:00
-- **Status:** implementation complete; PR #50 ready for independent QA
+- **Date/time:** 2026-07-12T10:08:56+03:00
+- **Status:** QA blockers fixed; PR #50 returned to independent QA
 - **Owner role:** `agent-engine`
 - **Selected task:** Build the minimum deterministic shared gameplay lifecycle for Stage 12.
 - **Goal:** Provide one testable `idle → ready → running → finished` state machine with a single update handle, replay reset, active-state gating, and complete transient-resource teardown.
@@ -29,6 +29,8 @@ Historical completed cycles 1–6 are preserved in [`TASK_LOG_ARCHIVE_CYCLES_1_6
 - Added explicit `prepare`, `start`, `finish`, `reset`, `replay`, `setActive`, managed timeout/interval/listener registration, `teardown`, and `getState` operations.
 - Enforced one pending update-frame handle and bounded frame delta time with a 100 ms default maximum.
 - Added independent frame and run generations so cancelled callbacks from an old visibility state or replay cannot clear a newer handle or mutate the new run.
+- Reset the frame timestamp baseline on deactivation so the first resumed frame always contributes zero delta after any inactive gap.
+- Added a dedicated timer generation and clear-on-deactivate behavior so deferred timeout or interval callbacks cannot execute after reactivation.
 - Added focused scheduler-injection tests without changing `package.json` or adding a dependency.
 
 ### Files changed
@@ -42,8 +44,8 @@ Historical completed cycles 1–6 are preserved in [`TASK_LOG_ARCHIVE_CYCLES_1_6
 - Runtime: Node.js v22.16.0.
 - `node --check src/game/lifecycle.js`: passed against exact final branch content.
 - `node --check test/game/lifecycle.test.js`: passed against exact final branch content.
-- Current repository test command `npm test`: passed in a reconstructed focused workspace containing the exact final branch lifecycle source, lifecycle test, and repository `package.json`; 5 tests passed and 0 failed.
-- Focused tests cover valid and invalid transitions, one-loop enforcement, bounded delta time, replay reset, stale prior-run timeout rejection, hidden/inactive callback blocking, stale cancelled-frame isolation after reactivation, and complete finish/teardown cleanup.
+- Current repository test command `npm test`: passed in a reconstructed focused workspace containing the exact final branch lifecycle source, lifecycle test, and repository `package.json`; 7 tests passed and 0 failed.
+- Focused tests cover valid and invalid transitions, one-loop enforcement, bounded delta time, replay reset, zero resumed delta after a long inactive gap, timeout and interval invalidation across reactivation, stale prior-run callbacks, hidden/inactive input blocking, stale cancelled-frame isolation, and complete finish/teardown cleanup.
 - Current build command `npm run build`: passed with the exact repository `package.json` and `scripts/build.js` in a reconstructed build-contract workspace; all 9 required inputs were represented and all 18 generated `dist/` and `docs/` copies matched their inputs.
 - Fresh branch blob-SHA parity was verified for all nine unchanged source/`docs/` build-input pairs: `index.html`, `styles.css`, `catalog-bootstrap.js`, `app.js`, `lane-guard.js`, `metrics.js`, `create.html`, `private.css`, and `private.js`.
 - A complete repository checkout and repository-wide test execution were unavailable because the runtime could not resolve `github.com`; no full-suite count beyond the exact focused workspace is claimed.
@@ -62,6 +64,8 @@ Historical completed cycles 1–6 are preserved in [`TASK_LOG_ARCHIVE_CYCLES_1_6
 - Resolution: the callback now clears `frameHandle` only when it owns that exact handle, while a frame generation rejects stale callbacks.
 - Self-review also found that a retained timeout or listener callback from a completed run could otherwise execute during replay.
 - Resolution: managed timers, intervals, and listeners capture a run generation that is invalidated on finish, reset, replay, and teardown; regression coverage was added.
+- Independent QA then found that deactivation preserved the previous frame timestamp and that deferred timer callbacks could survive until reactivation.
+- Resolution: deactivation now resets the timestamp baseline, clears managed timeouts and intervals, and advances a timer generation on both deactivation and reactivation; two focused regressions prove zero resumed delta and rejection of retained timer callbacks after reactivation.
 - Full diff review confirmed only the three issue-owned files changed, no dependency was added, and no forbidden shared, preview, localization, legacy, result, sharing, comparison, or metrics file changed.
 - No independent approval is claimed; this is implementation-agent self-review evidence only.
 
@@ -73,7 +77,7 @@ Repository preview output verified: all nine unchanged source/`docs/` build-inpu
 
 - A lifecycle-only issue is the smallest reusable Stage 12 slice and avoids coupling future flagship physics to legacy challenge code.
 - Scheduler injection keeps browser behavior testable with Node built-ins and no dependency.
-- One authoritative frame handle plus separate frame/run generations prevents duplicate loops and stale-run mutation under rapid replay, navigation, or visibility changes.
+- One authoritative frame handle plus separate frame, run, and timer generations prevents duplicate loops, inactive-time advancement, and stale callback mutation under rapid replay, navigation, or visibility changes.
 
 ### Product thinking
 
@@ -91,7 +95,7 @@ Repository preview output verified: all nine unchanged source/`docs/` build-inpu
 
 ### Next task
 
-Independent QA should verify issue #49, the complete PR #50 diff, focused lifecycle behavior, stale-callback protection, teardown, scope boundaries, and the stated verification limitations. Do not add physics or visuals in this PR.
+Independent QA should re-review issue #49 and the corrected PR #50 head, especially zero delta after inactive gaps, timeout and interval invalidation across reactivation, stale-callback protection, teardown, scope boundaries, and the stated verification limitations. Do not add physics or visuals in this PR.
 
 ## Cycle 17
 
