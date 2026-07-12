@@ -50,6 +50,11 @@ function createScheduler() {
       assert.ok(entry, 'Expected one pending frame.');
       return entry[1];
     },
+    takePendingTimeout() {
+      const entry = timeouts.entries().next().value;
+      assert.ok(entry, 'Expected one pending timeout.');
+      return entry[1];
+    },
     fireTimeout() {
       const entry = timeouts.entries().next().value;
       assert.ok(entry, 'Expected one pending timeout.');
@@ -136,10 +141,13 @@ test('keeps exactly one frame handle during rapid start and replay calls', () =>
 
 test('replay resets mutable frame state before starting a new run', () => {
   const scheduler = createScheduler();
+  let staleScore = 0;
   const lifecycle = createLifecycle(scheduler, { maxDeltaMs: 50 });
 
   lifecycle.prepare();
   lifecycle.start();
+  lifecycle.scheduleTimeout(() => { staleScore += 1; }, 100);
+  const staleTimeout = scheduler.takePendingTimeout();
   scheduler.flushFrame(100);
   scheduler.flushFrame(300);
 
@@ -157,6 +165,9 @@ test('replay resets mutable frame state before starting a new run', () => {
   assert.equal(replayed.frameCount, 0);
   assert.equal(replayed.elapsedMs, 0);
   assert.equal(scheduler.counts().frames, 1);
+
+  staleTimeout();
+  assert.equal(staleScore, 0);
 });
 
 test('inactive state blocks frames, timers, intervals, listeners, and stale scoring callbacks', () => {
@@ -185,7 +196,6 @@ test('inactive state blocks frames, timers, intervals, listeners, and stale scor
   const staleFrame = scheduler.takePendingFrame();
   lifecycle.setActive(false);
 
-  staleFrame(100);
   scheduler.fireTimeout();
   scheduler.fireInterval();
   registeredListener({ type: 'pointerdown' });
@@ -193,6 +203,12 @@ test('inactive state blocks frames, timers, intervals, listeners, and stale scor
   assert.equal(scheduler.counts().frames, 0);
   assert.equal(lifecycle.getState().framePending, false);
 
+  lifecycle.setActive(true);
+  assert.equal(scheduler.counts().frames, 1);
+  staleFrame(100);
+  assert.equal(score, 0);
+  assert.equal(scheduler.counts().frames, 1);
+  assert.equal(lifecycle.getState().framePending, true);
   lifecycle.setActive(true);
   assert.equal(scheduler.counts().frames, 1);
   scheduler.flushFrame(200);
