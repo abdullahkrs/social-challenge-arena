@@ -45,6 +45,7 @@
     let frameHandle = null;
     let frameToken = 0;
     let runToken = 0;
+    let timerToken = 0;
     let frameCount = 0;
     let elapsedMs = 0;
     let lastTimestamp = null;
@@ -88,6 +89,12 @@
       intervalHandles.clear();
     }
 
+    function invalidateTimers() {
+      timerToken += 1;
+      clearTimeouts();
+      clearIntervals();
+    }
+
     function clearListeners() {
       for (const remove of listenerRemovers) remove();
       listenerRemovers.clear();
@@ -96,8 +103,7 @@
     function clearTransientResources() {
       runToken += 1;
       cancelPendingFrame();
-      clearTimeouts();
-      clearIntervals();
+      invalidateTimers();
       clearListeners();
     }
 
@@ -197,21 +203,30 @@
       }
 
       active = nextActive;
-      if (!active) cancelPendingFrame();
-      else if (status === GAME_LIFECYCLE_STATES.RUNNING) scheduleFrame();
+      timerToken += 1;
+      if (!active) {
+        lastTimestamp = null;
+        cancelPendingFrame();
+        clearTimeouts();
+        clearIntervals();
+      } else if (status === GAME_LIFECYCLE_STATES.RUNNING) {
+        scheduleFrame();
+      }
       return getState();
     }
 
     function scheduleTimeout(callback, delayMs = 0) {
       if (destroyed || typeof callback !== 'function') return null;
-      const token = runToken;
+      const currentRunToken = runToken;
+      const currentTimerToken = timerToken;
       let handle = null;
       handle = setTimeoutFn(() => {
         timeoutHandles.delete(handle);
         if (!destroyed
           && active
           && status === GAME_LIFECYCLE_STATES.RUNNING
-          && token === runToken) callback();
+          && currentRunToken === runToken
+          && currentTimerToken === timerToken) callback();
       }, Math.max(0, Number(delayMs) || 0));
       timeoutHandles.add(handle);
       return handle;
@@ -219,12 +234,14 @@
 
     function scheduleInterval(callback, delayMs = 0) {
       if (destroyed || typeof callback !== 'function') return null;
-      const token = runToken;
+      const currentRunToken = runToken;
+      const currentTimerToken = timerToken;
       const handle = setIntervalFn(() => {
         if (!destroyed
           && active
           && status === GAME_LIFECYCLE_STATES.RUNNING
-          && token === runToken) callback();
+          && currentRunToken === runToken
+          && currentTimerToken === timerToken) callback();
       }, Math.max(0, Number(delayMs) || 0));
       intervalHandles.add(handle);
       return handle;
