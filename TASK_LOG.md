@@ -2,6 +2,99 @@
 
 Historical completed cycles 1–6 are preserved in [`TASK_LOG_ARCHIVE_CYCLES_1_6.md`](TASK_LOG_ARCHIVE_CYCLES_1_6.md), Cycles 7–8 in [`TASK_LOG_ARCHIVE_CYCLES_7_8.md`](TASK_LOG_ARCHIVE_CYCLES_7_8.md), Cycle 9 in [`TASK_LOG_ARCHIVE_CYCLE_9.md`](TASK_LOG_ARCHIVE_CYCLE_9.md), Cycle 10 in [`TASK_LOG_ARCHIVE_CYCLE_10.md`](TASK_LOG_ARCHIVE_CYCLE_10.md), Cycle 11 in [`TASK_LOG_ARCHIVE_CYCLE_11.md`](TASK_LOG_ARCHIVE_CYCLE_11.md), Cycle 12 in [`TASK_LOG_ARCHIVE_CYCLE_12.md`](TASK_LOG_ARCHIVE_CYCLE_12.md), Cycle 13 in [`TASK_LOG_ARCHIVE_CYCLE_13.md`](TASK_LOG_ARCHIVE_CYCLE_13.md), Cycle 14 in [`TASK_LOG_ARCHIVE_CYCLE_14.md`](TASK_LOG_ARCHIVE_CYCLE_14.md), Cycle 15 in [`TASK_LOG_ARCHIVE_CYCLE_15.md`](TASK_LOG_ARCHIVE_CYCLE_15.md), and Cycle 16 in [`TASK_LOG_ARCHIVE_CYCLE_16.md`](TASK_LOG_ARCHIVE_CYCLE_16.md). This file remains the active source of truth for the current cycle.
 
+## Cycle 20
+
+- **Date/time:** 2026-07-12T15:31:00+03:00
+- **Status:** implementation complete; pull request pending independent QA
+- **Owner role:** `agent-ux`
+- **Selected task:** Add the dedicated hidden arcade viewport shell for Stage 12 under Issue #53.
+- **Goal:** Add the smallest responsive, accessible, transform-friendly viewport structure needed by the first replacement arcade game without showing it during legacy play or adding a mechanic.
+- **Why selected:** Issue #53 was the only open `agent-ux` assignment, was selected from `ready-for-agent`, depends on merged lifecycle PR #50 and action-input PR #52, owns non-overlapping files, and had no existing UX pull request.
+- **Viral-loop impact:** The shell creates a stable future play surface for immediate mobile arcade interaction while preserving the existing discovery, result, sharing, friend-attempt, comparison, share-again, URL, and metrics flow unchanged.
+
+### Acceptance contract completed
+
+- **Player decision and input:** None in this issue. The shell remains hidden and attaches no listener; the merged action-input adapter is unchanged.
+- **Movement model:** None. No position, gravity, impulse, obstacle, collision, or renderer logic was added.
+- **Failure condition:** None.
+- **Scoring model:** None.
+- **Escalation:** None.
+- **Feedback effects:** None. Only ordered background/world, entity, transient-effect, HUD, and polite-status layers were created.
+- **Reduced-motion behavior:** Structure and future decisions remain identical; viewport-specific animation and transition are explicitly disabled under `prefers-reduced-motion`.
+- **Teardown behavior:** No timer, interval, animation frame, event listener, particle, or transient node lifecycle was created.
+- **Social-loop reuse:** Existing result, sharing, friend-attempt, comparison, share-again, URL codec, metrics, navigation, and legacy gameplay were not modified or duplicated.
+
+### Completed work
+
+- Added one hidden `#arcade-viewport` region inside the existing challenge view.
+- Added empty, ordered world, entity, effects, and HUD layers plus one empty polite status output.
+- Added isolated stacking, contained overflow, mobile width containment, bounded aspect sizing, touch-compatible behavior, and absolute transform-friendly layers.
+- Added explicit reduced-motion protection without introducing any animation or transition.
+- Added seven dependency-free contract tests for IDs, hidden semantics, layer order, empty visible copy, focus safety, responsive CSS, deterministic stacking, reduced motion, legacy preservation, and source/preview parity.
+- Regenerated only `docs/index.html` and `docs/styles.css` through the unchanged build contract.
+
+### Files changed
+
+- `TASK_LOG.md`
+- `index.html`
+- `styles.css`
+- `test/game/viewport-contract.test.js`
+- `docs/index.html`
+- `docs/styles.css`
+
+### Tests and checks
+
+- Runtime: Node.js v22.16.0.
+- `node --check test/game/viewport-contract.test.js`: passed against exact local content with blob SHA `5cfa8a17b4160ace9da6e47ad00a9c20e488cc6d`.
+- Current repository command `npm run build`: passed in a reconstructed build workspace using the exact repository `package.json` and `scripts/build.js`; all nine required inputs were present and copied to `dist/` and `docs/`.
+- Current repository command `npm test`: passed in the reconstructed focused workspace; 7 tests passed and 0 failed.
+- Source/preview parity passed for exact local blobs: `index.html` and `docs/index.html` both `1d9eb7581686c9bbd26e8a359a592d02864fd5e2`; `styles.css` and `docs/styles.css` both `422c07d0da415f0b499af1cc88b0fcaa6aeb7b47`.
+- A complete repository checkout and repository-wide test execution were unavailable because the runtime could not resolve `github.com`; the focused suite is claimed, not a full-suite count.
+- No lint or type-check script is configured.
+
+### Mobile, accessibility, motion, security, and privacy review
+
+- Static width calculation gives 280 CSS px of content at a 320 px viewport, 344 CSS px at 400 px, and 374 CSS px at 430 px; the viewport uses `width: 100%`, `max-width: 100%`, `min-width: 0`, border-box sizing, and contained overflow.
+- Browser rendering at 320 px and 360–430 px was not available; no visual browser verification is claimed.
+- The region has a non-empty accessible name, remains hidden by default, contains no focusable descendant or visible instruction, and exposes one empty `aria-live="polite"` status output for future use.
+- The four visual layers are `aria-hidden`, pointer-inert, and deterministically stacked from z-index 0 through 3.
+- No decorative motion was introduced; the viewport and layers are explicitly animation- and transition-free under reduced motion.
+- No JavaScript, listener, timer, URL state, storage, analytics, identity, personal data, credential, dependency, untrusted HTML path, or legacy challenge behavior changed.
+
+### Review findings and resolutions
+
+- The first focused test incorrectly searched attribute values for instruction words and matched the accessible label “Arcade playfield.”
+- Resolution: visible-copy validation now strips markup and verifies the rendered text content is empty, while accessible naming is tested separately.
+- Full changed-file review confirmed only the six issue-owned files changed, generated files exactly match source, and no forbidden application, engine, dependency, build, localization, private-creation, legacy, result, sharing, comparison, URL, or metrics file changed.
+- No independent approval is claimed; this is implementation-agent self-review evidence only.
+
+### Preview status
+
+Repository preview output verified: exact source/`docs` parity passed for `index.html` and `styles.css`. Live browser appearance was not verified because browser tooling and a complete repository checkout were unavailable.
+
+### Strategic review
+
+- A hidden structural shell is the smallest UX slice that can follow the merged lifecycle and input foundations without coupling future rendering to legacy challenge markup.
+- Absolute ordered layers, isolated stacking, bounded sizing, and contained overflow support future transform/opacity rendering without document-layout churn.
+- Empty visual layers and an empty polite status output avoid premature visual identity and unnecessary explanatory copy.
+
+### Product thinking
+
+1. A single dedicated surface lets the flagship game feel like an arcade experience instead of another static challenge card.
+2. Hidden-by-default behavior preserves the legacy fallback until the replacement is complete.
+3. One accessible named region and empty polite status output provide semantics without visible instructions.
+4. Parked idea: render the original flagship world only after separate assigned engine and experience contracts define movement, collision, score, and feedback.
+
+### Pull request outcome
+
+- Branch: `agent/issue-53-arcade-viewport`, created directly from `main` at `d8e12d52bbed0cee03b1b691b3d58781591ef7b9`.
+- The pull request targets `main` directly with `Closes #53`; its final head SHA and factual self-review are recorded in the PR conversation.
+- Merge remains intentionally pending independent `QA: PASS` and Coordinator review.
+
+### Next task
+
+Independent QA should verify hidden-by-default behavior, empty visible copy, accessible region/status semantics, no focusable descendants, layer order, isolation and overflow, 320 px and one 360–430 px browser width when available, reduced-motion equivalence, source/`docs` parity, legacy preservation, and strict file scope. Do not add flagship rendering or mechanics in this pull request.
+
 ## Cycle 19
 
 - **Date/time:** 2026-07-12T13:10:46+03:00
