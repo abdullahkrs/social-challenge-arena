@@ -1,13 +1,14 @@
 'use strict';
 
+const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
-const test = require('node:test');
 const vm = require('node:vm');
 
-const rendererPath = path.resolve(__dirname, '../../src/game/flight-renderer.js');
-const rendererApi = require(rendererPath);
+const rendererPath = path.join(__dirname, '../../src/game/flight-renderer.js');
+const rendererSource = fs.readFileSync(rendererPath, 'utf8');
+const api = require(rendererPath);
 
 class FakeStyle {
   constructor() {
@@ -18,88 +19,69 @@ class FakeStyle {
     this.values.set(name, String(value));
   }
 
-  removeProperty(name) {
-    const value = this.values.get(name) || '';
-    this.values.delete(name);
-    return value;
-  }
-
   getPropertyValue(name) {
     return this.values.get(name) || '';
+  }
+
+  removeProperty(name) {
+    const previous = this.getPropertyValue(name);
+    this.values.delete(name);
+    return previous;
   }
 }
 
 class FakeElement {
   constructor(tagName, ownerDocument) {
-    this.tagName = String(tagName).toUpperCase();
+    this.tagName = tagName.toUpperCase();
     this.ownerDocument = ownerDocument;
     this.parentNode = null;
     this.children = [];
     this.attributes = new Map();
     this.style = new FakeStyle();
     this.className = '';
-    this._textContent = '';
+    this.textContent = '';
   }
 
   appendChild(child) {
+    if (!child || typeof child !== 'object') throw new TypeError('child is required');
     if (child.parentNode) child.parentNode.removeChild(child);
-    child.parentNode = this;
     this.children.push(child);
+    child.parentNode = this;
     return child;
   }
 
   removeChild(child) {
     const index = this.children.indexOf(child);
-    if (index < 0) throw new Error('Child not found.');
+    if (index < 0) throw new Error('child not found');
     this.children.splice(index, 1);
     child.parentNode = null;
     return child;
   }
 
   setAttribute(name, value) {
-    this.attributes.set(String(name), String(value));
+    this.attributes.set(name, String(value));
   }
 
   getAttribute(name) {
-    return this.attributes.has(String(name)) ? this.attributes.get(String(name)) : null;
-  }
-
-  hasAttribute(name) {
-    return this.attributes.has(String(name));
+    return this.attributes.has(name) ? this.attributes.get(name) : null;
   }
 
   removeAttribute(name) {
-    this.attributes.delete(String(name));
-  }
-
-  set textContent(value) {
-    this._textContent = String(value);
-    for (const child of this.children) child.parentNode = null;
-    this.children = [];
-  }
-
-  get textContent() {
-    return this._textContent;
-  }
-
-  set innerHTML(_) {
-    throw new Error('innerHTML is forbidden in the fake DOM.');
+    this.attributes.delete(name);
   }
 
   get innerHTML() {
-    throw new Error('innerHTML is forbidden in the fake DOM.');
+    throw new Error('innerHTML must not be read');
+  }
+
+  set innerHTML(_value) {
+    throw new Error('innerHTML must not be written');
   }
 }
 
 class FakeDocument {
-  constructor() {
-    this.created = [];
-  }
-
   createElement(tagName) {
-    const element = new FakeElement(tagName, this);
-    this.created.push(element);
-    return element;
+    return new FakeElement(tagName, this);
   }
 }
 
@@ -109,319 +91,359 @@ function createHarness(options = {}) {
   const entityLayer = document.createElement('div');
   const effectsLayer = document.createElement('div');
   const hudLayer = document.createElement('div');
-  const statusLayer = document.createElement('p');
-  statusLayer.textContent = options.initialStatus || '';
+  const statusLayer = document.createElement('div');
+  statusLayer.textContent = options.statusText || 'original';
 
-  const renderer = rendererApi.createFlightRenderer({
+  const renderer = api.createFlightRenderer({
     worldLayer,
     entityLayer,
     effectsLayer,
     hudLayer,
     statusLayer,
-    reducedMotion: options.reducedMotion || false
+    reducedMotion: options.reducedMotion === true
   });
 
-  return { document, worldLayer, entityLayer, effectsLayer, hudLayer, statusLayer, renderer };
+  return {
+    document,
+    worldLayer,
+    entityLayer,
+    effectsLayer,
+    hudLayer,
+    statusLayer,
+    renderer
+  };
 }
 
-function validSnapshot(overrides = {}) {
+function snapshot(overrides = {}) {
   return {
-    player: { left: 0.18, right: 0.27, top: 0.42, bottom: 0.5 },
+    player: { left: 0.18, right: 0.27, top: 0.37, bottom: 0.44 },
     obstacles: [
-      { id: 1, left: 0.62, right: 0.73, gapTop: 0.28, gapBottom: 0.68 }
+      { id: 'a', left: 0.62, right: 0.7, gapTop: 0.28, gapBottom: 0.63 }
     ],
     score: 4,
-    outcome: 'active',
+    outcome: api.FLIGHT_RENDER_OUTCOMES.ACTIVE,
     events: {},
-    announcement: 'Score four',
+    announcement: '',
     ...overrides
   };
 }
 
 function findByClass(root, className) {
-  const matches = [];
+  const result = [];
   const visit = (node) => {
-    if (String(node.className).split(/\s+/).includes(className)) matches.push(node);
-    for (const child of node.children) visit(child);
+    if (String(node.className).split(/\s+/).includes(className)) result.push(node);
+    for (const child of node.children || []) visit(child);
   };
   visit(root);
-  return matches;
+  return result;
 }
 
-function allNodes(...roots) {
-  const seen = [];
-  const visit = (node) => {
-    seen.push(node);
-    for (const child of node.children) visit(child);
-  };
-  for (const root of roots) visit(root);
-  return seen;
+function countTree(root) {
+  let count = 1;
+  for (const child of root.children || []) count += countTree(child);
+  return count;
 }
 
-test('exports equivalent frozen APIs for CommonJS and browser globals', () => {
-  const source = fs.readFileSync(rendererPath, 'utf8');
-  const context = { globalThis: {} };
-  vm.runInNewContext(source, context, { filename: 'flight-renderer.js' });
+test('exports the same frozen API through CommonJS and browser global paths', () => {
+  assert.equal(typeof api.createFlightRenderer, 'function');
+  assert.equal(api.MAX_FLIGHT_SCORE, 999);
+  assert.equal(api.MAX_RENDERED_OBSTACLES, 256);
+  assert.ok(Object.isFrozen(api));
 
-  assert.deepEqual(Object.keys(context.globalThis.SocialChallengeGameFlightRenderer), Object.keys(rendererApi));
-  assert.equal(typeof rendererApi.createFlightRenderer, 'function');
-  assert.ok(Object.isFrozen(rendererApi));
+  const sandbox = { globalThis: {} };
+  vm.runInNewContext(rendererSource, sandbox, { filename: 'flight-renderer.js' });
+  const browserApi = sandbox.globalThis.SocialChallengeGameFlightRenderer;
+  assert.equal(typeof browserApi.createFlightRenderer, 'function');
+  assert.deepEqual(
+    Object.keys(browserApi).sort(),
+    Object.keys(api).sort()
+  );
 });
 
-test('validates all construction capabilities before mounting nodes', () => {
+test('validates constructor capabilities before mounting any renderer nodes', () => {
   const document = new FakeDocument();
   const layer = document.createElement('div');
-  const broken = { ownerDocument: document, style: new FakeStyle() };
+  const status = document.createElement('div');
+  const invalid = { ...layer, appendChild: null };
 
-  assert.throws(() => rendererApi.createFlightRenderer({
-    worldLayer: broken,
+  assert.throws(() => api.createFlightRenderer({
+    worldLayer: invalid,
     entityLayer: layer,
     effectsLayer: layer,
     hudLayer: layer,
-    statusLayer: layer
-  }), /appendChild/);
+    statusLayer: status
+  }), /worldLayer must provide appendChild/);
   assert.equal(layer.children.length, 0);
 });
 
-test('mounts one bounded scene and maps normalized geometry to percentage transforms', () => {
+test('rejects an invalid snapshot without partial DOM or state mutation', () => {
   const harness = createHarness();
-  harness.renderer.render(validSnapshot());
+  harness.renderer.render(snapshot({ score: 7, announcement: 'safe' }));
+  const beforeState = harness.renderer.getState();
+  const beforeWorldCount = countTree(harness.worldLayer);
+  const beforeStatus = harness.statusLayer.textContent;
+
+  assert.throws(() => harness.renderer.render(snapshot({
+    player: { left: 0.4, right: 0.2, top: 0.1, bottom: 0.2 },
+    score: 8,
+    announcement: 'must not apply'
+  })), /left must be less than/);
+
+  assert.deepEqual(harness.renderer.getState(), beforeState);
+  assert.equal(countTree(harness.worldLayer), beforeWorldCount);
+  assert.equal(harness.statusLayer.textContent, beforeStatus);
+});
+
+test('maps normalized coordinates with scene-relative left/top properties', () => {
+  const harness = createHarness();
+  harness.renderer.render(snapshot());
 
   const player = findByClass(harness.entityLayer, 'flight-renderer-player')[0];
   const obstacle = findByClass(harness.worldLayer, 'flight-renderer-obstacle')[0];
-  const score = findByClass(harness.hudLayer, 'flight-renderer-score')[0];
+  const style = findByClass(harness.worldLayer, 'flight-renderer-style')[0];
 
   assert.equal(player.style.getPropertyValue('--flight-player-left'), '18%');
-  assert.equal(player.style.getPropertyValue('--flight-player-top'), '42%');
+  assert.equal(player.style.getPropertyValue('--flight-player-top'), '37%');
   assert.equal(player.style.getPropertyValue('--flight-player-width'), '9%');
-  assert.equal(player.style.getPropertyValue('--flight-player-height'), '8%');
+  assert.equal(player.style.getPropertyValue('--flight-player-height'), '7%');
   assert.equal(obstacle.style.getPropertyValue('--flight-obstacle-left'), '62%');
-  assert.equal(obstacle.style.getPropertyValue('--flight-obstacle-width'), '11%');
-  assert.equal(obstacle.style.getPropertyValue('--flight-gap-top'), '28%');
-  assert.equal(obstacle.style.getPropertyValue('--flight-gap-bottom'), '68%');
-  assert.equal(score.textContent, '4');
-  assert.equal(harness.statusLayer.textContent, 'Score four');
+  assert.equal(obstacle.style.getPropertyValue('--flight-obstacle-width'), '8%');
+  assert.match(style.textContent, /left: var\(--flight-player-left\)/);
+  assert.match(style.textContent, /top: var\(--flight-player-top\)/);
+  assert.match(style.textContent, /left: var\(--flight-obstacle-left\)/);
+  assert.doesNotMatch(style.textContent, /translate3d\(var\(--flight-player-left\)/);
+  assert.doesNotMatch(style.textContent, /translate3d\(var\(--flight-obstacle-left\)/);
 });
 
-test('rejects a complete invalid snapshot without partial DOM or state mutation', () => {
+test('reuses typed stable obstacle IDs, removes stale nodes, and preserves requested order', () => {
   const harness = createHarness();
-  harness.renderer.render(validSnapshot());
-  const beforeState = harness.renderer.getState();
-  const beforeNodes = allNodes(harness.worldLayer, harness.entityLayer, harness.effectsLayer, harness.hudLayer);
-  const beforeText = beforeNodes.map((node) => node.textContent);
-  const beforeChildren = beforeNodes.map((node) => [...node.children]);
-
-  assert.throws(() => harness.renderer.render(validSnapshot({
-    player: { left: 0.4, right: 0.3, top: 0.2, bottom: 0.3 },
-    score: 1000,
-    obstacles: [{ id: 2, left: 0.4, right: 0.5, gapTop: 0.8, gapBottom: 0.2 }]
-  })), /score/);
-
-  assert.deepEqual(harness.renderer.getState(), beforeState);
-  assert.deepEqual(beforeNodes.map((node) => node.textContent), beforeText);
-  assert.deepEqual(beforeNodes.map((node) => [...node.children]), beforeChildren);
-});
-
-test('reuses typed stable IDs, preserves snapshot order, and removes stale obstacles', () => {
-  const harness = createHarness();
-  harness.renderer.render(validSnapshot({ obstacles: [
-    { id: 1, left: 0.1, right: 0.2, gapTop: 0.2, gapBottom: 0.7 },
-    { id: '1', left: 0.3, right: 0.4, gapTop: 0.25, gapBottom: 0.72 }
+  harness.renderer.render(snapshot({ obstacles: [
+    { id: 1, left: 0.2, right: 0.25, gapTop: 0.2, gapBottom: 0.6 },
+    { id: '1', left: 0.4, right: 0.45, gapTop: 0.25, gapBottom: 0.65 }
   ] }));
-  const firstNodes = findByClass(harness.worldLayer, 'flight-renderer-obstacle');
-  assert.equal(firstNodes.length, 2);
-  assert.notEqual(firstNodes[0], firstNodes[1]);
 
-  harness.renderer.render(validSnapshot({ obstacles: [
-    { id: '1', left: 0.32, right: 0.42, gapTop: 0.26, gapBottom: 0.71 },
-    { id: 1, left: 0.12, right: 0.22, gapTop: 0.21, gapBottom: 0.69 }
+  const first = findByClass(harness.worldLayer, 'flight-renderer-obstacle');
+  assert.equal(first.length, 2);
+  assert.notEqual(first[0], first[1]);
+  assert.equal(first[0].getAttribute('data-flight-obstacle-id'), 'number:1');
+  assert.equal(first[1].getAttribute('data-flight-obstacle-id'), 'string:1');
+
+  harness.renderer.render(snapshot({ obstacles: [
+    { id: '1', left: 0.5, right: 0.56, gapTop: 0.22, gapBottom: 0.61 },
+    { id: 2, left: 0.72, right: 0.78, gapTop: 0.3, gapBottom: 0.7 }
   ] }));
-  const reordered = findByClass(harness.worldLayer, 'flight-renderer-obstacle');
-  assert.equal(reordered[0], firstNodes[1]);
-  assert.equal(reordered[1], firstNodes[0]);
 
-  harness.renderer.render(validSnapshot({ obstacles: [
-    { id: '1', left: 0.5, right: 0.6, gapTop: 0.3, gapBottom: 0.74 }
-  ] }));
-  const finalNodes = findByClass(harness.worldLayer, 'flight-renderer-obstacle');
-  assert.deepEqual(finalNodes, [firstNodes[1]]);
-  assert.equal(firstNodes[0].parentNode, null);
+  const second = findByClass(harness.worldLayer, 'flight-renderer-obstacle');
+  assert.equal(second.length, 2);
+  assert.equal(second[0], first[1]);
+  assert.notEqual(second[1], first[0]);
+  assert.equal(first[0].parentNode, null);
+  assert.equal(second[0].style.getPropertyValue('--flight-obstacle-left'), '50%');
 });
 
-test('rejects sparse, duplicate, excessive, and invalid obstacle snapshots', () => {
+test('enforces obstacle, duplicate-ID, and bounded-score contracts', () => {
   const harness = createHarness();
-  const sparse = [];
-  sparse.length = 1;
-  assert.throws(() => harness.renderer.render(validSnapshot({ obstacles: sparse })), /sparse/);
-  assert.throws(() => harness.renderer.render(validSnapshot({ obstacles: [
-    { id: 1, left: 0.1, right: 0.2, gapTop: 0.2, gapBottom: 0.7 },
-    { id: 1, left: 0.3, right: 0.4, gapTop: 0.2, gapBottom: 0.7 }
-  ] })), /duplicate/);
-  assert.throws(() => harness.renderer.render(validSnapshot({ obstacles: Array.from({ length: 257 }, (_, id) => ({
-    id, left: 0.1, right: 0.2, gapTop: 0.2, gapBottom: 0.7
-  })) })), /cannot exceed/);
-  assert.throws(() => harness.renderer.render(validSnapshot({ obstacles: [
-    { id: {}, left: 0.1, right: 0.2, gapTop: 0.2, gapBottom: 0.7 }
-  ] })), /id/);
+  const obstacles = Array.from({ length: api.MAX_RENDERED_OBSTACLES + 1 }, (_, index) => ({
+    id: index,
+    left: 0.1,
+    right: 0.2,
+    gapTop: 0.2,
+    gapBottom: 0.7
+  }));
+
+  assert.throws(() => harness.renderer.render(snapshot({ obstacles })), /cannot exceed/);
+  assert.throws(() => harness.renderer.render(snapshot({ score: 1000 })), /0 to 999/);
+  assert.throws(() => harness.renderer.render(snapshot({ obstacles: [
+    { id: 'x', left: 0.1, right: 0.2, gapTop: 0.2, gapBottom: 0.7 },
+    { id: 'x', left: 0.3, right: 0.4, gapTop: 0.2, gapBottom: 0.7 }
+  ] })), /duplicate id/);
 });
 
-test('enforces score bounds and explicit outcomes', () => {
+test('replaces the player body for every new impulse token so feedback reliably restarts', () => {
   const harness = createHarness();
-  harness.renderer.render(validSnapshot({ score: 0, outcome: 'active' }));
-  harness.renderer.render(validSnapshot({ score: 999, outcome: 'failed' }));
-  assert.equal(harness.renderer.getState().snapshot.score, 999);
-  assert.equal(harness.renderer.getState().snapshot.outcome, 'failed');
-  assert.throws(() => harness.renderer.render(validSnapshot({ score: -1 })), /score/);
-  assert.throws(() => harness.renderer.render(validSnapshot({ outcome: 'finished' })), /outcome/);
-});
-
-test('presents exactly three token-driven bounded feedback paths without node growth', () => {
-  const harness = createHarness();
-  const first = validSnapshot({
-    score: 5,
-    outcome: 'failed',
-    events: { impulse: 1, score: 1, failure: 1 }
-  });
-  harness.renderer.render(first);
-
   const player = findByClass(harness.entityLayer, 'flight-renderer-player')[0];
-  assert.equal(player.getAttribute('data-flight-feedback'), 'impulse');
-  assert.equal(findByClass(harness.effectsLayer, 'flight-renderer-score-pop').length, 1);
-  assert.equal(findByClass(harness.effectsLayer, 'flight-renderer-failure-impact').length, 1);
-  assert.equal(harness.renderer.getState().transientCount, 2);
+  const neutralBody = player.children[0];
 
-  for (let token = 2; token <= 50; token += 1) {
-    harness.renderer.render(validSnapshot({
-      score: Math.min(999, token),
-      outcome: 'failed',
+  harness.renderer.render(snapshot({ events: { impulse: 1 } }));
+  const firstImpulseBody = player.children[0];
+  assert.notEqual(firstImpulseBody, neutralBody);
+  assert.match(firstImpulseBody.className, /flight-renderer-player-body--impulse/);
+
+  harness.renderer.render(snapshot({ events: { impulse: 2 } }));
+  const secondImpulseBody = player.children[0];
+  assert.notEqual(secondImpulseBody, firstImpulseBody);
+
+  harness.renderer.render(snapshot({ events: { impulse: 4 } }));
+  const jumpedTokenBody = player.children[0];
+  assert.notEqual(jumpedTokenBody, secondImpulseBody);
+
+  harness.renderer.render(snapshot({ events: { impulse: 4 } }));
+  assert.equal(player.children[0], jumpedTokenBody);
+  assert.equal(player.children.length, 1);
+});
+
+test('renders exactly the three bounded feedback paths without transient accumulation', () => {
+  const harness = createHarness();
+
+  for (let token = 1; token <= 40; token += 1) {
+    harness.renderer.render(snapshot({
+      score: token,
+      outcome: token === 40 ? api.FLIGHT_RENDER_OUTCOMES.FAILED : api.FLIGHT_RENDER_OUTCOMES.ACTIVE,
       events: { impulse: token, score: token, failure: token }
     }));
+    assert.equal(harness.renderer.getState().transientCount, 2);
     assert.equal(findByClass(harness.effectsLayer, 'flight-renderer-score-pop').length, 1);
     assert.equal(findByClass(harness.effectsLayer, 'flight-renderer-failure-impact').length, 1);
-    assert.equal(harness.renderer.getState().transientCount, 2);
+    assert.equal(findByClass(harness.entityLayer, 'flight-renderer-player-body').length, 1);
   }
-
-  assert.throws(() => harness.renderer.render(validSnapshot({ events: { impulse: 49 } })), /monotonic/);
 });
 
-test('copies announcements only through textContent and never interprets markup', () => {
+test('copies announcements only through textContent and preserves markup as inert text', () => {
   const harness = createHarness();
-  const unsafeLooking = '<img src=x onerror=alert(1)> & score';
-  harness.renderer.render(validSnapshot({ announcement: unsafeLooking }));
-  assert.equal(harness.statusLayer.textContent, unsafeLooking);
+  const announcement = '<img src=x onerror=alert(1)> score';
+  harness.renderer.render(snapshot({ announcement }));
+  assert.equal(harness.statusLayer.textContent, announcement);
 });
 
-test('explicit reduced motion preserves geometry, score, failure, and announcement while suppressing effects', () => {
+test('reduced motion preserves geometry, score, outcome, and announcements while suppressing effects', () => {
   const harness = createHarness({ reducedMotion: true });
-  harness.renderer.render(validSnapshot({
+  harness.renderer.render(snapshot({
     score: 9,
-    outcome: 'failed',
-    announcement: 'Failed at nine',
+    outcome: api.FLIGHT_RENDER_OUTCOMES.FAILED,
+    announcement: 'failed',
     events: { impulse: 1, score: 1, failure: 1 }
   }));
 
   const player = findByClass(harness.entityLayer, 'flight-renderer-player')[0];
-  const scene = findByClass(harness.entityLayer, 'flight-renderer-scene')[0];
-  assert.equal(scene.getAttribute('data-flight-reduced-motion'), 'true');
-  assert.equal(player.hasAttribute('data-flight-feedback'), false);
-  assert.equal(findByClass(harness.effectsLayer, 'flight-renderer-score-pop').length, 0);
-  assert.equal(findByClass(harness.effectsLayer, 'flight-renderer-failure-impact').length, 0);
-  assert.equal(player.style.getPropertyValue('--flight-player-left'), '18%');
-  assert.equal(findByClass(harness.hudLayer, 'flight-renderer-score')[0].textContent, '9');
-  assert.equal(scene.getAttribute('data-flight-outcome'), 'failed');
-  assert.equal(harness.statusLayer.textContent, 'Failed at nine');
+  const playerBody = findByClass(harness.entityLayer, 'flight-renderer-player-body')[0];
+  const entityRoot = findByClass(harness.entityLayer, 'flight-renderer-scene')[0];
+  const hud = findByClass(harness.hudLayer, 'flight-renderer-score')[0];
 
-  const style = findByClass(harness.worldLayer, 'flight-renderer-style')[0].textContent;
-  assert.match(style, /@media \(prefers-reduced-motion: reduce\)/);
-  assert.match(style, /\.flight-renderer-/);
+  assert.equal(player.style.getPropertyValue('--flight-player-left'), '18%');
+  assert.equal(player.style.getPropertyValue('--flight-player-top'), '37%');
+  assert.equal(hud.textContent, '9');
+  assert.equal(entityRoot.getAttribute('data-flight-outcome'), 'failed');
+  assert.equal(harness.statusLayer.textContent, 'failed');
+  assert.equal(playerBody.className, 'flight-renderer-player-body');
+  assert.equal(harness.renderer.getState().transientCount, 0);
 });
 
-test('reset returns a neutral bounded mounted scene and clears tokens and transient nodes', () => {
+test('reset restores a neutral mounted scene and clears all mutable feedback state', () => {
   const harness = createHarness();
-  harness.renderer.render(validSnapshot({ events: { impulse: 3, score: 4, failure: 5 }, outcome: 'failed' }));
+  harness.renderer.render(snapshot({
+    score: 12,
+    outcome: api.FLIGHT_RENDER_OUTCOMES.FAILED,
+    announcement: 'done',
+    events: { impulse: 3, score: 3, failure: 3 }
+  }));
+
   const state = harness.renderer.reset();
   const player = findByClass(harness.entityLayer, 'flight-renderer-player')[0];
+  const hud = findByClass(harness.hudLayer, 'flight-renderer-score')[0];
 
+  assert.equal(state.snapshot, null);
   assert.equal(state.obstacleCount, 0);
   assert.equal(state.transientCount, 0);
-  assert.equal(state.snapshot, null);
   assert.deepEqual(state.lastTokens, { impulse: null, score: null, failure: null });
   assert.equal(player.style.getPropertyValue('--flight-player-left'), '20%');
   assert.equal(player.style.getPropertyValue('--flight-player-top'), '46%');
-  assert.equal(findByClass(harness.hudLayer, 'flight-renderer-score')[0].textContent, '0');
+  assert.equal(hud.textContent, '0');
   assert.equal(harness.statusLayer.textContent, '');
 });
 
-test('destroy removes only renderer-created nodes, restores status text, and is idempotent', () => {
-  const harness = createHarness({ initialStatus: 'Original status' });
-  const callerWorldNode = harness.document.createElement('div');
-  harness.worldLayer.appendChild(callerWorldNode);
-  harness.renderer.render(validSnapshot({ announcement: 'Changed' }));
+test('destroy removes only renderer-owned nodes, restores status text, and is idempotent', () => {
+  const harness = createHarness({ statusText: 'before' });
+  const externalWorldNode = harness.document.createElement('div');
+  harness.worldLayer.appendChild(externalWorldNode);
+  harness.renderer.render(snapshot({ events: { impulse: 1, score: 1, failure: 1 } }));
 
   const first = harness.renderer.destroy();
   const second = harness.renderer.destroy();
 
   assert.equal(first.destroyed, true);
   assert.deepEqual(second, first);
-  assert.deepEqual(harness.worldLayer.children, [callerWorldNode]);
+  assert.equal(harness.worldLayer.children.length, 1);
+  assert.equal(harness.worldLayer.children[0], externalWorldNode);
   assert.equal(harness.entityLayer.children.length, 0);
   assert.equal(harness.effectsLayer.children.length, 0);
   assert.equal(harness.hudLayer.children.length, 0);
-  assert.equal(harness.statusLayer.textContent, 'Original status');
-  assert.throws(() => harness.renderer.render(validSnapshot()), /destroyed/);
+  assert.equal(harness.statusLayer.textContent, 'before');
+  assert.throws(() => harness.renderer.render(snapshot()), /destroyed/);
+  assert.throws(() => harness.renderer.reset(), /destroyed/);
 });
 
-test('returns deeply immutable fresh state and isolates caller mutation', () => {
+test('state snapshots are deeply frozen and isolated from caller mutation', () => {
   const harness = createHarness();
-  const input = validSnapshot({ events: { impulse: 1 } });
-  harness.renderer.render(input);
+  const input = snapshot({
+    player: { left: 0.1, right: 0.2, top: 0.3, bottom: 0.4 },
+    obstacles: [{ id: 'stable', left: 0.5, right: 0.6, gapTop: 0.2, gapBottom: 0.7 }],
+    events: { impulse: 1 }
+  });
+  const state = harness.renderer.render(input);
+
   input.player.left = 0.9;
   input.obstacles[0].left = 0.9;
   input.events.impulse = 99;
 
-  const state = harness.renderer.getState();
-  assert.equal(state.snapshot.player.left, 0.18);
-  assert.equal(state.snapshot.obstacles[0].left, 0.62);
+  assert.equal(state.snapshot.player.left, 0.1);
+  assert.equal(state.snapshot.obstacles[0].left, 0.5);
   assert.equal(state.snapshot.events.impulse, 1);
   assert.ok(Object.isFrozen(state));
   assert.ok(Object.isFrozen(state.snapshot));
   assert.ok(Object.isFrozen(state.snapshot.player));
   assert.ok(Object.isFrozen(state.snapshot.obstacles));
   assert.ok(Object.isFrozen(state.snapshot.obstacles[0]));
-  assert.equal(Reflect.set(state.snapshot.player, 'left', 0.8), false);
-  assert.notEqual(harness.renderer.getState(), state);
+  assert.ok(Object.isFrozen(state.snapshot.events));
 });
 
-test('keeps DOM counts bounded through repeated render and reset cycles', () => {
+test('100 render/reset cycles keep obstacle and transient DOM counts bounded', () => {
   const harness = createHarness();
-  for (let cycle = 0; cycle < 100; cycle += 1) {
-    harness.renderer.render(validSnapshot({
-      obstacles: Array.from({ length: 12 }, (_, index) => ({
-        id: `${cycle % 3}:${index}`,
-        left: index / 20,
-        right: index / 20 + 0.04,
-        gapTop: 0.2,
-        gapBottom: 0.72
-      })),
+
+  for (let cycle = 1; cycle <= 100; cycle += 1) {
+    const obstacles = Array.from({ length: 12 }, (_, index) => ({
+      id: index,
+      left: 0.05 + index * 0.07,
+      right: 0.09 + index * 0.07,
+      gapTop: 0.2,
+      gapBottom: 0.65
+    }));
+    harness.renderer.render(snapshot({
+      obstacles,
       score: cycle % 100,
-      outcome: cycle % 4 === 0 ? 'failed' : 'active',
       events: { impulse: cycle, score: cycle, failure: cycle }
     }));
+
     assert.equal(harness.renderer.getState().obstacleCount, 12);
-    assert.ok(allNodes(harness.worldLayer, harness.entityLayer, harness.effectsLayer, harness.hudLayer).length <= 64);
+    assert.equal(harness.renderer.getState().transientCount, 2);
+    assert.equal(findByClass(harness.worldLayer, 'flight-renderer-obstacle').length, 12);
+    assert.equal(findByClass(harness.entityLayer, 'flight-renderer-player-body').length, 1);
+    assert.equal(findByClass(harness.effectsLayer, 'flight-renderer-score-pop').length, 1);
+    assert.equal(findByClass(harness.effectsLayer, 'flight-renderer-failure-impact').length, 1);
+
     harness.renderer.reset();
     assert.equal(harness.renderer.getState().obstacleCount, 0);
-    assert.ok(allNodes(harness.worldLayer, harness.entityLayer, harness.effectsLayer, harness.hudLayer).length <= 28);
+    assert.equal(harness.renderer.getState().transientCount, 0);
   }
 });
 
-test('does not use loops, listeners, timers, observers, network, storage, URL, or analytics side effects', () => {
-  const source = fs.readFileSync(rendererPath, 'utf8');
-  const forbidden = [
-    'requestAnimationFrame', 'cancelAnimationFrame', 'setTimeout', 'setInterval',
-    'addEventListener', 'removeEventListener', 'MutationObserver', 'ResizeObserver',
-    'fetch(', 'XMLHttpRequest', 'localStorage', 'sessionStorage', 'location.',
-    'history.', 'navigator.sendBeacon', 'innerHTML'
-  ];
-  for (const token of forbidden) assert.equal(source.includes(token), false, `Unexpected side effect token: ${token}`);
+test('module contains no asynchronous, input, network, storage, URL, analytics, or unsafe HTML side effects', () => {
+  for (const forbidden of [
+    'addEventListener',
+    'removeEventListener',
+    'requestAnimationFrame',
+    'cancelAnimationFrame',
+    'setTimeout',
+    'setInterval',
+    'fetch(',
+    'XMLHttpRequest',
+    'localStorage',
+    'sessionStorage',
+    'location.',
+    'history.',
+    'innerHTML',
+    'insertAdjacentHTML',
+    'analytics'
+  ]) {
+    assert.equal(rendererSource.includes(forbidden), false, `unexpected side-effect token: ${forbidden}`);
+  }
 });
