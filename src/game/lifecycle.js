@@ -43,7 +43,8 @@
     let active = options.active !== false;
     let destroyed = false;
     let frameHandle = null;
-    let loopToken = 0;
+    let frameToken = 0;
+    let runToken = 0;
     let frameCount = 0;
     let elapsedMs = 0;
     let lastTimestamp = null;
@@ -70,7 +71,7 @@
     }
 
     function cancelPendingFrame() {
-      loopToken += 1;
+      frameToken += 1;
       if (frameHandle !== null) {
         cancelFrame(frameHandle);
         frameHandle = null;
@@ -93,6 +94,7 @@
     }
 
     function clearTransientResources() {
+      runToken += 1;
       cancelPendingFrame();
       clearTimeouts();
       clearIntervals();
@@ -111,13 +113,14 @@
         || status !== GAME_LIFECYCLE_STATES.RUNNING
         || frameHandle !== null) return getState();
 
-      const token = loopToken;
-      frameHandle = requestFrame(timestamp => {
-        frameHandle = null;
+      const token = frameToken;
+      let scheduledHandle = null;
+      scheduledHandle = requestFrame(timestamp => {
+        if (frameHandle === scheduledHandle) frameHandle = null;
         if (destroyed
           || !active
           || status !== GAME_LIFECYCLE_STATES.RUNNING
-          || token !== loopToken) return;
+          || token !== frameToken) return;
 
         const safeTimestamp = Number.isFinite(timestamp) ? timestamp : Date.now();
         const rawDelta = lastTimestamp === null ? 0 : Math.max(0, safeTimestamp - lastTimestamp);
@@ -137,8 +140,9 @@
         if (!destroyed
           && active
           && status === GAME_LIFECYCLE_STATES.RUNNING
-          && token === loopToken) scheduleFrame();
+          && token === frameToken) scheduleFrame();
       });
+      frameHandle = scheduledHandle;
 
       return getState();
     }
@@ -200,10 +204,14 @@
 
     function scheduleTimeout(callback, delayMs = 0) {
       if (destroyed || typeof callback !== 'function') return null;
+      const token = runToken;
       let handle = null;
       handle = setTimeoutFn(() => {
         timeoutHandles.delete(handle);
-        if (!destroyed && active && status === GAME_LIFECYCLE_STATES.RUNNING) callback();
+        if (!destroyed
+          && active
+          && status === GAME_LIFECYCLE_STATES.RUNNING
+          && token === runToken) callback();
       }, Math.max(0, Number(delayMs) || 0));
       timeoutHandles.add(handle);
       return handle;
@@ -211,8 +219,12 @@
 
     function scheduleInterval(callback, delayMs = 0) {
       if (destroyed || typeof callback !== 'function') return null;
+      const token = runToken;
       const handle = setIntervalFn(() => {
-        if (!destroyed && active && status === GAME_LIFECYCLE_STATES.RUNNING) callback();
+        if (!destroyed
+          && active
+          && status === GAME_LIFECYCLE_STATES.RUNNING
+          && token === runToken) callback();
       }, Math.max(0, Number(delayMs) || 0));
       intervalHandles.add(handle);
       return handle;
@@ -226,9 +238,13 @@
         || typeof type !== 'string'
         || typeof listener !== 'function') return () => {};
 
+      const token = runToken;
       let removed = false;
       const guardedListener = event => {
-        if (!destroyed && active && status === GAME_LIFECYCLE_STATES.RUNNING) {
+        if (!destroyed
+          && active
+          && status === GAME_LIFECYCLE_STATES.RUNNING
+          && token === runToken) {
           listener.call(target, event);
         }
       };
