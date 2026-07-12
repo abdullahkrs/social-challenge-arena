@@ -2,6 +2,92 @@
 
 Historical completed cycles 1–6 are preserved in [`TASK_LOG_ARCHIVE_CYCLES_1_6.md`](TASK_LOG_ARCHIVE_CYCLES_1_6.md), Cycles 7–8 in [`TASK_LOG_ARCHIVE_CYCLES_7_8.md`](TASK_LOG_ARCHIVE_CYCLES_7_8.md), Cycle 9 in [`TASK_LOG_ARCHIVE_CYCLE_9.md`](TASK_LOG_ARCHIVE_CYCLE_9.md), Cycle 10 in [`TASK_LOG_ARCHIVE_CYCLE_10.md`](TASK_LOG_ARCHIVE_CYCLE_10.md), Cycle 11 in [`TASK_LOG_ARCHIVE_CYCLE_11.md`](TASK_LOG_ARCHIVE_CYCLE_11.md), Cycle 12 in [`TASK_LOG_ARCHIVE_CYCLE_12.md`](TASK_LOG_ARCHIVE_CYCLE_12.md), Cycle 13 in [`TASK_LOG_ARCHIVE_CYCLE_13.md`](TASK_LOG_ARCHIVE_CYCLE_13.md), Cycle 14 in [`TASK_LOG_ARCHIVE_CYCLE_14.md`](TASK_LOG_ARCHIVE_CYCLE_14.md), Cycle 15 in [`TASK_LOG_ARCHIVE_CYCLE_15.md`](TASK_LOG_ARCHIVE_CYCLE_15.md), and Cycle 16 in [`TASK_LOG_ARCHIVE_CYCLE_16.md`](TASK_LOG_ARCHIVE_CYCLE_16.md). This file remains the active source of truth for the current cycle.
 
+## Cycle 22
+
+- **Date/time:** 2026-07-12T19:33:47+03:00
+- **Status:** implementation complete on the existing issue branch; pull request and independent QA pending
+- **Owner role:** `agent-engine`
+- **Selected task:** Add deterministic one-touch flight collision and bounded pass scoring for Stage 12 under Issue #57.
+- **Goal:** Add the smallest dependency-free flight-rule model that validates normalized frame snapshots, detects terminal boundary or corridor failure, awards one bounded point per uniquely passed obstacle, resets exactly, and exposes immutable state without rendering or integration.
+- **Why selected:** Issue #57 is the only open assignment, explicitly identifies `agent-engine` and `ready-for-agent`, depends only on merged PRs #50, #52, #54, and #56, owns three non-overlapping files, and has no open implementation pull request. An interrupted earlier run had already created the branch and source/test commits; this continuation added the required cycle contract before any further product edit and then reviewed that existing work.
+- **Viral-loop impact:** Deterministic failure and exactly-once bounded scoring protect replay fairness, friend attempts, result comparison, and share-again behavior when the flagship is later connected to the existing social loop; no result, share, comparison, URL, navigation, or metrics system is modified or duplicated.
+
+### Acceptance contract
+
+- **Player decision and input:** The future player still decides only when to impulse. This rule module consumes explicit snapshots and creates no keyboard, pointer, or touch listener.
+- **Movement model:** None. The module does not advance position, gravity, velocity, obstacle motion, or time; it evaluates finite normalized axis-aligned player and corridor geometry supplied by the caller.
+- **Failure condition:** `top` or `bottom` boundary contact fails immediately. Horizontal player/obstacle edge contact is conservatively treated as overlap, and touching or leaving either safe-gap edge fails. Failure is terminal until `reset()`.
+- **Scoring model:** One point is awarded once per stable string or non-negative safe-integer obstacle ID only when the obstacle is strictly behind the player. Repeated or reordered frames cannot rescore an ID. Score and retained scored-ID history are capped by a configured safe integer from 0 to the strict exported maximum of 999.
+- **Escalation:** None. Obstacle generation, movement, speed, spacing, recycling, and difficulty remain deferred.
+- **Feedback effects:** None. The module reports immutable outcome state only; impact, score pop, particles, shake, sound, danger feedback, and result transitions remain experience work.
+- **Reduced-motion behavior:** Collision, failure, and scoring decisions are presentation-neutral and unchanged because the module creates no visual motion.
+- **Teardown behavior:** The module creates no frame, timer, interval, listener, DOM node, storage, URL, network, analytics, or other asynchronous/browser resource. `reset()` clears terminal failure, score, and passed IDs exactly.
+- **Social-loop reuse:** Existing result, share, friend-attempt, comparison, share-again, strict URL validation, navigation, and metrics systems remain unchanged.
+
+### Expected files
+
+- `TASK_LOG.md`
+- `src/game/flight-rules.js`
+- `test/game/flight-rules.test.js`
+
+### Non-goals
+
+- No obstacle generation, movement, randomness, recycling, rendering, visible player, effects, sound, difficulty, lifecycle wiring, application wiring, localization, legacy work, dependency, generic collision library, or social-loop implementation.
+- No edits to merged motion, lifecycle, input, viewport, build inputs, generated preview files, package metadata, URL codecs, metrics, or private challenge behavior.
+
+### Completed work
+
+- Recovered the existing branch `agent/issue-57-flight-rules`, confirmed it starts from current `main` at `20d47915b2c47e8de54d887c541671eb181c124d`, and confirmed the only branch changes before this log entry were the two issue-owned source/test files.
+- Added one UMD/CommonJS-compatible `SocialChallengeGameFlightRules` module with explicit active/failed outcomes, neutral/top/bottom contacts, strict normalized geometry/configuration validation, duplicate-ID and sparse-array rejection, deterministic ID ordering, conservative edge semantics, terminal failure, exactly-once scoring, strict score cap, exact reset, and immutable snapshots.
+- Added sixteen focused dependency-free tests covering browser/CommonJS export, configuration isolation, malformed geometry without partial mutation, duplicate IDs, list bounds, top/bottom failure, edge contact, deterministic obstacle failure selection, safe corridor passage, strict-behind scoring, repeated/reordered frames, score cap, terminal freeze, reset replay, snapshot immutability, caller-mutation isolation, and absence of browser/async side effects.
+
+### Tests and checks
+
+- Runtime: Node.js v22.16.0; npm 10.9.2.
+- `node --check src/game/flight-rules.js`: passed against exact branch source content reconstructed from blob `e779d976b5d5163a5177d9cc0a7e9ee689c8314c`.
+- `node --check test/game/flight-rules.test.js`: passed against exact branch test content reconstructed from blob `e0f8e405dad7775e5e15beb85ef9dee7ed80d7fa`.
+- Current focused `npm test`: passed with 16 tests, 0 failures, 0 skipped, and 0 cancelled in a reconstructed workspace containing the exact branch source/test and repository package contract.
+- Current `npm run build`: passed in a reconstructed build-contract workspace using the exact repository `package.json` and `scripts/build.js`; nine representative unchanged required inputs were copied to 18 matching `dist/` and `docs/` outputs.
+- A complete repository checkout and repository-wide test count remain unavailable because the runtime cannot resolve `github.com`; no full-suite count or deployed preview claim is made.
+- No lint or type-check script is configured.
+
+### Review findings and resolutions
+
+- Full rule review confirms all frame geometry is validated and normalized before state mutation, preventing malformed or duplicate-ID frames from partially scoring or failing.
+- Obstacle inputs are canonically sorted by stable primitive ID before collision or simultaneous scoring, making failure selection and passed-ID sequence independent of caller ordering.
+- Conservative contact semantics are explicit: horizontal edge contact remains overlapping, safe-gap edge contact fails, and passage scoring requires strict horizontal separation.
+- Failure is evaluated before scoring, so a boundary or corridor collision cannot award points from another obstacle in the same frame.
+- Configuration is copied and frozen; state reads return fresh frozen objects with a fresh frozen passed-ID array; failure objects are frozen; no mutable Set is exposed.
+- Static review found no timer, frame, listener, DOM, dependency, network, URL, storage, analytics, identity, personal data, secret, rendering, obstacle-generation, lifecycle-wiring, localization, legacy, or social-loop path.
+- No independent approval is claimed; this is implementation-agent self-review evidence only.
+
+### Preview status
+
+Preview not verified: this isolated rule model is intentionally not wired to user-facing preview output, and no build input or `docs/` file changes.
+
+### Strategic review
+
+- Collision and bounded pass scoring are the smallest Stage 12 rule boundary after merged lifecycle, action input, viewport, and flight motion.
+- A challenge-specific pure module keeps fairness and failure testable without creating a general-purpose engine or coupling rules to rendering.
+- Strict normalized geometry, stable IDs, terminal failure, and a safe score cap prepare later reuse of the existing comparison and sharing flow without modifying it now.
+
+### Product thinking
+
+1. The meaningful skill remains impulse timing; collision converts that timing into an unambiguous terminal outcome.
+2. Normalized geometry preserves the same rule decisions across 320 px and larger mobile viewports.
+3. Stable typed IDs and once-only scoring prevent duplicate points during repeated, reordered, or later recycled snapshots.
+4. Strict score bounds and immutable state prepare safe future shared-score validation and friend comparison.
+5. Parked idea: after independent QA and merge, assign a separate Game Experience issue for an original vector player/world renderer with purposeful collision, score, danger, and result feedback plus reduced-motion equivalents, without yet wiring the complete flagship flow.
+
+### Pull request outcome
+
+- Branch: `agent/issue-57-flight-rules`, based directly on `main` at `20d47915b2c47e8de54d887c541671eb181c124d`.
+- Pull request: pending creation after final branch update and diff review; it will target `main` directly with `Closes #57` and remain unmerged for independent QA.
+
+### Next task
+
+Independent QA should verify exact base/head SHA, strict three-file scope, all geometry/configuration rejection without partial mutation, conservative contact semantics, boundary and obstacle failure, failure-before-score ordering, exactly-once typed-ID scoring, deterministic reordered frames and reset replay, safe-integer cap, immutable snapshots, caller-mutation isolation, and absence of async/browser resources or forbidden integration.
+
 ## Cycle 21
 
 - **Date/time:** 2026-07-12T17:09:25+03:00
@@ -328,7 +414,7 @@ Independent QA should re-review Issue #51 and corrected PR #52, especially stand
 - Current repository test command `npm test`: passed in a reconstructed focused workspace containing the exact final branch lifecycle source, lifecycle test, and repository `package.json`; 7 tests passed and 0 failed.
 - Focused tests cover valid and invalid transitions, one-loop enforcement, bounded delta time, replay reset, zero resumed delta after a long inactive gap, timeout and interval invalidation across reactivation, stale prior-run callbacks, hidden/inactive input blocking, stale cancelled-frame isolation, and complete finish/teardown cleanup.
 - Current build command `npm run build`: passed with the exact repository `package.json` and `scripts/build.js` in a reconstructed build-contract workspace; all 9 required inputs were represented and all 18 generated `dist/` and `docs/` copies matched their inputs.
-- Fresh branch blob-SHA parity was verified for all nine unchanged source/`docs/` build-input pairs: `index.html`, `styles.css`, `catalog-bootstrap.js`, `app.js`, `lane-guard.js`, `metrics.js`, `create.html`, `private.css`, and `private.js`.
+- Fresh branch blob-SHA parity was verified for all nine unchanged source/`docs` build-input pairs: `index.html`, `styles.css`, `catalog-bootstrap.js`, `app.js`, `lane-guard.js`, `metrics.js`, `create.html`, `private.css`, and `private.js`.
 - A complete repository checkout and repository-wide test execution were unavailable because the runtime could not resolve `github.com`; no full-suite count beyond the exact focused workspace is claimed.
 - No lint or type-check script is configured. No GitHub Actions workflow run exists for the PR head.
 
@@ -352,7 +438,7 @@ Independent QA should re-review Issue #51 and corrected PR #52, especially stand
 
 ### Preview status
 
-Repository preview output verified: all nine unchanged source/`docs/` build-input pairs have identical branch blob SHAs. The new lifecycle module is intentionally not wired into the user-facing preview in this foundation-only issue.
+Repository preview output verified: all nine unchanged source/`docs` build-input pairs have identical branch blob SHAs. The new lifecycle module is intentionally not wired into the user-facing preview in this foundation-only issue.
 
 ### Strategic review
 
@@ -429,7 +515,7 @@ Independent QA should re-review issue #49 and the corrected PR #50 head, especia
 - `npm test`: passed with 5 focused experiment-contract tests and 0 failures using the exact branch versions of `EXPERIMENTS.md`, `METRICS.md`, and `test/experiment-contract.test.js` in the reconstructed workspace.
 - The focused tests verify the explicitly unrun status, fixed cohort and challenge, exact eleven-event sharer and friend snapshots, nine identical formulas, 70%/50%/40% threshold consistency, one-bottleneck decision rule, and aggregate-only privacy boundary.
 - `npm run build`: passed with the exact repository `package.json` and `scripts/build.js` in a reconstructed build-contract workspace; the nine unchanged required inputs were represented locally and all 18 generated `dist/` and `docs/` copies matched their corresponding inputs.
-- GitHub blob-SHA parity was verified for all nine actual source/`docs/` pairs on the branch: `index.html`, `styles.css`, `catalog-bootstrap.js`, `app.js`, `lane-guard.js`, `metrics.js`, `create.html`, `private.css`, and `private.js`.
+- GitHub blob-SHA parity was verified for all nine actual source/`docs` pairs on the branch: `index.html`, `styles.css`, `catalog-bootstrap.js`, `app.js`, `lane-guard.js`, `metrics.js`, `create.html`, `private.css`, and `private.js`.
 - A complete repository checkout and repository-wide test execution were unavailable because the execution environment could not resolve `github.com`; no full-suite test count is claimed.
 - No lint or type-check script is configured.
 
