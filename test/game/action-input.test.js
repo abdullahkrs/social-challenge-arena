@@ -108,6 +108,22 @@ test('normalizes Space, Enter, and Arrow Up to immutable keyboard actions', () =
   assert.equal(actions[0], actions[1]);
 });
 
+test('accepts numpad Enter as one immutable keyboard action', () => {
+  const { input, keyboardTarget, actions } = createInput({ preventDefault: true });
+  input.attach();
+  const event = createEvent({ code: 'NumpadEnter', key: 'Enter' });
+
+  keyboardTarget.dispatch('keydown', event);
+
+  assert.equal(actions.length, 1);
+  assert.deepEqual(actions[0], {
+    type: PRIMARY_ACTION_TYPE,
+    source: ACTION_INPUT_SOURCES.KEYBOARD
+  });
+  assert.equal(Object.isFrozen(actions[0]), true);
+  assert.equal(event.prevented, 1);
+});
+
 test('rejects repeat, modifier, unrelated, and editable-target keyboard input', () => {
   const { input, keyboardTarget, actions } = createInput({ preventDefault: true });
   input.attach();
