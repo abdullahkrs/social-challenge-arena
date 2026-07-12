@@ -64,6 +64,14 @@
         <p class="game-instruction" id="game-instruction">Tap fast until time runs out.</p>
       </header>
 
+      <div class="arcade-viewport" id="arcade-viewport" role="region" aria-label="Arcade playfield" hidden>
+        <div class="arcade-layer arcade-world-layer" aria-hidden="true"></div>
+        <div class="arcade-layer arcade-entity-layer" aria-hidden="true"></div>
+        <div class="arcade-layer arcade-effects-layer" aria-hidden="true"></div>
+        <div class="arcade-layer arcade-hud-layer" aria-hidden="true"></div>
+        <p class="sr-only arcade-status" id="arcade-status" aria-live="polite" aria-atomic="true"></p>
+      </div>
+
       <div class="scoreboard" aria-label="Challenge status">
         <div class="stat">
           <strong id="time-value">20</strong>
