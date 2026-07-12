@@ -13,6 +13,7 @@
   const MAX_SPEED_INCREASE_PER_SECOND = 4;
   const MAX_RECYCLES_PER_ADVANCE = 4096;
   const MAX_TOTAL_RECYCLES = 1000000;
+  const PRECISION_DIGITS = 12;
 
   const DEFAULT_GAP_PATTERN = Object.freeze([
     Object.freeze({ gapTop: 0.12, gapBottom: 0.48 }),
@@ -40,6 +41,21 @@
 
   function isObject(value) {
     return value !== null && typeof value === 'object' && !Array.isArray(value);
+  }
+
+  function normalizeFloat(value) {
+    if (Object.is(value, -0)) return 0;
+    return Number(value.toFixed(PRECISION_DIGITS));
+  }
+
+  function normalizeBounds(leftValue, rightValue) {
+    let left = normalizeFloat(leftValue);
+    let right = normalizeFloat(rightValue);
+    if (!(left < right)) {
+      left = leftValue;
+      right = rightValue;
+    }
+    return { left, right };
   }
 
   function rejectUnknownKeys(object, allowedKeys, owner) {
@@ -113,20 +129,41 @@
 
   function distanceAt(config, elapsedMs) {
     const elapsedSeconds = elapsedMs / 1000;
-    const accelerationSeconds = (config.maxSpeed - config.initialSpeed)
+    const secondsToCap = (config.maxSpeed - config.initialSpeed)
       / config.speedIncreasePerSecond;
-    const acceleratingSeconds = Math.min(elapsedSeconds, accelerationSeconds);
-    const cappedSeconds = Math.max(0, elapsedSeconds - accelerationSeconds);
+    const acceleratingSeconds = Math.min(elapsedSeconds, secondsToCap);
+    const cappedSeconds = Math.max(0, elapsedSeconds - secondsToCap);
 
     return (config.initialSpeed * acceleratingSeconds)
       + (0.5 * config.speedIncreasePerSecond * acceleratingSeconds * acceleratingSeconds)
       + (config.maxSpeed * cappedSeconds);
   }
 
-  function estimateRecycleBoundForDistance(config, distance) {
-    const rounds = Math.ceil(distance / config.cycleSpan) + 1;
-    const estimate = config.obstacleCount * rounds;
-    return Number.isSafeInteger(estimate) ? estimate : Number.POSITIVE_INFINITY;
+  function firstSequenceIndexAt(config, distance) {
+    const firstExitDistance = config.initialLeft + config.obstacleWidth;
+    if (distance < firstExitDistance) return 0;
+    return Math.floor((distance - firstExitDistance) / config.step) + 1;
+  }
+
+  function validateRunBounds(config) {
+    const maxStepDistance = config.maxSpeed * (config.maxDeltaMs / 1000);
+    const maxPerAdvance = Math.ceil(maxStepDistance / config.step) + 1;
+    if (!Number.isSafeInteger(maxPerAdvance)
+      || maxPerAdvance > MAX_RECYCLES_PER_ADVANCE) {
+      throw new RangeError('Configuration could require too many recycling operations in one advance.');
+    }
+
+    const maxDistance = distanceAt(config, config.maxRunMs);
+    const maxRecycles = firstSequenceIndexAt(config, maxDistance);
+    if (!Number.isSafeInteger(maxRecycles)
+      || maxRecycles > MAX_TOTAL_RECYCLES) {
+      throw new RangeError('Configuration could require too many recycling operations in one run.');
+    }
+
+    const maximumNextId = config.initialId + maxRecycles + config.obstacleCount;
+    if (!Number.isSafeInteger(maximumNextId)) {
+      throw new RangeError('Configuration cannot preserve safe monotonic obstacle IDs for the bounded run.');
+    }
   }
 
   function createConfig(options) {
@@ -187,7 +224,7 @@
       throw new RangeError('The initial obstacle layout must fit within the normalized world.');
     }
 
-    const partialConfig = {
+    const config = Object.freeze({
       obstacleCount,
       obstacleWidth,
       spacing,
@@ -201,140 +238,75 @@
       initialId,
       step,
       cycleSpan
-    };
-
-    const maxStepDistance = maxSpeed * (maxDeltaMs / 1000);
-    const maxTotalDistance = distanceAt(partialConfig, maxRunMs);
-    const maxPerAdvance = estimateRecycleBoundForDistance(partialConfig, maxStepDistance);
-    const maxTotalRecycles = estimateRecycleBoundForDistance(partialConfig, maxTotalDistance);
-    if (maxPerAdvance > MAX_RECYCLES_PER_ADVANCE) {
-      throw new RangeError('Configuration could require too many recycling operations in one advance.');
-    }
-    if (maxTotalRecycles > MAX_TOTAL_RECYCLES) {
-      throw new RangeError('Configuration could require too many recycling operations in one run.');
-    }
-
-    const maximumNextId = initialId + obstacleCount + maxTotalRecycles;
-    if (!Number.isSafeInteger(maximumNextId)) {
-      throw new RangeError('Configuration cannot preserve safe monotonic obstacle IDs for the bounded run.');
-    }
-
-    return Object.freeze({
-      ...partialConfig,
-      maxTotalRecycles
     });
-  }
-
-  function createInitialState(config) {
-    const obstacles = [];
-    for (let index = 0; index < config.obstacleCount; index += 1) {
-      const left = config.initialLeft + (index * config.step);
-      const gap = config.gapPattern[index % config.gapPattern.length];
-      obstacles.push({
-        id: config.initialId + index,
-        left,
-        right: left + config.obstacleWidth,
-        gapTop: gap.gapTop,
-        gapBottom: gap.gapBottom
-      });
-    }
-
-    return {
-      elapsedMs: 0,
-      speed: config.initialSpeed,
-      nextPatternIndex: config.obstacleCount % config.gapPattern.length,
-      nextId: config.initialId + config.obstacleCount,
-      obstacles
-    };
-  }
-
-  function freezeObstacle(obstacle) {
-    return Object.freeze({
-      id: obstacle.id,
-      left: Math.max(0, Math.min(1, obstacle.left)),
-      right: Math.max(0, Math.min(1, obstacle.right)),
-      gapTop: obstacle.gapTop,
-      gapBottom: obstacle.gapBottom
-    });
+    validateRunBounds(config);
+    return config;
   }
 
   function createFlightObstacles(options = {}) {
     const config = createConfig(options);
-    let state = createInitialState(config);
+    let elapsedMs = 0;
 
-    function getState() {
+    function buildState() {
+      const distance = distanceAt(config, elapsedMs);
+      const firstSequenceIndex = firstSequenceIndexAt(config, distance);
+      const firstRawLeft = config.initialLeft
+        + (firstSequenceIndex * config.step)
+        - distance;
+      const obstacles = [];
+
+      for (let offset = 0; offset < config.obstacleCount; offset += 1) {
+        const sequenceIndex = firstSequenceIndex + offset;
+        const id = config.initialId + sequenceIndex;
+        const rawLeft = firstRawLeft + (offset * config.step);
+        const rawRight = rawLeft + config.obstacleWidth;
+        const gap = config.gapPattern[sequenceIndex % config.gapPattern.length];
+        const clippedLeft = Math.max(0, rawLeft);
+        const clippedRight = Math.min(1, rawRight);
+        const { left, right } = normalizeBounds(clippedLeft, clippedRight);
+
+        obstacles.push(Object.freeze({
+          id,
+          left,
+          right,
+          gapTop: gap.gapTop,
+          gapBottom: gap.gapBottom
+        }));
+      }
+
+      const nextId = config.initialId + firstSequenceIndex + config.obstacleCount;
       return Object.freeze({
-        elapsedMs: state.elapsedMs,
-        speed: state.speed,
-        nextPatternIndex: state.nextPatternIndex,
-        nextId: state.nextId,
-        obstacles: Object.freeze(state.obstacles.map(freezeObstacle))
+        elapsedMs: normalizeFloat(elapsedMs),
+        speed: normalizeFloat(speedAt(config, elapsedMs)),
+        nextPatternIndex: (firstSequenceIndex + config.obstacleCount)
+          % config.gapPattern.length,
+        nextId,
+        obstacles: Object.freeze(obstacles)
       });
     }
 
+    function getState() {
+      return buildState();
+    }
+
     function reset() {
-      state = createInitialState(config);
-      return getState();
+      elapsedMs = 0;
+      return buildState();
     }
 
     function advance(deltaMs) {
-      if (typeof deltaMs !== 'number' || !Number.isFinite(deltaMs) || deltaMs <= 0) {
-        return getState();
+      if (typeof deltaMs !== 'number' || !Number.isFinite(deltaMs)
+        || deltaMs <= 0 || elapsedMs >= config.maxRunMs) {
+        return buildState();
       }
-      if (state.elapsedMs >= config.maxRunMs) return getState();
 
       const acceptedDeltaMs = Math.min(
         deltaMs,
         config.maxDeltaMs,
-        config.maxRunMs - state.elapsedMs
+        config.maxRunMs - elapsedMs
       );
-      if (!(acceptedDeltaMs > 0)) return getState();
-
-      const nextElapsedMs = state.elapsedMs + acceptedDeltaMs;
-      const travel = distanceAt(config, nextElapsedMs) - distanceAt(config, state.elapsedMs);
-      const obstacles = state.obstacles.map((obstacle) => ({
-        id: obstacle.id,
-        left: obstacle.left - travel,
-        right: obstacle.right - travel,
-        gapTop: obstacle.gapTop,
-        gapBottom: obstacle.gapBottom
-      }));
-      let nextPatternIndex = state.nextPatternIndex;
-      let nextId = state.nextId;
-      let recycleCount = 0;
-
-      while (obstacles[0].right <= 0) {
-        recycleCount += 1;
-        if (recycleCount > MAX_RECYCLES_PER_ADVANCE) {
-          throw new RangeError('Recycling operation bound exceeded.');
-        }
-        if (!Number.isSafeInteger(nextId) || nextId < 0) {
-          throw new RangeError('No safe monotonic obstacle ID remains.');
-        }
-
-        const recycled = obstacles.shift();
-        const last = obstacles.length > 0 ? obstacles[obstacles.length - 1] : recycled;
-        const left = last.right + config.spacing;
-        const gap = config.gapPattern[nextPatternIndex];
-        obstacles.push({
-          id: nextId,
-          left,
-          right: left + config.obstacleWidth,
-          gapTop: gap.gapTop,
-          gapBottom: gap.gapBottom
-        });
-        nextId += 1;
-        nextPatternIndex = (nextPatternIndex + 1) % config.gapPattern.length;
-      }
-
-      state = {
-        elapsedMs: nextElapsedMs,
-        speed: speedAt(config, nextElapsedMs),
-        nextPatternIndex,
-        nextId,
-        obstacles
-      };
-      return getState();
+      elapsedMs = normalizeFloat(elapsedMs + acceptedDeltaMs);
+      return buildState();
     }
 
     return Object.freeze({ advance, reset, getState });
