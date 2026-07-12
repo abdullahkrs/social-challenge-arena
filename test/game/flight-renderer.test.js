@@ -215,6 +215,27 @@ test('maps normalized coordinates with scene-relative left/top properties', () =
   assert.doesNotMatch(style.textContent, /translate3d\(var\(--flight-obstacle-left\)/);
 });
 
+test('preserves exact normalized player geometry at 320px including an edge placement', () => {
+  const harness = createHarness();
+  harness.renderer.render(snapshot({
+    player: { left: 0.9, right: 0.99, top: 0.12, bottom: 0.19 }
+  }));
+
+  const player = findByClass(harness.entityLayer, 'flight-renderer-player')[0];
+  const style = findByClass(harness.worldLayer, 'flight-renderer-style')[0];
+  const playfieldWidth = 280;
+  const left = Number.parseFloat(player.style.getPropertyValue('--flight-player-left')) * playfieldWidth / 100;
+  const width = Number.parseFloat(player.style.getPropertyValue('--flight-player-width')) * playfieldWidth / 100;
+  const right = left + width;
+  const playerRule = style.textContent.match(/\.flight-renderer-player \{([\s\S]*?)\n\}/)[1];
+
+  assert.equal(Math.round(left * 10) / 10, 252);
+  assert.equal(Math.round(width * 10) / 10, 25.2);
+  assert.equal(Math.round(right * 10) / 10, 277.2);
+  assert.ok(right <= playfieldWidth);
+  assert.doesNotMatch(playerRule, /min-(?:width|height|inline-size|block-size)/);
+});
+
 test('reuses typed stable obstacle IDs, removes stale nodes, and preserves requested order', () => {
   const harness = createHarness();
   harness.renderer.render(snapshot({ obstacles: [
@@ -303,6 +324,24 @@ test('copies announcements only through textContent and preserves markup as iner
   const announcement = '<img src=x onerror=alert(1)> score';
   harness.renderer.render(snapshot({ announcement }));
   assert.equal(harness.statusLayer.textContent, announcement);
+});
+
+test('system reduced-motion CSS hides retained score and failure overlays', () => {
+  const harness = createHarness();
+  harness.renderer.render(snapshot({
+    score: 9,
+    outcome: api.FLIGHT_RENDER_OUTCOMES.FAILED,
+    events: { score: 1, failure: 1 }
+  }));
+
+  const style = findByClass(harness.worldLayer, 'flight-renderer-style')[0];
+  assert.equal(harness.renderer.getState().transientCount, 2);
+  assert.equal(findByClass(harness.effectsLayer, 'flight-renderer-score-pop').length, 1);
+  assert.equal(findByClass(harness.effectsLayer, 'flight-renderer-failure-impact').length, 1);
+  assert.match(
+    style.textContent,
+    /@media \(prefers-reduced-motion: reduce\) \{[\s\S]*?\.flight-renderer-score-pop,\s*\.flight-renderer-failure-impact \{\s*display: none !important;\s*animation: none !important;\s*\}/
+  );
 });
 
 test('reduced motion preserves geometry, score, outcome, and announcements while suppressing effects', () => {
