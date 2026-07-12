@@ -270,7 +270,7 @@ Repository preview output verified: exact source/`docs` parity passed for `index
 
 ### Next task
 
-Independent QA should verify hidden-by-default behavior, empty visible copy, accessible region/status semantics, no focusable descendants, layer order, isolation and overflow, 320 px and one 360–430 px browser width when available, reduced-motion equivalence, source/`docs` parity, legacy preservation, and strict file scope. Do not add flagship rendering or mechanics in this pull request.
+Independent QA should verify hidden-by-default behavior, empty visible copy, accessible region/status semantics, no focusable descendants, layer order, isolation and overflow, 320 px and one 360–430 px browser width when available, reduced-motion equivalence, source/`docs/` parity, legacy preservation, and strict file scope. Do not add flagship rendering or mechanics in this pull request.
 
 ## Cycle 19
 
@@ -414,7 +414,7 @@ Independent QA should re-review Issue #51 and corrected PR #52, especially stand
 - Current repository test command `npm test`: passed in a reconstructed focused workspace containing the exact final branch lifecycle source, lifecycle test, and repository `package.json`; 7 tests passed and 0 failed.
 - Focused tests cover valid and invalid transitions, one-loop enforcement, bounded delta time, replay reset, zero resumed delta after a long inactive gap, timeout and interval invalidation across reactivation, stale prior-run callbacks, hidden/inactive input blocking, stale cancelled-frame isolation, and complete finish/teardown cleanup.
 - Current build command `npm run build`: passed with the exact repository `package.json` and `scripts/build.js` in a reconstructed build-contract workspace; all 9 required inputs were represented and all 18 generated `dist/` and `docs/` copies matched their inputs.
-- Fresh branch blob-SHA parity was verified for all nine unchanged source/`docs` build-input pairs: `index.html`, `styles.css`, `catalog-bootstrap.js`, `app.js`, `lane-guard.js`, `metrics.js`, `create.html`, `private.css`, and `private.js`.
+- Fresh branch blob-SHA parity was verified for all nine unchanged source/`docs/` build-input pairs: `index.html`, `styles.css`, `catalog-bootstrap.js`, `app.js`, `lane-guard.js`, `metrics.js`, `create.html`, `private.css`, and `private.js`.
 - A complete repository checkout and repository-wide test execution were unavailable because the runtime could not resolve `github.com`; no full-suite count beyond the exact focused workspace is claimed.
 - No lint or type-check script is configured. No GitHub Actions workflow run exists for the PR head.
 
@@ -438,7 +438,7 @@ Independent QA should re-review Issue #51 and corrected PR #52, especially stand
 
 ### Preview status
 
-Repository preview output verified: all nine unchanged source/`docs` build-input pairs have identical branch blob SHAs. The new lifecycle module is intentionally not wired into the user-facing preview in this foundation-only issue.
+Repository preview output verified: all nine unchanged source/`docs/` build-input pairs have identical branch blob SHAs. The new lifecycle module is intentionally not wired into the user-facing preview in this foundation-only issue.
 
 ### Strategic review
 
@@ -515,7 +515,7 @@ Independent QA should re-review issue #49 and the corrected PR #50 head, especia
 - `npm test`: passed with 5 focused experiment-contract tests and 0 failures using the exact branch versions of `EXPERIMENTS.md`, `METRICS.md`, and `test/experiment-contract.test.js` in the reconstructed workspace.
 - The focused tests verify the explicitly unrun status, fixed cohort and challenge, exact eleven-event sharer and friend snapshots, nine identical formulas, 70%/50%/40% threshold consistency, one-bottleneck decision rule, and aggregate-only privacy boundary.
 - `npm run build`: passed with the exact repository `package.json` and `scripts/build.js` in a reconstructed build-contract workspace; the nine unchanged required inputs were represented locally and all 18 generated `dist/` and `docs/` copies matched their corresponding inputs.
-- GitHub blob-SHA parity was verified for all nine actual source/`docs` pairs on the branch: `index.html`, `styles.css`, `catalog-bootstrap.js`, `app.js`, `lane-guard.js`, `metrics.js`, `create.html`, `private.css`, and `private.js`.
+- GitHub blob-SHA parity was verified for all nine actual source/`docs/` pairs on the branch: `index.html`, `styles.css`, `catalog-bootstrap.js`, `app.js`, `lane-guard.js`, `metrics.js`, `create.html`, `private.css`, and `private.js`.
 - A complete repository checkout and repository-wide test execution were unavailable because the execution environment could not resolve `github.com`; no full-suite test count is claimed.
 - No lint or type-check script is configured.
 
