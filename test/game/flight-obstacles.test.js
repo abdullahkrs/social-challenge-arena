@@ -34,7 +34,11 @@ function assertCanonicalSpacing(state, width, spacing) {
     assert.equal(Number.isFinite(obstacle.right), true);
     assert.equal(Number.isFinite(obstacle.gapTop), true);
     assert.equal(Number.isFinite(obstacle.gapBottom), true);
-    assert.ok(Math.abs((obstacle.right - obstacle.left) - width) < 1e-12);
+    assert.ok(obstacle.left >= 0 && obstacle.right <= 1);
+    assert.ok(obstacle.left < obstacle.right);
+    const visibleWidth = obstacle.right - obstacle.left;
+    if (obstacle.left === 0) assert.ok(visibleWidth <= width + 1e-12);
+    else assert.ok(Math.abs(visibleWidth - width) < 1e-12);
     if (index > 0) {
       const prior = state.obstacles[index - 1];
       assert.ok(obstacle.left > prior.left);
@@ -272,6 +276,32 @@ test('recycles off-left obstacles canonically with fixed spacing, cycling gaps, 
   assert.equal(state.nextId, 24);
   assert.equal(state.nextPatternIndex, 1);
   assertCanonicalSpacing(state, 0.1, 0.2);
+});
+
+
+test('clips a partially off-left corridor to the merged normalized rules and renderer shape', () => {
+  const stream = createFlightObstacles({
+    obstacleCount: 2,
+    obstacleWidth: 0.1,
+    spacing: 0.3,
+    initialLeft: 0.02,
+    initialSpeed: 0.2,
+    maxSpeed: 0.3,
+    speedIncreasePerSecond: 0.1,
+    maxDeltaMs: 100,
+    maxRunMs: 1000
+  });
+
+  const state = stream.advance(100);
+  assert.equal(state.obstacles[0].left, 0);
+  assert.ok(state.obstacles[0].right > 0 && state.obstacles[0].right <= 1);
+  for (const obstacle of state.obstacles) {
+    assert.ok(obstacle.left >= 0 && obstacle.left <= 1);
+    assert.ok(obstacle.right >= 0 && obstacle.right <= 1);
+    assert.ok(obstacle.left < obstacle.right);
+    assert.ok(obstacle.gapTop >= 0 && obstacle.gapBottom <= 1);
+    assert.ok(obstacle.gapTop < obstacle.gapBottom);
+  }
 });
 
 test('handles canonical multi-obstacle and repeated recycling in one bounded advance', () => {
