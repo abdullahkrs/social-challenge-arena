@@ -5,47 +5,93 @@ Historical completed cycles 1–6 are preserved in [`TASK_LOG_ARCHIVE_CYCLES_1_6
 ## Cycle 18
 
 - **Date/time:** 2026-07-12T09:13:00+03:00
-- **Status:** implementation in progress for issue #49
+- **Status:** implementation complete; PR #50 ready for independent QA
 - **Owner role:** `agent-engine`
 - **Selected task:** Build the minimum deterministic shared gameplay lifecycle for Stage 12.
 - **Goal:** Provide one testable `idle → ready → running → finished` state machine with a single update handle, replay reset, active-state gating, and complete transient-resource teardown.
-- **Why selected:** Issue #49 is the only open engine assignment, has no dependencies, owns non-overlapping `src/game/**`, `test/game/**`, and `TASK_LOG.md` paths, and directly advances the earliest incomplete roadmap stage.
+- **Why selected:** Issue #49 was the only open engine assignment, had no dependencies, owned non-overlapping `src/game/**`, `test/game/**`, and `TASK_LOG.md` paths, and directly advanced the earliest incomplete roadmap stage.
 - **Viral-loop impact:** This foundation reduces replay and navigation failures in the future flagship game while leaving the existing result, sharing, friend-attempt, comparison, share-again, and metrics systems unchanged.
 
-### Planned acceptance contract
+### Acceptance contract completed
 
-- **Player decision and input:** No game mechanic is introduced. Lifecycle actions are explicit, invalid actions are deterministic no-ops, and temporary input listeners may dispatch only while the lifecycle is both `running` and active.
+- **Player decision and input:** No game mechanic was introduced. Lifecycle actions are explicit, invalid actions are deterministic no-ops, and lifecycle-managed temporary input listeners dispatch only while the instance is both `running` and active.
 - **Movement model:** None in this issue; physics and movement remain deferred to a later assigned engine issue.
-- **Failure condition:** Game-specific failure is not added. The explicit `finish()` transition provides the deterministic endpoint future collision or failure logic will call.
-- **Scoring model:** No score formula or bounds are introduced. Frame, timer, interval, and listener callbacks are gated so inactive, hidden, finished, reset, or destroyed runs cannot continue score-producing work.
-- **Feedback effects:** None; rendering, HUD, particles, impact, and result presentation remain outside the engine lifecycle assignment.
-- **Reduced-motion behavior:** The lifecycle itself is presentation-neutral and schedules no decorative motion; future reduced-motion rendering will use the same state and scoring decisions.
-- **Teardown behavior:** Finish, reset, replay, and teardown cancel the pending animation frame, registered timeouts, intervals, and temporary listeners. Teardown permanently disables the instance.
-- **Social-loop reuse:** No result, sharing, comparison, friend-attempt, share-again, URL, or metrics system is created or modified.
-- **Focused tests:** Cover valid and invalid transitions, one-loop enforcement, bounded delta time, replay reset, inactive callback blocking, and complete teardown.
+- **Failure condition:** Game-specific failure was not added. The explicit `finish()` transition provides the deterministic endpoint future collision or failure logic will call.
+- **Scoring model:** No score formula or bounds were introduced. Frame, timer, interval, and listener callbacks are gated so inactive, hidden, finished, reset, replayed, or destroyed runs cannot continue score-producing work.
+- **Feedback effects:** None; rendering, HUD, particles, impact, and result presentation remain outside this engine lifecycle assignment.
+- **Reduced-motion behavior:** The lifecycle is presentation-neutral and schedules no decorative motion; future reduced-motion rendering can use the same state transitions and scoring decisions.
+- **Teardown behavior:** Finish, reset, replay, and teardown invalidate stale callbacks and cancel the pending animation frame, registered timeouts, intervals, and temporary listeners. Teardown permanently disables the instance.
+- **Social-loop reuse:** No result, sharing, comparison, friend-attempt, share-again, URL, or metrics system was created or modified.
 
-### Expected files
+### Completed work
+
+- Added a dependency-free UMD/CommonJS lifecycle module with immutable state snapshots.
+- Added explicit `prepare`, `start`, `finish`, `reset`, `replay`, `setActive`, managed timeout/interval/listener registration, `teardown`, and `getState` operations.
+- Enforced one pending update-frame handle and bounded frame delta time with a 100 ms default maximum.
+- Added independent frame and run generations so cancelled callbacks from an old visibility state or replay cannot clear a newer handle or mutate the new run.
+- Added focused scheduler-injection tests without changing `package.json` or adding a dependency.
+
+### Files changed
 
 - `TASK_LOG.md`
 - `src/game/lifecycle.js`
 - `test/game/lifecycle.test.js`
 
-### Intentional non-goals
+### Tests and checks
 
-- No flight or jump physics, collision rules, obstacles, score formula, rendering, HUD, effects, localization, legacy edits, social-loop changes, dependency, framework, bundler, or general-purpose engine.
+- Runtime: Node.js v22.16.0.
+- `node --check src/game/lifecycle.js`: passed against exact final branch content.
+- `node --check test/game/lifecycle.test.js`: passed against exact final branch content.
+- Current repository test command `npm test`: passed in a reconstructed focused workspace containing the exact final branch lifecycle source, lifecycle test, and repository `package.json`; 5 tests passed and 0 failed.
+- Focused tests cover valid and invalid transitions, one-loop enforcement, bounded delta time, replay reset, stale prior-run timeout rejection, hidden/inactive callback blocking, stale cancelled-frame isolation after reactivation, and complete finish/teardown cleanup.
+- Current build command `npm run build`: passed with the exact repository `package.json` and `scripts/build.js` in a reconstructed build-contract workspace; all 9 required inputs were represented and all 18 generated `dist/` and `docs/` copies matched their inputs.
+- Fresh branch blob-SHA parity was verified for all nine unchanged source/`docs/` build-input pairs: `index.html`, `styles.css`, `catalog-bootstrap.js`, `app.js`, `lane-guard.js`, `metrics.js`, `create.html`, `private.css`, and `private.js`.
+- A complete repository checkout and repository-wide test execution were unavailable because the runtime could not resolve `github.com`; no full-suite count beyond the exact focused workspace is claimed.
+- No lint or type-check script is configured. No GitHub Actions workflow run exists for the PR head.
+
+### Mobile, accessibility, motion, security, and privacy review
+
+- No HTML, CSS, viewport, control, focus, touch-target, visible copy, or legacy challenge file changed; 320px and 360–430px presentation behavior was therefore not re-claimed as newly exercised.
+- The lifecycle is independent of visual motion and does not weaken future `prefers-reduced-motion` behavior.
+- No external service, storage, URL state, analytics, identity, personal data, credential, secret, dependency, or untrusted HTML path was added.
+- Managed callbacks cannot execute scoring or input work outside the current active running generation.
+
+### Review findings and resolutions
+
+- Self-review found that a cancelled animation callback retained by a scheduler could run after reactivation and clear the newer frame handle.
+- Resolution: the callback now clears `frameHandle` only when it owns that exact handle, while a frame generation rejects stale callbacks.
+- Self-review also found that a retained timeout or listener callback from a completed run could otherwise execute during replay.
+- Resolution: managed timers, intervals, and listeners capture a run generation that is invalidated on finish, reset, replay, and teardown; regression coverage was added.
+- Full diff review confirmed only the three issue-owned files changed, no dependency was added, and no forbidden shared, preview, localization, legacy, result, sharing, comparison, or metrics file changed.
+- No independent approval is claimed; this is implementation-agent self-review evidence only.
+
+### Preview status
+
+Repository preview output verified: all nine unchanged source/`docs/` build-input pairs have identical branch blob SHAs. The new lifecycle module is intentionally not wired into the user-facing preview in this foundation-only issue.
 
 ### Strategic review
 
 - A lifecycle-only issue is the smallest reusable Stage 12 slice and avoids coupling future flagship physics to legacy challenge code.
 - Scheduler injection keeps browser behavior testable with Node built-ins and no dependency.
-- One authoritative pending-frame handle plus stale-callback invalidation prevents duplicate loops under rapid replay or visibility changes.
+- One authoritative frame handle plus separate frame/run generations prevents duplicate loops and stale-run mutation under rapid replay, navigation, or visibility changes.
 
 ### Product thinking
 
 1. Future gameplay should call one lifecycle rather than duplicate timer and teardown rules per game.
-2. Inactive-state gating protects fair scoring when a page is hidden or navigated away from.
+2. Inactive-state and generation gating protect fair scoring when a page is hidden, navigated away from, or replayed rapidly.
 3. Completion cleanup reduces replay memory growth before visual effects are added.
 4. Parked idea: add game-specific fixed-step physics and collision only after this lifecycle passes independent QA.
+
+### Pull request outcome
+
+- Branch: `agent/issue-49-game-lifecycle`, created directly from `main` at `0a6995b007223c067e8b935a9be81fc216ea2a55`.
+- Pull request: #50 — `feat(game): add deterministic shared lifecycle`, targeting `main` directly.
+- The final reviewed head SHA and factual self-review are recorded on PR #50.
+- Merge remains intentionally pending independent `QA: PASS` and Coordinator review.
+
+### Next task
+
+Independent QA should verify issue #49, the complete PR #50 diff, focused lifecycle behavior, stale-callback protection, teardown, scope boundaries, and the stated verification limitations. Do not add physics or visuals in this PR.
 
 ## Cycle 17
 
