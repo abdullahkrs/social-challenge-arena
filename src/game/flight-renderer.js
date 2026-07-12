@@ -79,8 +79,6 @@
   top: var(--flight-player-top);
   width: var(--flight-player-width);
   height: var(--flight-player-height);
-  min-width: 1.75rem;
-  min-height: 1.35rem;
 }
 .flight-renderer-player-body {
   position: absolute;
@@ -179,9 +177,12 @@
   opacity: 0;
 }
 @media (prefers-reduced-motion: reduce) {
-  .flight-renderer-player-body,
+  .flight-renderer-player-body {
+    animation: none !important;
+  }
   .flight-renderer-score-pop,
   .flight-renderer-failure-impact {
+    display: none !important;
     animation: none !important;
   }
   .flight-renderer-player-spark { opacity: 0; }
