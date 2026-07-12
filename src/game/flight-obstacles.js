@@ -48,16 +48,6 @@
     return Number(value.toFixed(PRECISION_DIGITS));
   }
 
-  function normalizeBounds(leftValue, rightValue) {
-    let left = normalizeFloat(leftValue);
-    let right = normalizeFloat(rightValue);
-    if (!(left < right)) {
-      left = leftValue;
-      right = rightValue;
-    }
-    return { left, right };
-  }
-
   function rejectUnknownKeys(object, allowedKeys, owner) {
     for (const key of Object.keys(object)) {
       if (!allowedKeys.has(key)) throw new TypeError(`${owner}.${key} is not supported.`);
@@ -263,12 +253,11 @@
         const gap = config.gapPattern[sequenceIndex % config.gapPattern.length];
         const clippedLeft = Math.max(0, rawLeft);
         const clippedRight = Math.min(1, rawRight);
-        const { left, right } = normalizeBounds(clippedLeft, clippedRight);
 
         obstacles.push(Object.freeze({
           id,
-          left,
-          right,
+          left: clippedLeft,
+          right: clippedRight,
           gapTop: gap.gapTop,
           gapBottom: gap.gapBottom
         }));
