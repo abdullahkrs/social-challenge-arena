@@ -441,3 +441,56 @@ Independent QA should re-review issue #49 and the corrected PR #50 head, especia
 - Only aggregate integer totals and predefined aggregate blocker counts may be retained.
 - The documentation explicitly prohibits personal data, participant identifiers, scores, links, timestamps, screenshots, device details, demographics, and free-text quotes.
 - Static review found no secret, credential, external destination, data payload, persistence mechanism, or expanded collection field.
+
+### Diversity and animation evidence
+
+- No challenge definition, mechanic, scoring model, animation, or reduced-motion behavior changed.
+- The existing nine challenges and four genuinely different mechanics remain intact.
+- This cycle protects evidence-driven prioritization of the shared social loop instead of adding cosmetic variety or unnecessary motion.
+
+### Review findings and resolutions
+
+- Internal-consistency finding: the first hypothesis wording referred to comparison reach while the decision rule measured friend completion and successful re-share attempts.
+- Resolution: aligned the hypothesis exactly with the 70% friend-completion, 50% re-share-success, and 40% end-to-end thresholds used by the decision rule.
+- Test-harness finding: the first local draft required every event name to appear three times, which was stricter than the two required role tables for counters not used in formulas.
+- Resolution: replaced the draft harness with the committed exact-table parser and reran all five focused tests successfully.
+- Scope, privacy, misleading-result claims, formulas, thresholds, source/preview parity, secrets, and changed-file boundaries were reviewed. No blocking finding remains before pull-request review.
+- No independent approval is claimed; this is factual self-review evidence.
+
+### Preview status
+
+Repository preview output verified for the relevant branch: all nine actual source and `docs/` build-input blob SHAs match exactly, and no preview file changed in this documentation-and-test cycle.
+
+### Decision
+
+Use a manual, aggregate-only ten-pair experiment before adding another mechanic or any analytics destination. Select at most one earliest failing stage after real results exist.
+
+### Strategic review
+
+- The MVP loop and four-mechanic minimum are already complete.
+- The smallest high-impact next step is an executable evidence protocol, not another feature.
+- Role-specific fresh sessions prevent mixed `challenge_started` and `challenge_completed` counters from making ordinary and friend paths ambiguous.
+- Aggregate-only manual tallies preserve the existing privacy boundary while still exposing stage conversion.
+
+### Product thinking
+
+1. A controlled pair protocol can validate the loop without adding telemetry infrastructure.
+2. A single fixed challenge reduces gameplay variance while the social handoff is being tested.
+3. Fresh one-attempt sessions make expected snapshots deterministic and auditable.
+4. Separate sharer and friend aggregate totals allow the shared counters to be interpreted correctly.
+5. Parked idea: a remote or persistent analytics pilot only after the manual experiment produces a concrete bottleneck and an explicit privacy decision.
+
+### Remaining limitation
+
+E-001 has been defined but not run. Real participants and manual cohort totals are required before a product bottleneck can be selected. The runtime could not perform a complete repository checkout, so the full repository test suite and live deployed preview were not verified.
+
+### Pull request and merge outcome
+
+- Branch: `agent/cycle-17-define-loop-validation-experiment`, created directly from `main` at `98ee13261068dcb346f665de8498f0440fa176d6`.
+- Pull request: #44 — `docs(experiment): define privacy-safe loop validation`, targeting `main` directly.
+- Reviewed head SHA: recorded in the final PR self-review after the complete diff is inspected.
+- Merge SHA: unavailable until PR #44 is squash-merged; final merge metadata will be recorded in the pull request and cycle report without opening a second pull request.
+
+### Next task
+
+Run E-001 with ten real sharer-and-friend pairs, retain aggregate totals only, calculate the nine conversions, and choose at most one earliest failing stage. Do not add a feature before those results exist.
