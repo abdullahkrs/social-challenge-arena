@@ -2,6 +2,97 @@
 
 Historical completed cycles 1–6 are preserved in [`TASK_LOG_ARCHIVE_CYCLES_1_6.md`](TASK_LOG_ARCHIVE_CYCLES_1_6.md), Cycles 7–8 in [`TASK_LOG_ARCHIVE_CYCLES_7_8.md`](TASK_LOG_ARCHIVE_CYCLES_7_8.md), Cycle 9 in [`TASK_LOG_ARCHIVE_CYCLE_9.md`](TASK_LOG_ARCHIVE_CYCLE_9.md), Cycle 10 in [`TASK_LOG_ARCHIVE_CYCLE_10.md`](TASK_LOG_ARCHIVE_CYCLE_10.md), Cycle 11 in [`TASK_LOG_ARCHIVE_CYCLE_11.md`](TASK_LOG_ARCHIVE_CYCLE_11.md), Cycle 12 in [`TASK_LOG_ARCHIVE_CYCLE_12.md`](TASK_LOG_ARCHIVE_CYCLE_12.md), Cycle 13 in [`TASK_LOG_ARCHIVE_CYCLE_13.md`](TASK_LOG_ARCHIVE_CYCLE_13.md), Cycle 14 in [`TASK_LOG_ARCHIVE_CYCLE_14.md`](TASK_LOG_ARCHIVE_CYCLE_14.md), Cycle 15 in [`TASK_LOG_ARCHIVE_CYCLE_15.md`](TASK_LOG_ARCHIVE_CYCLE_15.md), and Cycle 16 in [`TASK_LOG_ARCHIVE_CYCLE_16.md`](TASK_LOG_ARCHIVE_CYCLE_16.md). This file remains the active source of truth for the current cycle.
 
+## Cycle 21
+
+- **Date/time:** 2026-07-12T17:09:25+03:00
+- **Status:** implementation complete in exact local content; branch product commit and pull request pending independent QA
+- **Owner role:** `agent-engine`
+- **Selected task:** Add the deterministic one-touch flight motion model for Stage 12 under Issue #55.
+- **Goal:** Add the smallest dependency-free normalized vertical-motion module with gravity, one bounded upward impulse, bounded delta handling, immutable state, boundary contact, and exact reset without wiring a game or social flow.
+- **Why selected:** Issue #55 was the only open assignment, explicitly owned by `agent-engine`, was labeled `ready-for-agent`, depended only on merged PRs #50, #52, and #54, owned non-overlapping files, and had no existing engine pull request.
+- **Viral-loop impact:** Deterministic movement protects future replay fairness, friend attempts, score comparison, and share-again behavior while leaving the existing result, sharing, comparison, URL, navigation, and metrics systems unchanged.
+
+### Acceptance contract completed
+
+- **Player decision and input:** The future player decides when to call one explicit `applyImpulse()` operation. The module attaches no keyboard, pointer, or touch listener and does not modify the merged action-input adapter.
+- **Movement model:** Device-independent vertical position uses explicit top and bottom bounds. Positive gravity advances velocity downward, each explicit impulse sets one configured bounded upward velocity, positive delta is capped, and velocity is clamped between finite upward and downward limits.
+- **Failure condition:** None. Top or bottom crossing clamps position, zeros boundary-directed velocity, and reports immutable `top` or `bottom` contact for a later assigned collision/failure issue.
+- **Scoring model:** None. No score, URL value, shared bound, or score mutation was introduced.
+- **Escalation:** None. Gravity, impulse, velocity limits, and delta cap remain constant for the instance.
+- **Feedback effects:** None. Rendering, impact, particles, shake, danger feedback, sound, score pop, and result transition remain deferred.
+- **Reduced-motion behavior:** Simulation state and player decisions are presentation-neutral and identical because this module creates no visual motion.
+- **Teardown behavior:** The module owns no timer, interval, frame, listener, DOM node, or asynchronous resource. `reset()` restores exact configured mutable state, and dropping the instance leaves no active work.
+- **Social-loop reuse:** Existing result, share, friend-attempt, comparison, share-again, strict URL validation, navigation, and metrics systems were not modified or duplicated.
+
+### Completed work
+
+- Added one UMD/CommonJS-compatible `SocialChallengeGameFlightMotion` module with no dependency or browser side effect.
+- Added strict finite-safe configuration validation for bounds, initial state, gravity, impulse velocity, velocity limits, and maximum delta.
+- Added immutable state snapshots containing only `position`, `velocity`, and `boundaryContact`.
+- Added explicit `applyImpulse()`, `advance(deltaMs)`, `reset()`, and `getState()` operations.
+- Added deterministic semi-implicit gravity progression, one non-queued upward impulse velocity, positive-delta clamping, safe invalid-delta no-ops, velocity bounds, world-bound clamping, and exact reset replay.
+- Added ten focused dependency-free tests covering CommonJS/browser-global export, invalid configuration, retained-config isolation, immutable snapshots, one-impulse behavior, gravity progression, deterministic replay, delta clamping, invalid deltas, velocity bounds, top/bottom contact, and exact reset.
+
+### Files changed
+
+- `TASK_LOG.md`
+- `src/game/flight-motion.js`
+- `test/game/flight-motion.test.js`
+
+### Tests and checks
+
+- Runtime: Node.js v22.16.0.
+- `node --check src/game/flight-motion.js`: passed against the exact prepared source content.
+- `node --check test/game/flight-motion.test.js`: passed against the exact prepared test content.
+- Current repository command `npm test`: passed in a reconstructed focused workspace using the exact prepared source, test, and repository `package.json`; 10 tests passed and 0 failed.
+- Focused coverage verifies UMD/CommonJS parity, configuration rejection and isolation, immutable snapshots, one explicit impulse without queueing, gravity direction, deterministic reset replay, 100 ms default delta cap behavior, zero/negative/non-finite safe no-ops, finite velocity limits, exact top/bottom contact, and neutral reset.
+- Current repository command `npm run build`: passed in a reconstructed build-contract workspace using the exact repository `package.json` and `scripts/build.js`; nine representative unchanged required inputs were copied to all 18 `dist/` and `docs/` outputs and all outputs matched their inputs.
+- A complete repository checkout and repository-wide test execution were unavailable because the runtime could not resolve `github.com`; no full-suite count beyond the exact focused workspace is claimed.
+- The build run verifies the unchanged current build contract rather than deployed preview contents because this issue changes no build input.
+- No lint or type-check script is configured.
+
+### Mobile, accessibility, motion, security, and privacy review
+
+- Normalized coordinates are independent of viewport pixels, so the same state sequence can drive 320 px and 360–430 px rendering without physics changes.
+- No HTML, CSS, visible copy, focus order, touch target, animation, renderer, legacy challenge, or reduced-motion presentation file changed.
+- Static forbidden-resource scanning found no animation frame, timer, interval, event listener, DOM, storage, URL, network, analytics, identity, personal data, credential, secret, or dependency path.
+- Configuration is copied and frozen; retained caller objects and repeated state reads cannot mutate internal state.
+
+### Review findings and resolutions
+
+- The first immutability regression expected direct assignment to a frozen snapshot to throw, but the CommonJS test file was not strict mode and JavaScript correctly ignored that assignment silently.
+- Resolution: the test now uses `Reflect.set()` and verifies it returns `false` while the frozen value remains unchanged.
+- Self-review chose a configured upward target velocity rather than additive impulse accumulation so every accepted explicit action produces one bounded upward response even after a fast fall and repeated calls do not queue or compound hidden actions.
+- Full planned changed-file review confirms only the three issue-owned files change, with no dependency, build input, generated output, lifecycle, input, viewport, application, localization, legacy, social-loop, URL, navigation, or metrics edit.
+- No independent approval is claimed; this is implementation-agent self-review evidence only.
+
+### Preview status
+
+Preview not verified: this isolated model is intentionally not wired to user-facing preview output.
+
+### Strategic review
+
+- A pure vertical-motion model is the smallest capability after lifecycle, input, and viewport, and directly enables the flagship timing decision without hiding collision, score, or rendering inside one broad change.
+- Explicit deltas and copied configuration make identical friend-attempt input sequences reproducible while preserving separate review boundaries for collision, failure, score, and effects.
+- Keeping the API to four operations avoids a general-purpose engine, scheduler, entity system, or integration layer.
+
+### Product thinking
+
+1. One clear impulse-timing decision supports immediate one-touch play without instructions or form-like interaction.
+2. Device-independent coordinates preserve movement behavior across mobile viewport sizes.
+3. Bounded delta and velocity protect fairness after long frames before shared scoring is introduced.
+4. Parked idea: after independent QA and merge, assign one separate engine issue for deterministic obstacle/boundary collision and bounded survival scoring, followed by a separate experience issue for original vector rendering and purposeful feedback.
+
+### Pull request outcome
+
+- Branch: `agent/issue-55-flight-motion`, created directly from `main` at `1750e5ae4d47c73be2ab92c9a9674c22a3c56b6d`.
+- The pull request will target `main` directly with `Closes #55`; its final head SHA and factual self-review will be recorded in the PR conversation after the product commit.
+- Merge remains intentionally pending independent `QA: PASS` and Coordinator review.
+
+### Next task
+
+Independent QA should verify exact base and head SHAs, deterministic replay, one-call/one-impulse behavior, gravity direction, delta cap, invalid-delta no-ops, finite velocity and position bounds, top/bottom contact, strict configuration validation, immutable state/config isolation, exact reset, absence of asynchronous/browser resources, and strict three-file scope. Do not add collision shapes, failure, score, rendering, effects, integration, localization, or social-loop code in this pull request.
+
 ## Cycle 20
 
 - **Date/time:** 2026-07-12T15:31:00+03:00
@@ -350,56 +441,3 @@ Independent QA should re-review issue #49 and the corrected PR #50 head, especia
 - Only aggregate integer totals and predefined aggregate blocker counts may be retained.
 - The documentation explicitly prohibits personal data, participant identifiers, scores, links, timestamps, screenshots, device details, demographics, and free-text quotes.
 - Static review found no secret, credential, external destination, data payload, persistence mechanism, or expanded collection field.
-
-### Diversity and animation evidence
-
-- No challenge definition, mechanic, scoring model, animation, or reduced-motion behavior changed.
-- The existing nine challenges and four genuinely different mechanics remain intact.
-- This cycle protects evidence-driven prioritization of the shared social loop instead of adding cosmetic variety or unnecessary motion.
-
-### Review findings and resolutions
-
-- Internal-consistency finding: the first hypothesis wording referred to comparison reach while the decision rule measured friend completion and successful re-share attempts.
-- Resolution: aligned the hypothesis exactly with the 70% friend-completion, 50% re-share-success, and 40% end-to-end thresholds used by the decision rule.
-- Test-harness finding: the first local draft required every event name to appear three times, which was stricter than the two required role tables for counters not used in formulas.
-- Resolution: replaced the draft harness with the committed exact-table parser and reran all five focused tests successfully.
-- Scope, privacy, misleading-result claims, formulas, thresholds, source/preview parity, secrets, and changed-file boundaries were reviewed. No blocking finding remains before pull-request review.
-- No independent approval is claimed; this is factual self-review evidence.
-
-### Preview status
-
-Repository preview output verified for the relevant branch: all nine actual source and `docs/` build-input blob SHAs match exactly, and no preview file changed in this documentation-and-test cycle.
-
-### Decision
-
-Use a manual, aggregate-only ten-pair experiment before adding another mechanic or any analytics destination. Select at most one earliest failing stage after real results exist.
-
-### Strategic review
-
-- The MVP loop and four-mechanic minimum are already complete.
-- The smallest high-impact next step is an executable evidence protocol, not another feature.
-- Role-specific fresh sessions prevent mixed `challenge_started` and `challenge_completed` counters from making ordinary and friend paths ambiguous.
-- Aggregate-only manual tallies preserve the existing privacy boundary while still exposing stage conversion.
-
-### Product thinking
-
-1. A controlled pair protocol can validate the loop without adding telemetry infrastructure.
-2. A single fixed challenge reduces gameplay variance while the social handoff is being tested.
-3. Fresh one-attempt sessions make expected snapshots deterministic and auditable.
-4. Separate sharer and friend aggregate totals allow the shared counters to be interpreted correctly.
-5. Parked idea: a remote or persistent analytics pilot only after the manual experiment produces a concrete bottleneck and an explicit privacy decision.
-
-### Remaining limitation
-
-E-001 has been defined but not run. Real participants and manual cohort totals are required before a product bottleneck can be selected. The runtime could not perform a complete repository checkout, so the full repository test suite and live deployed preview were not verified.
-
-### Pull request and merge outcome
-
-- Branch: `agent/cycle-17-define-loop-validation-experiment`, created directly from `main` at `98ee13261068dcb346f665de8498f0440fa176d6`.
-- Pull request: #44 — `docs(experiment): define privacy-safe loop validation`, targeting `main` directly.
-- Reviewed head SHA: recorded in the final PR self-review after the complete diff is inspected.
-- Merge SHA: unavailable until PR #44 is squash-merged; final merge metadata will be recorded in the pull request and cycle report without opening a second pull request.
-
-### Next task
-
-Run E-001 with ten real sharer-and-friend pairs, retain aggregate totals only, calculate the nine conversions, and choose at most one earliest failing stage. Do not add a feature before those results exist.
