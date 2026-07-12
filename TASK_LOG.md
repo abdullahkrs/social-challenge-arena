@@ -5,7 +5,7 @@ Historical completed cycles 1–6 are preserved in [`TASK_LOG_ARCHIVE_CYCLES_1_6
 ## Cycle 19
 
 - **Date/time:** 2026-07-12T13:10:46+03:00
-- **Status:** implementation complete; PR #52 pending independent QA
+- **Status:** QA blocker fixed; PR #52 returned to independent QA
 - **Owner role:** `agent-engine`
 - **Selected task:** Normalize one-action arcade input for Stage 12 under Issue #51.
 - **Goal:** Provide one dependency-free adapter that converts keyboard, primary pointer, or single-touch fallback input into one immutable semantic action without duplicate emissions or listener growth.
@@ -14,7 +14,7 @@ Historical completed cycles 1–6 are preserved in [`TASK_LOG_ARCHIVE_CYCLES_1_6
 
 ### Acceptance contract completed
 
-- **Player decision and input:** One Space, Enter, Arrow Up, primary left pointer activation, or single-touch fallback emits exactly one frozen `primary-action` with source `keyboard`, `pointer`, or `touch`.
+- **Player decision and input:** One Space, standard Enter, numpad Enter, Arrow Up, primary left pointer activation, or single-touch fallback emits exactly one frozen `primary-action` with source `keyboard`, `pointer`, or `touch`.
 - **Movement model:** None in this issue; gravity, impulse, position, and collision remain deferred.
 - **Failure condition:** None in this issue.
 - **Scoring model:** None was introduced. The injected `isEnabled()` gate prevents action callbacks outside future active running play, so disabled or torn-down input cannot advance scoring.
@@ -29,9 +29,10 @@ Historical completed cycles 1–6 are preserved in [`TASK_LOG_ARCHIVE_CYCLES_1_6
 - Added a UMD/CommonJS `SocialChallengeGameActionInput` module with no dependency.
 - Added one semantic action type and immutable source-specific action objects.
 - Added keyboard filtering for repeat events, modifiers, unrelated keys, and editable targets including content-editable ancestors.
+- Added explicit `NumpadEnter` parity so numeric-keypad Enter emits the same keyboard action as standard Enter.
 - Added primary-left pointer filtering and mutually exclusive pointer-versus-touch registration.
 - Added single-touch fallback, enabled-state gating, explicit accepted-input `preventDefault`, idempotent attach/detach, stale-listener invalidation, and permanent teardown.
-- Added ten focused tests using injected event-target doubles and a Node VM browser-global check.
+- Added eleven focused tests using injected event-target doubles and a Node VM browser-global check.
 
 ### Files changed
 
@@ -42,10 +43,10 @@ Historical completed cycles 1–6 are preserved in [`TASK_LOG_ARCHIVE_CYCLES_1_6
 ### Tests and checks
 
 - Runtime: Node.js v22.16.0.
-- `node --check src/game/action-input.js`: passed against branch blob `8f4522a6c08105b652f7cee76b397fd47c33bd46`.
-- `node --check test/game/action-input.test.js`: passed against branch blob `400effacc3011fd45f141fb7e46a0c4638e22969`.
-- Current repository command `npm test`: passed in a reconstructed focused workspace using those exact branch blobs and the exact repository `package.json`; 10 tests passed and 0 failed.
-- Focused coverage includes CommonJS/browser-global export, immutable actions, keyboard parity, repeat/modifier/editable rejection, primary-pointer filtering, pointer/touch exclusivity, multi-touch rejection, enabled-state gating, accepted-only default prevention, one-action emission, idempotent attach/detach, replay-style reattachment, retained-listener rejection, and permanent teardown.
+- `node --check src/game/action-input.js`: passed against exact branch blob `917b38ae4b3718104eb4b9d6f96fc67997e3bea4`.
+- `node --check test/game/action-input.test.js`: passed against exact branch blob `35fd8f20453fc96b254ffb989a1fec817d3ec267`.
+- Current repository command `npm test`: passed in a reconstructed focused workspace using those exact branch blobs and the exact repository `package.json`; 11 tests passed and 0 failed.
+- Focused coverage includes CommonJS/browser-global export, immutable actions, Space/standard Enter/numpad Enter/Arrow Up parity, configured `preventDefault` for numpad Enter, repeat/modifier/editable rejection, primary-pointer filtering, pointer/touch exclusivity, multi-touch rejection, enabled-state gating, accepted-only default prevention, one-action emission, idempotent attach/detach, replay-style reattachment, retained-listener rejection, and permanent teardown.
 - Current repository command `npm run build`: passed in a reconstructed build-contract workspace using the exact repository `package.json` and `scripts/build.js`; nine representative required inputs were copied to all 18 `dist/` and `docs/` outputs.
 - A complete repository checkout and repository-wide test execution were unavailable because the runtime could not resolve `github.com`; no full-suite count is claimed.
 - The build run verifies the unchanged build contract rather than deployed preview contents because representative input fixtures were used.
@@ -53,7 +54,7 @@ Historical completed cycles 1–6 are preserved in [`TASK_LOG_ARCHIVE_CYCLES_1_6
 
 ### Mobile, accessibility, motion, security, and privacy review
 
-- Keyboard parity includes Space, Enter, and Arrow Up; editable controls and content-editable ancestors are protected from gameplay shortcuts.
+- Keyboard parity includes Space, standard Enter, numpad Enter, and Arrow Up; editable controls and content-editable ancestors are protected from gameplay shortcuts.
 - Pointer and touch modes are mutually exclusive, preventing one physical tap from producing both callbacks.
 - Ignored input does not call `preventDefault`; accepted input does so only when explicitly configured.
 - No HTML, CSS, visible copy, focus order, viewport, touch target, animation, dependency, storage, URL state, analytics, identity, personal data, credential, secret, or untrusted HTML path changed.
@@ -64,6 +65,8 @@ Historical completed cycles 1–6 are preserved in [`TASK_LOG_ARCHIVE_CYCLES_1_6
 - Resolution: every listener captures a generation, and detach, reattach, or teardown invalidates earlier generations permanently.
 - Self-review identified that registering both pointer and touch listeners would allow synthetic duplicate actions on capable devices.
 - Resolution: the adapter selects exactly one action mode at construction and registers only `pointerdown` or `touchstart`.
+- Independent QA found that `{ code: "NumpadEnter", key: "Enter" }` was rejected because `event.code` was preferred but absent from the accepted identifier set.
+- Resolution: added `NumpadEnter` to the accepted set and a focused regression proving one frozen keyboard action plus configured `preventDefault` behavior.
 - Full changed-file review confirmed only the three issue-owned files changed, no dependency was added, and no forbidden lifecycle, UI, preview, localization, legacy, social-loop, URL, or metrics file changed.
 - No independent approval is claimed; this is implementation-agent self-review evidence only.
 
@@ -75,6 +78,7 @@ Preview not verified: the adapter is intentionally not wired into the public UI 
 
 - One semantic action avoids coupling future physics to browser-specific event details.
 - Pointer/touch exclusivity and repeat filtering protect score fairness before movement is added.
+- Explicit numpad Enter support preserves documented keyboard parity without broadening the adapter into a key-mapping framework.
 - Generation-gated listeners make rapid replay and navigation safe without introducing a general-purpose input framework.
 
 ### Product thinking
@@ -88,12 +92,12 @@ Preview not verified: the adapter is intentionally not wired into the public UI 
 
 - Branch: `agent/issue-51-action-input`, created directly from `main` at `1abbf1de63f6d67c67a2af8be1375abcd238d903`.
 - Pull request: #52 — `feat(game): normalize one-action arcade input`, targeting `main` directly with `Closes #51`.
-- The final reviewed head SHA and factual self-review are recorded on PR #52 after this task-log commit.
+- The corrected head SHA and factual self-review are recorded on PR #52 after this task-log commit.
 - Merge remains intentionally pending independent `QA: PASS` and Coordinator review.
 
 ### Next task
 
-Independent QA should review Issue #51 and PR #52, especially one-callback semantics, keyboard/editable filtering, primary pointer rules, pointer-versus-touch exclusivity, enabled-state gating, accepted-only default prevention, stale-listener rejection, idempotent replay-style cycles, permanent teardown, scope boundaries, and the stated verification limitations. Do not add physics or visuals in this PR.
+Independent QA should re-review Issue #51 and corrected PR #52, especially standard and numpad Enter parity, one-callback semantics, keyboard/editable filtering, primary pointer rules, pointer-versus-touch exclusivity, enabled-state gating, accepted-only default prevention, stale-listener rejection, idempotent replay-style cycles, permanent teardown, scope boundaries, and the stated verification limitations. Do not add physics or visuals in this PR.
 
 ## Cycle 18
 
