@@ -2,6 +2,96 @@
 
 Historical completed cycles 1–6 are preserved in [`TASK_LOG_ARCHIVE_CYCLES_1_6.md`](TASK_LOG_ARCHIVE_CYCLES_1_6.md), Cycles 7–8 in [`TASK_LOG_ARCHIVE_CYCLES_7_8.md`](TASK_LOG_ARCHIVE_CYCLES_7_8.md), Cycle 9 in [`TASK_LOG_ARCHIVE_CYCLE_9.md`](TASK_LOG_ARCHIVE_CYCLE_9.md), Cycle 10 in [`TASK_LOG_ARCHIVE_CYCLE_10.md`](TASK_LOG_ARCHIVE_CYCLE_10.md), Cycle 11 in [`TASK_LOG_ARCHIVE_CYCLE_11.md`](TASK_LOG_ARCHIVE_CYCLE_11.md), Cycle 12 in [`TASK_LOG_ARCHIVE_CYCLE_12.md`](TASK_LOG_ARCHIVE_CYCLE_12.md), Cycle 13 in [`TASK_LOG_ARCHIVE_CYCLE_13.md`](TASK_LOG_ARCHIVE_CYCLE_13.md), Cycle 14 in [`TASK_LOG_ARCHIVE_CYCLE_14.md`](TASK_LOG_ARCHIVE_CYCLE_14.md), Cycle 15 in [`TASK_LOG_ARCHIVE_CYCLE_15.md`](TASK_LOG_ARCHIVE_CYCLE_15.md), and Cycle 16 in [`TASK_LOG_ARCHIVE_CYCLE_16.md`](TASK_LOG_ARCHIVE_CYCLE_16.md). This file remains the active source of truth for the current cycle.
 
+## Cycle 22
+
+- **Date/time:** 2026-07-12T19:08:25+03:00
+- **Status:** implementation complete; pull request pending independent QA
+- **Owner role:** `agent-engine`
+- **Selected task:** Add deterministic flight collision and bounded pass scoring for Stage 12 under Issue #57.
+- **Goal:** Add the smallest dependency-free challenge-specific rule model that consumes normalized player and obstacle snapshots, produces terminal boundary/obstacle failure, and awards strictly bounded once-only obstacle-pass points without movement, rendering, lifecycle wiring, or social-loop changes.
+- **Why selected:** Issue #57 was the only open repository issue, explicitly identified owner role `agent-engine`, carried `ready-for-agent`, depended only on merged PRs #50, #52, #54, and #56, owned three non-overlapping files, and had no existing implementation pull request.
+- **Viral-loop impact:** Deterministic terminal outcomes and once-only bounded scoring protect replay fairness, friend attempts, result comparison, and share-again behavior when this model is later connected to the existing social loop; this cycle does not modify or duplicate that loop.
+
+### Acceptance contract completed
+
+- **Player decision and input:** The only future decision remains impulse timing. This rule module creates no keyboard, pointer, or touch listener and consumes resulting frame snapshots only.
+- **Movement model:** None. It accepts finite normalized axis-aligned player bounds plus finite obstacle corridor snapshots and does not advance position, velocity, obstacle motion, or time.
+- **Failure condition:** Terminal failure occurs on supplied `top` or `bottom` boundary contact, or when the player horizontally touches or overlaps an obstacle while touching or leaving its safe vertical gap. Contact is conservative: touching is not separation, gap-edge touch fails, and an obstacle must be strictly behind the player before it can score.
+- **Scoring model:** One point per uniquely identified obstacle that becomes strictly behind the player, awarded once in canonical stable-ID order, with a configurable cap that cannot exceed the strict global maximum of 999.
+- **Escalation:** None. Speed, spacing, generation, randomization, recycling, and difficulty remain deferred.
+- **Feedback effects:** None. The module reports immutable state only; rendering, score pop, impact, particles, shake, danger feedback, sound, and result transition remain experience work.
+- **Reduced-motion behavior:** Decisions, collision, failure, and scoring are presentation-neutral and identical because the module creates no visual motion.
+- **Teardown behavior:** The module owns no animation frame, timer, interval, listener, DOM node, storage, network request, or other asynchronous resource. `reset()` clears terminal failure, score, and retained scored IDs exactly.
+- **Social-loop reuse:** Existing result, sharing, friend-attempt, comparison, share-again, URL codec, navigation, localization, and metrics systems remain unchanged and are not duplicated.
+
+### Completed work
+
+- Added one dependency-free UMD/CommonJS module exposed as `SocialChallengeGameFlightRules` in browsers.
+- Added strict normalized player and obstacle-corridor validation, finite stable primitive IDs, duplicate-ID rejection, sparse/excessive-list rejection, and validation-before-mutation behavior.
+- Added deterministic top/bottom boundary failure and obstacle failure with conservative horizontal and safe-gap edge contact.
+- Added terminal failure state, canonical typed-ID ordering, exactly-once obstacle-pass scoring, strict behind-player passage, configurable score cap, and global maximum score 999.
+- Added immutable fresh state snapshots, frozen failure details and passed-ID arrays, exact reset, deterministic replay, and caller-configuration/frame mutation isolation.
+- Added sixteen focused dependency-free tests covering export parity, configuration and geometry rejection, edge semantics, boundary and obstacle failure, safe passage, once-only scoring, reordered/repeated frames, score cap, terminal freeze, reset replay, immutability, caller isolation, and absence of asynchronous/browser side effects.
+
+### Files changed
+
+- `TASK_LOG.md`
+- `src/game/flight-rules.js`
+- `test/game/flight-rules.test.js`
+
+### Tests and checks
+
+- Runtime: Node.js v22.16.0.
+- `node --check src/game/flight-rules.js`: passed against the exact prepared source.
+- `node --check test/game/flight-rules.test.js`: passed against the exact prepared tests.
+- Current repository command `npm test`: passed in a reconstructed focused workspace using the exact source, test, and repository `package.json`; 16 tests passed and 0 failed.
+- Current repository command `npm run build`: passed in a reconstructed build-contract workspace using the exact repository `package.json` and `scripts/build.js`; all nine representative unchanged inputs were copied to all 18 `dist/` and `docs/` outputs and matched their inputs.
+- A complete repository checkout and repository-wide suite execution were unavailable because the runtime could not resolve `github.com`; no full-suite count beyond the exact focused workspace is claimed.
+- The build run verifies the unchanged build contract rather than deployed preview contents because this issue changes no build input.
+- No lint or type-check script is configured.
+
+### Mobile, accessibility, motion, security, and privacy review
+
+- Normalized geometry keeps identical collision and score decisions across 320 px and larger mobile rendering without pixel-dependent rules.
+- No HTML, CSS, visible copy, focus order, touch target, renderer, animation, reduced-motion presentation, localization, legacy challenge, URL, result, sharing, comparison, or metrics file changed.
+- Static review found no animation frame, timer, interval, listener, DOM, storage, URL, network, analytics, identity, personal data, credential, secret, dependency, or untrusted input-to-HTML path.
+- Configuration and frame geometry are validated into copied primitives before mutation; repeated state reads expose no mutable internal collection.
+
+### Review findings and resolutions
+
+- Self-review selected conservative contact semantics so horizontal or safe-gap edge contact cannot flip between pass and failure due to frame rounding; only a strictly behind obstacle scores.
+- Self-review found that collision and scoring in the same snapshot could otherwise award points during failure. Resolution: boundary and obstacle failure are evaluated before any scoring mutation.
+- Self-review bounded both per-frame obstacle count and global shared-score preparation, while stopping retained pass-ID growth once the configured cap is reached.
+- Full changed-file review confirms only the three issue-owned files change and no generic engine, obstacle generation, movement, rendering, lifecycle wiring, application integration, localization, legacy, social-loop, URL, or metrics code was added.
+- No independent approval is claimed; this is implementation-agent self-review evidence only.
+
+### Preview status
+
+Preview not verified: this isolated rule model is intentionally not wired to user-facing preview output.
+
+### Strategic review
+
+- A pure rules boundary is the smallest next Stage 12 slice after merged lifecycle, input, viewport, and movement.
+- Keeping geometry consumption separate from movement and presentation makes failure and scoring independently testable and avoids a general-purpose engine.
+- Canonical stable-ID ordering, strict validation before mutation, terminal failure, and a fixed global score ceiling protect deterministic replay and later shared-score validation.
+
+### Product thinking
+
+1. Impulse timing remains the only meaningful player decision; collision turns that timing into a clear fail-or-pass outcome.
+2. Normalized geometry keeps rules consistent across mobile viewport sizes without pixel-dependent scoring.
+3. Stable IDs and once-only scoring prevent duplicate points during repeated, recycled, or reordered snapshots.
+4. Parked idea: after independent QA and merge, assign a separate experience issue for original vector player/world rendering and purposeful reduced-motion-safe feedback without yet wiring the complete flagship flow.
+
+### Pull request outcome
+
+- Branch: `agent/issue-57-flight-rules`, created directly from `main` at `20d47915b2c47e8de54d887c541671eb181c124d`.
+- The pull request targets `main` directly with `Closes #57`; its final head SHA and factual self-review are recorded in the PR conversation.
+- Merge remains intentionally pending independent `QA: PASS` and Coordinator review.
+
+### Next task
+
+Independent QA should verify exact base and head SHAs, strict three-file scope, normalized geometry/config validation without partial mutation, conservative edge contact, top/bottom and obstacle failure, safe passage, exactly-once scoring, duplicate/reordered frame resistance, score cap, terminal failure freeze, deterministic reset replay, immutable state and passed-ID isolation, and absence of asynchronous/browser resources or forbidden integration. Do not add obstacle generation, movement, rendering, lifecycle wiring, localization, legacy work, or social-loop code in this pull request.
+
 ## Cycle 21
 
 - **Date/time:** 2026-07-12T17:09:25+03:00
