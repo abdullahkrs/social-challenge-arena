@@ -251,8 +251,8 @@
   function freezeObstacle(obstacle) {
     return Object.freeze({
       id: obstacle.id,
-      left: obstacle.left,
-      right: obstacle.right,
+      left: Math.max(0, Math.min(1, obstacle.left)),
+      right: Math.max(0, Math.min(1, obstacle.right)),
       gapTop: obstacle.gapTop,
       gapBottom: obstacle.gapBottom
     });
