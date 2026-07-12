@@ -252,7 +252,22 @@ test('caps horizontal speed without changing width, spacing, count, or configure
   }
 });
 
-test('recycles off-left obstacles canonically with fixed spacing, cycling gaps, and new IDs', () => {
+test('clips partial visibility and recycles off-left obstacles canonically', () => {
+  const partial = createFlightObstacles({
+    obstacleCount: 2,
+    obstacleWidth: 0.1,
+    spacing: 0.3,
+    initialLeft: 0.02,
+    initialSpeed: 0.2,
+    maxSpeed: 0.3,
+    speedIncreasePerSecond: 0.1,
+    maxDeltaMs: 100,
+    maxRunMs: 1000
+  }).advance(100);
+  assert.equal(partial.obstacles[0].left, 0);
+  assert.ok(partial.obstacles[0].right > 0 && partial.obstacles[0].right <= 1);
+  assertCanonicalSpacing(partial, 0.1, 0.3);
+
   const stream = createFlightObstacles({
     obstacleCount: 3,
     obstacleWidth: 0.1,
@@ -276,32 +291,6 @@ test('recycles off-left obstacles canonically with fixed spacing, cycling gaps, 
   assert.equal(state.nextId, 24);
   assert.equal(state.nextPatternIndex, 1);
   assertCanonicalSpacing(state, 0.1, 0.2);
-});
-
-
-test('clips a partially off-left corridor to the merged normalized rules and renderer shape', () => {
-  const stream = createFlightObstacles({
-    obstacleCount: 2,
-    obstacleWidth: 0.1,
-    spacing: 0.3,
-    initialLeft: 0.02,
-    initialSpeed: 0.2,
-    maxSpeed: 0.3,
-    speedIncreasePerSecond: 0.1,
-    maxDeltaMs: 100,
-    maxRunMs: 1000
-  });
-
-  const state = stream.advance(100);
-  assert.equal(state.obstacles[0].left, 0);
-  assert.ok(state.obstacles[0].right > 0 && state.obstacles[0].right <= 1);
-  for (const obstacle of state.obstacles) {
-    assert.ok(obstacle.left >= 0 && obstacle.left <= 1);
-    assert.ok(obstacle.right >= 0 && obstacle.right <= 1);
-    assert.ok(obstacle.left < obstacle.right);
-    assert.ok(obstacle.gapTop >= 0 && obstacle.gapBottom <= 1);
-    assert.ok(obstacle.gapTop < obstacle.gapBottom);
-  }
 });
 
 test('handles canonical multi-obstacle and repeated recycling in one bounded advance', () => {
