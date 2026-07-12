@@ -22,10 +22,6 @@
   inset: 0;
   overflow: hidden;
   color: #f8fafc;
-  --flight-player-left: 20%;
-  --flight-player-top: 46%;
-  --flight-player-width: 9%;
-  --flight-player-height: 7%;
 }
 .flight-renderer-sky {
   position: absolute;
@@ -44,9 +40,10 @@
 }
 .flight-renderer-obstacle {
   position: absolute;
-  inset: 0 auto 0 0;
+  left: var(--flight-obstacle-left);
+  top: 0;
+  bottom: 0;
   width: var(--flight-obstacle-width);
-  transform: translate3d(var(--flight-obstacle-left), 0, 0);
 }
 .flight-renderer-obstacle-cap {
   position: absolute;
@@ -78,14 +75,20 @@
 .flight-renderer-obstacle-cap--bottom::after { top: 5%; }
 .flight-renderer-player {
   position: absolute;
-  left: 0;
-  top: 0;
+  left: var(--flight-player-left);
+  top: var(--flight-player-top);
   width: var(--flight-player-width);
   height: var(--flight-player-height);
   min-width: 1.75rem;
   min-height: 1.35rem;
-  transform: translate3d(var(--flight-player-left), var(--flight-player-top), 0);
+}
+.flight-renderer-player-body {
+  position: absolute;
+  inset: 0;
   transform-origin: 50% 50%;
+}
+.flight-renderer-player-body--impulse {
+  animation: flight-renderer-impulse 220ms cubic-bezier(.2,.9,.3,1);
 }
 .flight-renderer-player-core {
   position: absolute;
@@ -113,9 +116,6 @@
   border-radius: 999px 0 0 999px;
   background: linear-gradient(90deg, transparent, #fb7185 58%, #fef3c7);
   opacity: 0.86;
-}
-.flight-renderer-player[data-flight-feedback="impulse"] {
-  animation: flight-renderer-impulse 220ms cubic-bezier(.2,.9,.3,1);
 }
 .flight-renderer-score {
   display: inline-grid;
@@ -158,7 +158,7 @@
   filter: saturate(0.55) brightness(0.82);
 }
 @keyframes flight-renderer-impulse {
-  45% { transform: translate3d(var(--flight-player-left), var(--flight-player-top), 0) rotate(-9deg) scale(1.08, 0.92); }
+  45% { transform: rotate(-9deg) scale(1.08, 0.92); }
 }
 @keyframes flight-renderer-score-pop {
   0% { opacity: 0; transform: translate(-50%, 25%) scale(0.75); }
@@ -170,7 +170,7 @@
   35% { opacity: 1; }
   100% { opacity: 0; transform: scale(1); }
 }
-.flight-renderer-scene[data-flight-reduced-motion="true"] .flight-renderer-player,
+.flight-renderer-scene[data-flight-reduced-motion="true"] .flight-renderer-player-body,
 .flight-renderer-scene[data-flight-reduced-motion="true"] .flight-renderer-score-pop,
 .flight-renderer-scene[data-flight-reduced-motion="true"] .flight-renderer-failure-impact {
   animation: none !important;
@@ -179,7 +179,7 @@
   opacity: 0;
 }
 @media (prefers-reduced-motion: reduce) {
-  .flight-renderer-player,
+  .flight-renderer-player-body,
   .flight-renderer-score-pop,
   .flight-renderer-failure-impact {
     animation: none !important;
@@ -375,6 +375,7 @@
     let lastSnapshot = null;
     let obstacleNodes = new Map();
     let lastTokens = { impulse: null, score: null, failure: null };
+    let playerBodyNode = null;
     let scorePopNode = null;
     let failureImpactNode = null;
 
@@ -401,15 +402,6 @@
 
     const playerNode = document.createElement('div');
     playerNode.className = 'flight-renderer-player';
-    const playerCore = document.createElement('span');
-    playerCore.className = 'flight-renderer-player-core';
-    const playerWing = document.createElement('span');
-    playerWing.className = 'flight-renderer-player-wing';
-    const playerSpark = document.createElement('span');
-    playerSpark.className = 'flight-renderer-player-spark';
-    playerNode.appendChild(playerCore);
-    playerNode.appendChild(playerWing);
-    playerNode.appendChild(playerSpark);
     entityRoot.appendChild(playerNode);
 
     const effectsRoot = document.createElement('div');
@@ -429,6 +421,30 @@
 
     function assertMounted() {
       if (destroyed) throw new Error('Flight renderer has been destroyed.');
+    }
+
+    function createPlayerBody(impulse) {
+      const body = document.createElement('div');
+      body.className = impulse
+        ? 'flight-renderer-player-body flight-renderer-player-body--impulse'
+        : 'flight-renderer-player-body';
+
+      const core = document.createElement('span');
+      core.className = 'flight-renderer-player-core';
+      const wing = document.createElement('span');
+      wing.className = 'flight-renderer-player-wing';
+      const spark = document.createElement('span');
+      spark.className = 'flight-renderer-player-spark';
+      body.appendChild(core);
+      body.appendChild(wing);
+      body.appendChild(spark);
+      return body;
+    }
+
+    function replacePlayerBody(impulse) {
+      removeIfAttached(playerNode, playerBodyNode);
+      playerBodyNode = createPlayerBody(impulse && !reducedMotion);
+      playerNode.appendChild(playerBodyNode);
     }
 
     function createObstacleNode(obstacle) {
@@ -488,14 +504,9 @@
         lastTokens[name] = token;
         if (!changed) continue;
 
-        if (name === 'impulse') {
-          playerNode.removeAttribute('data-flight-feedback');
-          if (!reducedMotion) playerNode.setAttribute('data-flight-feedback', 'impulse');
-        } else if (name === 'score') {
-          replaceScorePop(score);
-        } else {
-          replaceFailureImpact();
-        }
+        if (name === 'impulse') replacePlayerBody(true);
+        else if (name === 'score') replaceScorePop(score);
+        else replaceFailureImpact();
       }
     }
 
@@ -545,7 +556,7 @@
       removeIfAttached(effectsRoot, failureImpactNode);
       scorePopNode = null;
       failureImpactNode = null;
-      playerNode.removeAttribute('data-flight-feedback');
+      replacePlayerBody(false);
       applyPlayer({ left: 0.2, right: 0.29, top: 0.46, bottom: 0.53 });
       hudRoot.textContent = '0';
       worldRoot.setAttribute('data-flight-outcome', FLIGHT_RENDER_OUTCOMES.ACTIVE);
@@ -585,6 +596,8 @@
       clearObstacles();
       removeIfAttached(effectsRoot, scorePopNode);
       removeIfAttached(effectsRoot, failureImpactNode);
+      removeIfAttached(playerNode, playerBodyNode);
+      playerBodyNode = null;
       scorePopNode = null;
       failureImpactNode = null;
       removeIfAttached(worldLayer, styleNode);
