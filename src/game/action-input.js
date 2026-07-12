@@ -31,6 +31,7 @@
     ' ',
     'Spacebar',
     'Enter',
+    'NumpadEnter',
     'ArrowUp'
   ]);
   const EDITABLE_TAGS = new Set(['input', 'textarea', 'select']);
