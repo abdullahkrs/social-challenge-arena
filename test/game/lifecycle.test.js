@@ -55,6 +55,11 @@ function createScheduler() {
       assert.ok(entry, 'Expected one pending timeout.');
       return entry[1];
     },
+    takePendingInterval() {
+      const entry = intervals.entries().next().value;
+      assert.ok(entry, 'Expected one pending interval.');
+      return entry[1];
+    },
     fireTimeout() {
       const entry = timeouts.entries().next().value;
       assert.ok(entry, 'Expected one pending timeout.');
@@ -170,7 +175,63 @@ test('replay resets mutable frame state before starting a new run', () => {
   assert.equal(staleScore, 0);
 });
 
-test('inactive state blocks frames, timers, intervals, listeners, and stale scoring callbacks', () => {
+test('reactivation starts with zero delta after a long inactive gap', () => {
+  const scheduler = createScheduler();
+  const frames = [];
+  const lifecycle = createLifecycle(scheduler, {
+    onFrame(frame) {
+      frames.push({ deltaMs: frame.deltaMs, elapsedMs: frame.elapsedMs });
+    }
+  });
+
+  lifecycle.prepare();
+  lifecycle.start();
+  scheduler.flushFrame(100);
+  lifecycle.setActive(false);
+  lifecycle.setActive(true);
+  scheduler.flushFrame(10100);
+
+  assert.deepEqual(frames, [
+    { deltaMs: 0, elapsedMs: 0 },
+    { deltaMs: 0, elapsedMs: 0 }
+  ]);
+  assert.equal(lifecycle.getState().frameCount, 2);
+  assert.equal(lifecycle.getState().elapsedMs, 0);
+});
+
+test('deactivation cancels and invalidates deferred timers across reactivation', () => {
+  const scheduler = createScheduler();
+  let score = 0;
+  const lifecycle = createLifecycle(scheduler);
+
+  lifecycle.prepare();
+  lifecycle.start();
+  lifecycle.scheduleTimeout(() => { score += 10; }, 100);
+  lifecycle.scheduleInterval(() => { score += 100; }, 100);
+  const staleTimeout = scheduler.takePendingTimeout();
+  const staleInterval = scheduler.takePendingInterval();
+
+  lifecycle.setActive(false);
+  assert.equal(scheduler.counts().timeouts, 0);
+  assert.equal(scheduler.counts().intervals, 0);
+
+  staleTimeout();
+  staleInterval();
+  assert.equal(score, 0);
+
+  lifecycle.setActive(true);
+  staleTimeout();
+  staleInterval();
+  assert.equal(score, 0);
+
+  lifecycle.scheduleTimeout(() => { score += 1; }, 100);
+  lifecycle.scheduleInterval(() => { score += 2; }, 100);
+  scheduler.fireTimeout();
+  scheduler.fireInterval();
+  assert.equal(score, 3);
+});
+
+test('inactive state blocks stale frames and listeners while preserving one resumed frame', () => {
   const scheduler = createScheduler();
   let score = 0;
   let registeredListener = null;
@@ -190,14 +251,10 @@ test('inactive state blocks frames, timers, intervals, listeners, and stale scor
 
   lifecycle.prepare();
   lifecycle.start();
-  lifecycle.scheduleTimeout(() => { score += 10; }, 100);
-  lifecycle.scheduleInterval(() => { score += 100; }, 100);
   lifecycle.addTemporaryListener(target, 'pointerdown', () => { score += 1000; });
   const staleFrame = scheduler.takePendingFrame();
   lifecycle.setActive(false);
 
-  scheduler.fireTimeout();
-  scheduler.fireInterval();
   registeredListener({ type: 'pointerdown' });
   assert.equal(score, 0);
   assert.equal(scheduler.counts().frames, 0);
@@ -212,9 +269,8 @@ test('inactive state blocks frames, timers, intervals, listeners, and stale scor
   lifecycle.setActive(true);
   assert.equal(scheduler.counts().frames, 1);
   scheduler.flushFrame(200);
-  scheduler.fireInterval();
   registeredListener({ type: 'pointerdown' });
-  assert.equal(score, 1101);
+  assert.equal(score, 1001);
 
   lifecycle.setActive(false);
   assert.equal(scheduler.counts().frames, 0);
