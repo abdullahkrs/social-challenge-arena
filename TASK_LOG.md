@@ -1,127 +1,120 @@
 # Task Log
 
-Historical completed cycles 1–6 are preserved in [`TASK_LOG_ARCHIVE_CYCLES_1_6.md`](TASK_LOG_ARCHIVE_CYCLES_1_6.md), Cycles 7–8 in [`TASK_LOG_ARCHIVE_CYCLES_7_8.md`](TASK_LOG_ARCHIVE_CYCLES_7_8.md), Cycle 9 in [`TASK_LOG_ARCHIVE_CYCLE_9.md`](TASK_LOG_ARCHIVE_CYCLE_9.md), Cycle 10 in [`TASK_LOG_ARCHIVE_CYCLE_10.md`](TASK_LOG_ARCHIVE_CYCLE_10.md), Cycle 11 in [`TASK_LOG_ARCHIVE_CYCLE_11.md`](TASK_LOG_ARCHIVE_CYCLE_11.md), Cycle 12 in [`TASK_LOG_ARCHIVE_CYCLE_12.md`](TASK_LOG_ARCHIVE_CYCLE_12.md), Cycle 13 in [`TASK_LOG_ARCHIVE_CYCLE_13.md`](TASK_LOG_ARCHIVE_CYCLE_13.md), Cycle 14 in [`TASK_LOG_ARCHIVE_CYCLE_14.md`](TASK_LOG_ARCHIVE_CYCLE_14.md), and Cycle 15 in [`TASK_LOG_ARCHIVE_CYCLE_15.md`](TASK_LOG_ARCHIVE_CYCLE_15.md). This file remains the active source of truth for the current cycle.
+Historical completed cycles 1–6 are preserved in [`TASK_LOG_ARCHIVE_CYCLES_1_6.md`](TASK_LOG_ARCHIVE_CYCLES_1_6.md), Cycles 7–8 in [`TASK_LOG_ARCHIVE_CYCLES_7_8.md`](TASK_LOG_ARCHIVE_CYCLES_7_8.md), Cycle 9 in [`TASK_LOG_ARCHIVE_CYCLE_9.md`](TASK_LOG_ARCHIVE_CYCLE_9.md), Cycle 10 in [`TASK_LOG_ARCHIVE_CYCLE_10.md`](TASK_LOG_ARCHIVE_CYCLE_10.md), Cycle 11 in [`TASK_LOG_ARCHIVE_CYCLE_11.md`](TASK_LOG_ARCHIVE_CYCLE_11.md), Cycle 12 in [`TASK_LOG_ARCHIVE_CYCLE_12.md`](TASK_LOG_ARCHIVE_CYCLE_12.md), Cycle 13 in [`TASK_LOG_ARCHIVE_CYCLE_13.md`](TASK_LOG_ARCHIVE_CYCLE_13.md), Cycle 14 in [`TASK_LOG_ARCHIVE_CYCLE_14.md`](TASK_LOG_ARCHIVE_CYCLE_14.md), Cycle 15 in [`TASK_LOG_ARCHIVE_CYCLE_15.md`](TASK_LOG_ARCHIVE_CYCLE_15.md), and Cycle 16 in [`TASK_LOG_ARCHIVE_CYCLE_16.md`](TASK_LOG_ARCHIVE_CYCLE_16.md). This file remains the active source of truth for the current cycle.
 
-## Cycle 16
+## Cycle 17
 
-- **Date/time:** 2026-07-12T01:42:03+03:00
-- **Verification completed at:** 2026-07-12T01:54:00+03:00
-- **Merge verified at:** 2026-07-12T01:56:56+03:00
-- **Status:** complete; implementation squash-merged into `main`
-- **Selected task:** Distinguish successful comparison re-shares from successful first-result shares in the privacy-safe session metrics.
-- **Goal:** Add one aggregate `share_again_completed` counter so the final Share Again step can be measured independently without payloads, persistence, identity, timestamps, URLs, or network delivery.
-- **Why selected:** No pull request or unfinished cycle was open and all roadmap stages were complete. The documented next step is real usage evidence, but the previous collector recorded successful first shares and successful comparison re-shares in the same `share_completed` bucket, preventing direct measurement of loop closure.
-- **Viral-loop impact:** Separating successful re-share completion exposes whether a friend actually closes the Discover → Share Again loop instead of merely pressing the final button.
+- **Date/time:** 2026-07-12T02:41:33+03:00
+- **Status:** implementation complete; PR #44 review and merge pending
+- **Selected task:** Define one manual, privacy-safe experiment for validating the complete social loop with the existing eleven session counters.
+- **Goal:** Turn the existing counters into a controlled two-person protocol with exact role-specific expectations, aggregate-only recording, conversion formulas, success thresholds, and decision rules.
+- **Why selected:** No pull request or unfinished cycle was open, every MVP roadmap stage was complete, and Cycle 16 explicitly identified this as the next evidence step. Adding another mechanic before measuring the loop would broaden scope without evidence.
+- **Viral-loop impact:** The experiment measures where a sharer-and-friend pair drops between discovery and successful re-sharing, so the next product cycle can target one observed bottleneck instead of guessing.
 
 ### Acceptance criteria completed
 
-- Added exactly one allowlisted aggregate event named `share_again_completed`.
-- Successful sharing from the ordinary result increments `share_completed` only.
-- Successful sharing from comparison increments `share_again_completed` only and no longer inflates `share_completed`.
-- Repeated observer notifications for unchanged ordinary or comparison success text do not double-count completion.
-- Invalid event names remain rejected and snapshots remain frozen integer-only objects.
-- No event payload, score, URL, fragment, timestamp, identity, device data, cookie, persistence, network request, analytics SDK, or external destination was added.
-- Added focused architecture/privacy decision D-003.
-- Updated focused tests, metrics documentation, roadmap evidence, changelog, and synchronized `docs/metrics.js`.
-- Ran syntax, focused test, build, and exact metrics source/preview parity checks in a reconstructed focused workspace.
+- Added one active E-001 experiment with a clear hypothesis, fixed Tap Sprint challenge, ten-pair sample, separate roles, procedure, valid-session rules, privacy boundary, stop conditions, and result template.
+- Used all eleven allowlisted counters without changing application code or the collection boundary.
+- Defined exact expected counter snapshots for one sharer session and one friend session.
+- Defined nine aggregate conversion formulas covering initial play, first-share attempt and success, link opening, friend completion, comparison, re-share attempt and success, and end-to-end loop closure.
+- Restricted retention to sharer-cohort totals, friend-cohort totals, and predefined blocker-category counts.
+- Prohibited names, contact details, handles, pair/session identifiers, scores, links, timestamps, screenshots, device details, demographics, free-text quotes, and individual snapshots.
+- Defined Pass, Iterate, and Blocked rules that select at most one earliest failing product stage.
+- Added a focused Node documentation-contract test for the two role snapshots, eleven counters, nine formulas, threshold consistency, unrun status, and privacy prohibitions.
+- Kept gameplay, sharing, metrics code, preview files, motion, accessibility, dependencies, architecture, and shared-link schemas unchanged.
 
 ### Completed work
 
-- Extended the strict metrics allowlist from ten to eleven aggregate session counters.
-- Reclassified successful comparison Web Share or clipboard feedback from `share_completed` to `share_again_completed`.
-- Preserved `share_completed` exclusively for successful ordinary-result sharing.
-- Strengthened the comparison instrumentation test with duplicate observer notification coverage and explicit separation of the two completion counters.
-- Documented the privacy and architecture rationale in D-003 and updated the metrics contract and Stage 9 evidence.
-- Archived completed Cycle 15 without modifying its historical record.
+- Replaced the empty experiment placeholder with E-001, a facilitated two-person loop-validation protocol.
+- Fixed the test to Tap Sprint for 20 seconds so gameplay variance does not obscure the social handoff.
+- Specified fresh one-attempt sharer and friend sessions with deterministic expected snapshots.
+- Added denominator handling, raw-ratio validation, aggregate blocker categories, pass thresholds, and stop conditions.
+- Updated the metrics contract with the same nine formulas and role-separation warning.
+- Updated the changelog and archived Cycle 16 without rewriting its historical record.
 
 ### Intentional non-goals preserved
 
-- No analytics destination, persistence, consent UI, user identity, device fingerprint, score payload, URL payload, timestamp, dashboard, backend, dependency, framework, gameplay change, new mechanic, shared-link schema change, visual redesign, or motion change.
+- No participant recruitment or fabricated experiment result.
+- No analytics service, backend, persistence, cookie, identity, consent UI, dashboard, URL logging, score logging, timestamp, device fingerprint, dependency, framework, gameplay change, new mechanic, visual redesign, animation change, shared-link schema change, or production telemetry expansion.
 
 ### Files changed
 
-- `metrics.js`
-- `docs/metrics.js`
-- `test/instrumentation.test.js`
-- `DECISIONS.md`
+- `EXPERIMENTS.md`
 - `METRICS.md`
-- `ROADMAP.md`
 - `CHANGELOG.md`
 - `TASK_LOG.md`
-- `TASK_LOG_ARCHIVE_CYCLE_15.md`
+- `TASK_LOG_ARCHIVE_CYCLE_16.md`
+- `test/experiment-contract.test.js`
 
 ### Tests and checks
 
-- `node --version`: v22.16.0.
-- `node --check metrics.js`: passed for the exact implementation content in the reconstructed focused workspace.
-- `npm test`: passed with 4 focused instrumentation tests and 0 failures in the reconstructed focused workspace.
-- `npm run build`: passed and copied the nine required files to `dist/` and `docs/` in the reconstructed focused workspace.
-- Exact `metrics.js` / `docs/metrics.js` parity passed before build; exact source / `dist/metrics.js` parity passed after build.
-- Focused tests verify frozen allowlisted counts, invalid-event rejection, ordinary-share completion, comparison re-share completion, duplicate observer suppression, script ordering, and absence of persistence, timestamps, URL access, or network sinks.
-- The implementation branch was created directly from `main` at `b4196d5b38a32183a56a98088cfde9a1da0bc943`, remained zero commits behind during review, and changed only the nine expected files.
-- A complete repository checkout and full-suite execution were unavailable because the runtime could not resolve `github.com`; no repository-wide test count is claimed.
-- No lint or type-check command is configured. GitHub Actions and status checks remain absent by repository-owner direction.
+- Runtime: Node.js v22.16.0.
+- `node --check test/experiment-contract.test.js`: passed for the exact committed focused test content in the reconstructed workspace.
+- `npm test`: passed with 5 focused experiment-contract tests and 0 failures using the exact branch versions of `EXPERIMENTS.md`, `METRICS.md`, and `test/experiment-contract.test.js` in the reconstructed workspace.
+- The focused tests verify the explicitly unrun status, fixed cohort and challenge, exact eleven-event sharer and friend snapshots, nine identical formulas, 70%/50%/40% threshold consistency, one-bottleneck decision rule, and aggregate-only privacy boundary.
+- `npm run build`: passed with the exact repository `package.json` and `scripts/build.js` in a reconstructed build-contract workspace; the nine unchanged required inputs were represented locally and all 18 generated `dist/` and `docs/` copies matched their corresponding inputs.
+- GitHub blob-SHA parity was verified for all nine actual source/`docs/` pairs on the branch: `index.html`, `styles.css`, `catalog-bootstrap.js`, `app.js`, `lane-guard.js`, `metrics.js`, `create.html`, `private.css`, and `private.js`.
+- A complete repository checkout and repository-wide test execution were unavailable because the execution environment could not resolve `github.com`; no full-suite test count is claimed.
+- No lint or type-check script is configured.
 
-### Mobile, accessibility, motion, security, and privacy review
+### Mobile, accessibility, animation, security, and privacy review
 
-- No HTML, CSS, controls, focus behavior, touch target, gameplay timer, animation, or reduced-motion behavior changed, so the verified mobile and accessibility presentation remains unchanged.
-- Both completion events are triggered only by the existing exact success messages `Shared.` or `Link copied.`.
-- The observer compares the next status with the previous status before tracking, preventing duplicate notifications for unchanged text from increasing counts.
-- The collector still accepts only fixed allowlisted names and stores only integer counts in page memory.
-- Static source review found no payload collection, personal data, timestamps, score recording, URL or fragment access, cookies, browser storage, network request, backend, third-party SDK, or secret-like string.
+- No HTML, CSS, control, focus, touch-target, timer, animation, or reduced-motion file changed; prior 320px and 360–430px product behavior remains untouched rather than being re-claimed as newly exercised.
+- E-001 requires two role-specific fresh sessions and one attempt per role, preventing shared counters from being interpreted as mixed-role production analytics.
+- Individual snapshots must be added immediately to cohort totals and discarded.
+- Only aggregate integer totals and predefined aggregate blocker counts may be retained.
+- The documentation explicitly prohibits personal data, participant identifiers, scores, links, timestamps, screenshots, device details, demographics, and free-text quotes.
+- Static review found no secret, credential, external destination, data payload, persistence mechanism, or expanded collection field.
 
-### Animation and diversity evidence
+### Diversity and animation evidence
 
-- No gameplay mechanic, catalog definition, animation, or reduced-motion code changed.
-- The existing nine challenges and four genuine mechanics remain intact; this cycle protects measurement of their shared social loop rather than adding cosmetic or mechanical variety.
+- No challenge definition, mechanic, scoring model, animation, or reduced-motion behavior changed.
+- The existing nine challenges and four genuinely different mechanics remain intact.
+- This cycle protects evidence-driven prioritization of the shared social loop instead of adding cosmetic variety or unnecessary motion.
 
 ### Review findings and resolutions
 
-- Blocking measurement ambiguity reviewed: comparison success previously incremented the same counter as ordinary result success.
-- Resolution: the comparison status observer now increments only `share_again_completed`, with focused regression assertions that `share_completed` remains zero in the friend loop.
-- Blocking duplicate-count risk reviewed: MutationObserver may notify more than once for the same text.
-- Resolution: the existing previous-status comparison is retained and the focused test now sends a duplicate comparison notification while expecting one completion.
-- Blocking privacy-expansion risk reviewed: adding a metric could introduce payloads or a destination.
-- Resolution: D-003 limits the change to one session-local integer; static tests continue rejecting persistence and network sinks.
-- Complete diff, changed filenames, branch ancestry, tests, build behavior, source/preview parity, documentation, privacy, security, scope, and secrets were reviewed. No unresolved blocking finding remained before merge.
-- No independent approval is claimed; this is a factual self-review.
-
-### Git and merge outcome
-
-- Implementation branch: `agent/cycle-16-track-share-again-completion`, created directly from `main` at `b4196d5b38a32183a56a98088cfde9a1da0bc943`.
-- Pull request: #42 — `fix(metrics): track successful share-again separately`, targeting `main`.
-- Final reviewed head SHA: `ca5e946db475e40672a39108b31b1b11a5a0f41d`.
-- Squash merge completed at 2026-07-12T01:56:56+03:00.
-- Merge SHA: `d3f3ff0b79801f78cd6c7a303ec53ceae3bcca1c`.
-- GitHub reports PR #42 as closed and merged with no remaining conflict, review thread, submitted review, workflow run, or status check.
+- Internal-consistency finding: the first hypothesis wording referred to comparison reach while the decision rule measured friend completion and successful re-share attempts.
+- Resolution: aligned the hypothesis exactly with the 70% friend-completion, 50% re-share-success, and 40% end-to-end thresholds used by the decision rule.
+- Test-harness finding: the first local draft required every event name to appear three times, which was stricter than the two required role tables for counters not used in formulas.
+- Resolution: replaced the draft harness with the committed exact-table parser and reran all five focused tests successfully.
+- Scope, privacy, misleading-result claims, formulas, thresholds, source/preview parity, secrets, and changed-file boundaries were reviewed. No blocking finding remains before pull-request review.
+- No independent approval is claimed; this is factual self-review evidence.
 
 ### Preview status
 
-Repository preview output verified for the relevant implementation content through exact `metrics.js` / `docs/metrics.js` parity and a passing focused build. No live deployed behavior is claimed.
+Repository preview output verified for the relevant branch: all nine actual source and `docs/` build-input blob SHAs match exactly, and no preview file changed in this documentation-and-test cycle.
 
 ### Decision
 
-D-003 keeps successful ordinary sharing and successful comparison re-sharing as separate allowlisted session-local integer counters. No framework, dependency, backend, schema, identity, persistence, or external-service decision was introduced.
+Use a manual, aggregate-only ten-pair experiment before adding another mechanic or any analytics destination. Select at most one earliest failing stage after real results exist.
 
 ### Strategic review
 
-- The MVP loop and minimum mechanic variety are complete; adding another game without evidence would broaden scope prematurely.
-- The smallest evidence-readiness defect was the inability to distinguish a successful first share from a successful re-share.
-- The correction remains local, dependency-free, and invisible to the player.
-- The privacy boundary remains unchanged because only one additional session-local integer counter was introduced.
+- The MVP loop and four-mechanic minimum are already complete.
+- The smallest high-impact next step is an executable evidence protocol, not another feature.
+- Role-specific fresh sessions prevent mixed `challenge_started` and `challenge_completed` counters from making ordinary and friend paths ambiguous.
+- Aggregate-only manual tallies preserve the existing privacy boundary while still exposing stage conversion.
 
 ### Product thinking
 
-1. The final loop step is successful re-sharing, not merely pressing the Share Again button.
-2. `share_again_attempted` alone cannot show whether Web Share or clipboard completion succeeded.
-3. Mixing comparison success into `share_completed` obscured both initial-share and re-share conversion.
-4. One separate allowlisted integer counter is the minimum useful correction.
-5. Parked idea: define a manual experiment and conversion formulas after this metric can distinguish final-loop completion.
+1. A controlled pair protocol can validate the loop without adding telemetry infrastructure.
+2. A single fixed challenge reduces gameplay variance while the social handoff is being tested.
+3. Fresh one-attempt sessions make expected snapshots deterministic and auditable.
+4. Separate sharer and friend aggregate totals allow the shared counters to be interpreted correctly.
+5. Parked idea: a remote or persistent analytics pilot only after the manual experiment produces a concrete bottleneck and an explicit privacy decision.
 
 ### Remaining limitation
 
-The collector remains page-session-only and cannot produce cross-user or cross-session real usage evidence without a future explicit privacy and architecture decision. Full repository checkout, full-suite execution, live deployed preview, and GitHub Actions were unavailable in this runtime.
+E-001 has been defined but not run. Real participants and manual cohort totals are required before a product bottleneck can be selected. The runtime could not perform a complete repository checkout, so the full repository test suite and live deployed preview were not verified.
+
+### Pull request and merge outcome
+
+- Branch: `agent/cycle-17-define-loop-validation-experiment`, created directly from `main` at `98ee13261068dcb346f665de8498f0440fa176d6`.
+- Pull request: #44 — `docs(experiment): define privacy-safe loop validation`, targeting `main` directly.
+- Reviewed head SHA: recorded in the final PR self-review after the complete diff is inspected.
+- Merge SHA: unavailable until PR #44 is squash-merged; final merge metadata will be recorded in the pull request and cycle report without opening a second pull request.
 
 ### Next task
 
-Define one manual, privacy-safe loop-validation experiment using the eleven aggregate counters before considering another mechanic or analytics destination.
+Run E-001 with ten real sharer-and-friend pairs, retain aggregate totals only, calculate the nine conversions, and choose at most one earliest failing stage. Do not add a feature before those results exist.
