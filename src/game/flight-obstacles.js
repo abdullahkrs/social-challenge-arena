@@ -150,7 +150,7 @@
       throw new RangeError('Configuration could require too many recycling operations in one run.');
     }
 
-    const maximumNextId = config.initialId + maxRecycles + config.obstacleCount;
+    const maximumNextId = config.initialId + maxRecycles + config.obstacleCount + 1;
     if (!Number.isSafeInteger(maximumNextId)) {
       throw new RangeError('Configuration cannot preserve safe monotonic obstacle IDs for the bounded run.');
     }
