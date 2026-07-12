@@ -2,6 +2,51 @@
 
 Historical completed cycles 1–6 are preserved in [`TASK_LOG_ARCHIVE_CYCLES_1_6.md`](TASK_LOG_ARCHIVE_CYCLES_1_6.md), Cycles 7–8 in [`TASK_LOG_ARCHIVE_CYCLES_7_8.md`](TASK_LOG_ARCHIVE_CYCLES_7_8.md), Cycle 9 in [`TASK_LOG_ARCHIVE_CYCLE_9.md`](TASK_LOG_ARCHIVE_CYCLE_9.md), Cycle 10 in [`TASK_LOG_ARCHIVE_CYCLE_10.md`](TASK_LOG_ARCHIVE_CYCLE_10.md), Cycle 11 in [`TASK_LOG_ARCHIVE_CYCLE_11.md`](TASK_LOG_ARCHIVE_CYCLE_11.md), Cycle 12 in [`TASK_LOG_ARCHIVE_CYCLE_12.md`](TASK_LOG_ARCHIVE_CYCLE_12.md), Cycle 13 in [`TASK_LOG_ARCHIVE_CYCLE_13.md`](TASK_LOG_ARCHIVE_CYCLE_13.md), Cycle 14 in [`TASK_LOG_ARCHIVE_CYCLE_14.md`](TASK_LOG_ARCHIVE_CYCLE_14.md), Cycle 15 in [`TASK_LOG_ARCHIVE_CYCLE_15.md`](TASK_LOG_ARCHIVE_CYCLE_15.md), and Cycle 16 in [`TASK_LOG_ARCHIVE_CYCLE_16.md`](TASK_LOG_ARCHIVE_CYCLE_16.md). This file remains the active source of truth for the current cycle.
 
+## Cycle 18
+
+- **Date/time:** 2026-07-12T09:13:00+03:00
+- **Status:** implementation in progress for issue #49
+- **Owner role:** `agent-engine`
+- **Selected task:** Build the minimum deterministic shared gameplay lifecycle for Stage 12.
+- **Goal:** Provide one testable `idle → ready → running → finished` state machine with a single update handle, replay reset, active-state gating, and complete transient-resource teardown.
+- **Why selected:** Issue #49 is the only open engine assignment, has no dependencies, owns non-overlapping `src/game/**`, `test/game/**`, and `TASK_LOG.md` paths, and directly advances the earliest incomplete roadmap stage.
+- **Viral-loop impact:** This foundation reduces replay and navigation failures in the future flagship game while leaving the existing result, sharing, friend-attempt, comparison, share-again, and metrics systems unchanged.
+
+### Planned acceptance contract
+
+- **Player decision and input:** No game mechanic is introduced. Lifecycle actions are explicit, invalid actions are deterministic no-ops, and temporary input listeners may dispatch only while the lifecycle is both `running` and active.
+- **Movement model:** None in this issue; physics and movement remain deferred to a later assigned engine issue.
+- **Failure condition:** Game-specific failure is not added. The explicit `finish()` transition provides the deterministic endpoint future collision or failure logic will call.
+- **Scoring model:** No score formula or bounds are introduced. Frame, timer, interval, and listener callbacks are gated so inactive, hidden, finished, reset, or destroyed runs cannot continue score-producing work.
+- **Feedback effects:** None; rendering, HUD, particles, impact, and result presentation remain outside the engine lifecycle assignment.
+- **Reduced-motion behavior:** The lifecycle itself is presentation-neutral and schedules no decorative motion; future reduced-motion rendering will use the same state and scoring decisions.
+- **Teardown behavior:** Finish, reset, replay, and teardown cancel the pending animation frame, registered timeouts, intervals, and temporary listeners. Teardown permanently disables the instance.
+- **Social-loop reuse:** No result, sharing, comparison, friend-attempt, share-again, URL, or metrics system is created or modified.
+- **Focused tests:** Cover valid and invalid transitions, one-loop enforcement, bounded delta time, replay reset, inactive callback blocking, and complete teardown.
+
+### Expected files
+
+- `TASK_LOG.md`
+- `src/game/lifecycle.js`
+- `test/game/lifecycle.test.js`
+
+### Intentional non-goals
+
+- No flight or jump physics, collision rules, obstacles, score formula, rendering, HUD, effects, localization, legacy edits, social-loop changes, dependency, framework, bundler, or general-purpose engine.
+
+### Strategic review
+
+- A lifecycle-only issue is the smallest reusable Stage 12 slice and avoids coupling future flagship physics to legacy challenge code.
+- Scheduler injection keeps browser behavior testable with Node built-ins and no dependency.
+- One authoritative pending-frame handle plus stale-callback invalidation prevents duplicate loops under rapid replay or visibility changes.
+
+### Product thinking
+
+1. Future gameplay should call one lifecycle rather than duplicate timer and teardown rules per game.
+2. Inactive-state gating protects fair scoring when a page is hidden or navigated away from.
+3. Completion cleanup reduces replay memory growth before visual effects are added.
+4. Parked idea: add game-specific fixed-step physics and collision only after this lifecycle passes independent QA.
+
 ## Cycle 17
 
 - **Date/time:** 2026-07-12T02:41:33+03:00
