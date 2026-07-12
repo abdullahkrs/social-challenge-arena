@@ -1,0 +1,90 @@
+name: Agent task
+description: Assign one narrow repository task to one specialized agent.
+title: "[Agent] "
+body:
+  - type: dropdown
+    id: owner_role
+    attributes:
+      label: Owner role
+      options:
+        - agent-coordinator
+        - agent-creative
+        - agent-trends
+        - agent-engine
+        - agent-ux
+        - agent-i18n
+        - ready-for-qa
+    validations:
+      required: true
+  - type: dropdown
+    id: status
+    attributes:
+      label: Status
+      options:
+        - ready-for-agent
+        - blocked
+    validations:
+      required: true
+  - type: textarea
+    id: goal
+    attributes:
+      label: Goal
+      description: One narrow outcome.
+    validations:
+      required: true
+  - type: textarea
+    id: product_reason
+    attributes:
+      label: Product reason
+      description: Why this matters to the arcade and social loop.
+    validations:
+      required: true
+  - type: textarea
+    id: dependencies
+    attributes:
+      label: Dependencies
+      description: List required merged issues or write None.
+    validations:
+      required: true
+  - type: textarea
+    id: allowed_files
+    attributes:
+      label: Allowed files
+      description: Exact files or directories the agent may modify.
+    validations:
+      required: true
+  - type: textarea
+    id: forbidden_files
+    attributes:
+      label: Forbidden files
+      description: Files or areas that must remain untouched.
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      description: Measurable behavior and evidence.
+    validations:
+      required: true
+  - type: textarea
+    id: non_goals
+    attributes:
+      label: Non-goals
+      description: Explicitly excluded work.
+    validations:
+      required: true
+  - type: textarea
+    id: required_evidence
+    attributes:
+      label: Required evidence
+      description: Tests, build, preview, research, or review evidence.
+    validations:
+      required: true
+  - type: textarea
+    id: qa_focus
+    attributes:
+      label: QA focus
+      description: Highest-risk areas the QA agent must inspect.
+    validations:
+      required: true
