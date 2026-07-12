@@ -2,6 +2,99 @@
 
 Historical completed cycles 1–6 are preserved in [`TASK_LOG_ARCHIVE_CYCLES_1_6.md`](TASK_LOG_ARCHIVE_CYCLES_1_6.md), Cycles 7–8 in [`TASK_LOG_ARCHIVE_CYCLES_7_8.md`](TASK_LOG_ARCHIVE_CYCLES_7_8.md), Cycle 9 in [`TASK_LOG_ARCHIVE_CYCLE_9.md`](TASK_LOG_ARCHIVE_CYCLE_9.md), Cycle 10 in [`TASK_LOG_ARCHIVE_CYCLE_10.md`](TASK_LOG_ARCHIVE_CYCLE_10.md), Cycle 11 in [`TASK_LOG_ARCHIVE_CYCLE_11.md`](TASK_LOG_ARCHIVE_CYCLE_11.md), Cycle 12 in [`TASK_LOG_ARCHIVE_CYCLE_12.md`](TASK_LOG_ARCHIVE_CYCLE_12.md), Cycle 13 in [`TASK_LOG_ARCHIVE_CYCLE_13.md`](TASK_LOG_ARCHIVE_CYCLE_13.md), Cycle 14 in [`TASK_LOG_ARCHIVE_CYCLE_14.md`](TASK_LOG_ARCHIVE_CYCLE_14.md), Cycle 15 in [`TASK_LOG_ARCHIVE_CYCLE_15.md`](TASK_LOG_ARCHIVE_CYCLE_15.md), and Cycle 16 in [`TASK_LOG_ARCHIVE_CYCLE_16.md`](TASK_LOG_ARCHIVE_CYCLE_16.md). This file remains the active source of truth for the current cycle.
 
+## Cycle 19
+
+- **Date/time:** 2026-07-12T13:10:46+03:00
+- **Status:** implementation complete; PR #52 pending independent QA
+- **Owner role:** `agent-engine`
+- **Selected task:** Normalize one-action arcade input for Stage 12 under Issue #51.
+- **Goal:** Provide one dependency-free adapter that converts keyboard, primary pointer, or single-touch fallback input into one immutable semantic action without duplicate emissions or listener growth.
+- **Why selected:** Issue #51 was the only open assignment, explicitly named `agent-engine` with `ready-for-agent`, depended only on merged Issue #49 and PR #50 at `1abbf1de63f6d67c67a2af8be1375abcd238d903`, owned non-overlapping files, and had no existing implementation PR.
+- **Viral-loop impact:** Reliable one-action input protects the future flagship game's immediate play, fair scoring, replay, and friend-attempt experience while leaving the existing result, sharing, comparison, share-again, URL, and metrics systems unchanged.
+
+### Acceptance contract completed
+
+- **Player decision and input:** One Space, Enter, Arrow Up, primary left pointer activation, or single-touch fallback emits exactly one frozen `primary-action` with source `keyboard`, `pointer`, or `touch`.
+- **Movement model:** None in this issue; gravity, impulse, position, and collision remain deferred.
+- **Failure condition:** None in this issue.
+- **Scoring model:** None was introduced. The injected `isEnabled()` gate prevents action callbacks outside future active running play, so disabled or torn-down input cannot advance scoring.
+- **Escalation:** None in this issue.
+- **Feedback effects:** None; rendering, haptics, particles, shake, sound, and result transitions remain experience work.
+- **Reduced-motion behavior:** The adapter contains no animation, and action decisions/counts are identical in reduced-motion mode.
+- **Teardown behavior:** `attach()` and `detach()` are idempotent, replay-style reattachment creates one clean listener set, listener generations reject retained stale callbacks, and `teardown()` permanently removes and disables all input.
+- **Social-loop reuse:** No result, sharing, friend-attempt, comparison, share-again, URL codec, or metrics code was created or modified.
+
+### Completed work
+
+- Added a UMD/CommonJS `SocialChallengeGameActionInput` module with no dependency.
+- Added one semantic action type and immutable source-specific action objects.
+- Added keyboard filtering for repeat events, modifiers, unrelated keys, and editable targets including content-editable ancestors.
+- Added primary-left pointer filtering and mutually exclusive pointer-versus-touch registration.
+- Added single-touch fallback, enabled-state gating, explicit accepted-input `preventDefault`, idempotent attach/detach, stale-listener invalidation, and permanent teardown.
+- Added ten focused tests using injected event-target doubles and a Node VM browser-global check.
+
+### Files changed
+
+- `TASK_LOG.md`
+- `src/game/action-input.js`
+- `test/game/action-input.test.js`
+
+### Tests and checks
+
+- Runtime: Node.js v22.16.0.
+- `node --check src/game/action-input.js`: passed against branch blob `8f4522a6c08105b652f7cee76b397fd47c33bd46`.
+- `node --check test/game/action-input.test.js`: passed against branch blob `400effacc3011fd45f141fb7e46a0c4638e22969`.
+- Current repository command `npm test`: passed in a reconstructed focused workspace using those exact branch blobs and the exact repository `package.json`; 10 tests passed and 0 failed.
+- Focused coverage includes CommonJS/browser-global export, immutable actions, keyboard parity, repeat/modifier/editable rejection, primary-pointer filtering, pointer/touch exclusivity, multi-touch rejection, enabled-state gating, accepted-only default prevention, one-action emission, idempotent attach/detach, replay-style reattachment, retained-listener rejection, and permanent teardown.
+- Current repository command `npm run build`: passed in a reconstructed build-contract workspace using the exact repository `package.json` and `scripts/build.js`; nine representative required inputs were copied to all 18 `dist/` and `docs/` outputs.
+- A complete repository checkout and repository-wide test execution were unavailable because the runtime could not resolve `github.com`; no full-suite count is claimed.
+- The build run verifies the unchanged build contract rather than deployed preview contents because representative input fixtures were used.
+- No lint or type-check script is configured.
+
+### Mobile, accessibility, motion, security, and privacy review
+
+- Keyboard parity includes Space, Enter, and Arrow Up; editable controls and content-editable ancestors are protected from gameplay shortcuts.
+- Pointer and touch modes are mutually exclusive, preventing one physical tap from producing both callbacks.
+- Ignored input does not call `preventDefault`; accepted input does so only when explicitly configured.
+- No HTML, CSS, visible copy, focus order, viewport, touch target, animation, dependency, storage, URL state, analytics, identity, personal data, credential, secret, or untrusted HTML path changed.
+
+### Review findings and resolutions
+
+- Self-review identified that detached listener functions retained by a test double could otherwise become active again after reattachment if only an `attached` flag were checked.
+- Resolution: every listener captures a generation, and detach, reattach, or teardown invalidates earlier generations permanently.
+- Self-review identified that registering both pointer and touch listeners would allow synthetic duplicate actions on capable devices.
+- Resolution: the adapter selects exactly one action mode at construction and registers only `pointerdown` or `touchstart`.
+- Full changed-file review confirmed only the three issue-owned files changed, no dependency was added, and no forbidden lifecycle, UI, preview, localization, legacy, social-loop, URL, or metrics file changed.
+- No independent approval is claimed; this is implementation-agent self-review evidence only.
+
+### Preview status
+
+Preview not verified: the adapter is intentionally not wired into the public UI or `docs/` output in this input-foundation issue, and the runtime could not open a complete repository checkout or live browser preview.
+
+### Strategic review
+
+- One semantic action avoids coupling future physics to browser-specific event details.
+- Pointer/touch exclusivity and repeat filtering protect score fairness before movement is added.
+- Generation-gated listeners make rapid replay and navigation safe without introducing a general-purpose input framework.
+
+### Product thinking
+
+1. One action contract lets the first flagship game support touch and keyboard without duplicating game logic.
+2. Ignoring editable targets preserves normal form and assistive interaction outside gameplay.
+3. Accepted-only default prevention avoids unnecessary page-interaction suppression.
+4. Parked idea: connect this adapter to deterministic impulse physics only after independent QA and a separate assigned issue.
+
+### Pull request outcome
+
+- Branch: `agent/issue-51-action-input`, created directly from `main` at `1abbf1de63f6d67c67a2af8be1375abcd238d903`.
+- Pull request: #52 — `feat(game): normalize one-action arcade input`, targeting `main` directly with `Closes #51`.
+- The final reviewed head SHA and factual self-review are recorded on PR #52 after this task-log commit.
+- Merge remains intentionally pending independent `QA: PASS` and Coordinator review.
+
+### Next task
+
+Independent QA should review Issue #51 and PR #52, especially one-callback semantics, keyboard/editable filtering, primary pointer rules, pointer-versus-touch exclusivity, enabled-state gating, accepted-only default prevention, stale-listener rejection, idempotent replay-style cycles, permanent teardown, scope boundaries, and the stated verification limitations. Do not add physics or visuals in this PR.
+
 ## Cycle 18
 
 - **Date/time:** 2026-07-12T10:08:56+03:00
