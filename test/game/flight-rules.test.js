@@ -179,6 +179,12 @@ test('uses conservative edge contact: touching is not separated and safe-gap edg
   })).score, 0);
   assert.equal(horizontalTouch.getState().outcome, FLIGHT_RULE_OUTCOMES.ACTIVE);
 
+  const horizontalCollision = createFlightRules();
+  assert.equal(horizontalCollision.evaluate(frame({
+    player: player({ left: 0.5, right: 0.6, top: 0.2, bottom: 0.4 }),
+    obstacles: [obstacle('horizontal-edge')]
+  })).outcome, FLIGHT_RULE_OUTCOMES.FAILED);
+
   const gapTopTouch = createFlightRules();
   assert.equal(gapTopTouch.evaluate(frame({
     player: player({ left: 0.6, right: 0.65, top: 0.3, bottom: 0.4 }),
