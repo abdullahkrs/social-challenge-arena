@@ -25,7 +25,7 @@ Record active and completed autonomous cycles factually.
 ### C-2026-001 — 2026-07-13 — First vertical-slice product strategy
 
 - Owner role: Product Strategist (`agent-product`).
-- Issue and PR: Issue #67; PR pending creation from branch `agent-product/issue-67-first-vertical-slice`.
+- Issue and PR: Issue #67; PR #68 from branch `agent-product/issue-67-first-vertical-slice` targeting `main`.
 - Goal and product reason: select one evidence-based first vertical slice that validates the complete social competition loop without premature engine or infrastructure work.
 - User journey and product entry point: discovery card in the real product → brief visual demonstration → three seeded Trace Relay rounds → result → replay or language-independent share link → friend plays the identical seed → localized comparison → rematch or share-again.
 - Visible product change: documentation-only product decision; no runtime product exists yet.
