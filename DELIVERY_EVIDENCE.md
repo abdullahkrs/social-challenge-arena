@@ -20,7 +20,7 @@
 
 - Arabic RTL, English, and Turkish share one key-complete localization module; gameplay state and invite URLs contain no language.
 - Touch, pointer, Space, and Enter are supported. Interactive targets are at least 48 CSS px where practical.
-- Visible focus, live hit/miss/result announcements, readable contrast, non-color-only text feedback, canvas fallback, and 320px responsive rules are included.
+- Visible focus, live hit/miss/result announcements, readable contrast, non-color-only text feedback, an accessible canvas name, and 320px responsive rules are included.
 - Reduced-effects mode removes ambient animation and particles while preserving the timing decision and score.
 
 ## Privacy and security
