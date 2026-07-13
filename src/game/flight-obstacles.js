@@ -13,8 +13,9 @@
   const MAX_SPEED_INCREASE_PER_SECOND = 4;
   const MAX_RECYCLES_PER_ADVANCE = 4096;
   const MAX_TOTAL_RECYCLES = 1000000;
-  const PRECISION_DIGITS = 12;
-  const ELAPSED_DECIMAL_SCALE = 10n ** BigInt(PRECISION_DIGITS);
+  const OUTPUT_PRECISION_DIGITS = 12;
+  const ELAPSED_PRECISION_DIGITS = 6;
+  const ELAPSED_DECIMAL_SCALE = 10n ** BigInt(ELAPSED_PRECISION_DIGITS);
   const DOUBLE_UNITS_PER_MS = 1n << 1074n;
   const DOUBLE_FRACTION_MASK = (1n << 52n) - 1n;
   const DOUBLE_IMPLICIT_BIT = 1n << 52n;
@@ -49,7 +50,7 @@
 
   function normalizeFloat(value) {
     if (Object.is(value, -0)) return 0;
-    return Number(value.toFixed(PRECISION_DIGITS));
+    return Number(value.toFixed(OUTPUT_PRECISION_DIGITS));
   }
 
   function positiveFiniteNumberToDoubleUnits(value) {
@@ -59,8 +60,7 @@
     const exponentBits = Number((bits >> 52n) & 0x7ffn);
     const fractionBits = bits & DOUBLE_FRACTION_MASK;
     if (exponentBits === 0) return fractionBits;
-    const significand = DOUBLE_IMPLICIT_BIT | fractionBits;
-    return significand << BigInt(exponentBits - 1);
+    return (DOUBLE_IMPLICIT_BIT | fractionBits) << BigInt(exponentBits - 1);
   }
 
   function canonicalElapsedMs(elapsedUnits) {
@@ -72,7 +72,7 @@
     const whole = scaledElapsed / ELAPSED_DECIMAL_SCALE;
     const fraction = (scaledElapsed % ELAPSED_DECIMAL_SCALE)
       .toString()
-      .padStart(PRECISION_DIGITS, '0');
+      .padStart(ELAPSED_PRECISION_DIGITS, '0');
     return Number(`${whole}.${fraction}`);
   }
 
@@ -118,7 +118,6 @@
       const owner = `gapPattern[${index}]`;
       if (!isObject(entry)) throw new TypeError(`${owner} must be an object.`);
       rejectUnknownKeys(entry, GAP_KEYS, owner);
-
       if (!Object.prototype.hasOwnProperty.call(entry, 'gapTop')
         || !Object.prototype.hasOwnProperty.call(entry, 'gapBottom')) {
         throw new TypeError(`${owner} must define gapTop and gapBottom.`);
@@ -130,18 +129,15 @@
         || gapTop < 0 || gapBottom > 1 || !(gapTop < gapBottom)) {
         throw new RangeError(`${owner} must define a finite normalized gap with gapTop less than gapBottom.`);
       }
-
       pattern.push(Object.freeze({ gapTop, gapBottom }));
     }
-
     return Object.freeze(pattern);
   }
 
   function speedAt(config, elapsedMs) {
-    const elapsedSeconds = elapsedMs / 1000;
     return Math.min(
       config.maxSpeed,
-      config.initialSpeed + (config.speedIncreasePerSecond * elapsedSeconds)
+      config.initialSpeed + (config.speedIncreasePerSecond * (elapsedMs / 1000))
     );
   }
 
@@ -151,7 +147,6 @@
       / config.speedIncreasePerSecond;
     const acceleratingSeconds = Math.min(elapsedSeconds, secondsToCap);
     const cappedSeconds = Math.max(0, elapsedSeconds - secondsToCap);
-
     return (config.initialSpeed * acceleratingSeconds)
       + (0.5 * config.speedIncreasePerSecond * acceleratingSeconds * acceleratingSeconds)
       + (config.maxSpeed * cappedSeconds);
@@ -267,8 +262,8 @@
     let elapsedUnits = 0n;
 
     function buildState() {
-      const canonicalElapsed = canonicalElapsedMs(elapsedUnits);
-      const distance = distanceAt(config, canonicalElapsed);
+      const elapsedMs = canonicalElapsedMs(elapsedUnits);
+      const distance = distanceAt(config, elapsedMs);
       const firstSequenceIndex = firstSequenceIndexAt(config, distance);
       const firstRawLeft = config.initialLeft
         + (firstSequenceIndex * config.step)
@@ -277,29 +272,24 @@
 
       for (let offset = 0; offset < config.obstacleCount; offset += 1) {
         const sequenceIndex = firstSequenceIndex + offset;
-        const id = config.initialId + sequenceIndex;
         const rawLeft = firstRawLeft + (offset * config.step);
         const rawRight = rawLeft + config.obstacleWidth;
         const gap = config.gapPattern[sequenceIndex % config.gapPattern.length];
-        const clippedLeft = Math.max(0, rawLeft);
-        const clippedRight = Math.min(1, rawRight);
-
         obstacles.push(Object.freeze({
-          id,
-          left: clippedLeft,
-          right: clippedRight,
+          id: config.initialId + sequenceIndex,
+          left: Math.max(0, rawLeft),
+          right: Math.min(1, rawRight),
           gapTop: gap.gapTop,
           gapBottom: gap.gapBottom
         }));
       }
 
-      const nextId = config.initialId + firstSequenceIndex + config.obstacleCount;
       return Object.freeze({
-        elapsedMs: canonicalElapsed,
-        speed: normalizeFloat(speedAt(config, canonicalElapsed)),
+        elapsedMs,
+        speed: normalizeFloat(speedAt(config, elapsedMs)),
         nextPatternIndex: (firstSequenceIndex + config.obstacleCount)
           % config.gapPattern.length,
-        nextId,
+        nextId: config.initialId + firstSequenceIndex + config.obstacleCount,
         obstacles: Object.freeze(obstacles)
       });
     }
