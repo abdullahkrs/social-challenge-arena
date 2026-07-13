@@ -15,7 +15,8 @@
   const MAX_TOTAL_RECYCLES = 1000000;
   const OUTPUT_PRECISION_DIGITS = 12;
   const ELAPSED_PRECISION_DIGITS = 6;
-  const ELAPSED_ROUNDING_ULPS = 8;
+  const ELAPSED_BOUNDARY_TOLERANCE_MS = 1e-9;
+  const ELAPSED_ROUNDING_ULPS = 64;
 
   const DEFAULT_GAP_PATTERN = Object.freeze([
     Object.freeze({ gapTop: 0.12, gapBottom: 0.48 }),
@@ -53,10 +54,19 @@
   function canonicalElapsedMs(value) {
     if (Object.is(value, -0)) return 0;
     const scale = 10 ** ELAPSED_PRECISION_DIGITS;
-    const boundaryTolerance = Number.EPSILON
-      * Math.max(1, Math.abs(value))
-      * ELAPSED_ROUNDING_ULPS;
-    return Math.round((value + boundaryTolerance) * scale) / scale;
+    const scaledValue = value * scale;
+    const lowerUnit = Math.floor(scaledValue);
+    const boundaryDistance = Math.abs((scaledValue - lowerUnit) - 0.5);
+    const boundaryTolerance = Math.max(
+      ELAPSED_BOUNDARY_TOLERANCE_MS,
+      Number.EPSILON * Math.max(1, Math.abs(value)) * ELAPSED_ROUNDING_ULPS
+    ) * scale;
+
+    // Equivalent adjacent partitions can differ by a few binary64 ulps even
+    // after compensated summation. Treat that narrow half-unit band as an
+    // explicit tie and choose the lower canonical unit for every partition.
+    if (boundaryDistance <= boundaryTolerance) return lowerUnit / scale;
+    return Math.round(scaledValue) / scale;
   }
 
   function rejectUnknownKeys(object, allowedKeys, owner) {
