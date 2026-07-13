@@ -4,6 +4,9 @@ Track proposed, developing, approved, parked, rejected, implemented, and retired
 
 | ID | Idea | Status | Product problem | Dimension | Social hook | Islamic review | Languages | Decision reason |
 |---|---|---|---|---|---|---|---|---|
+| I-2026-001 | Trace Relay | Selected for specialist review | Users need a fast, fair, language-light challenge that turns one shared link into direct friend competition | 2D | Identical deterministic route seed, score to beat, comparison, rematch, share-again | Pending required review; no apparent prohibited theme or mechanic identified by Product Strategy | Arabic RTL, English, Turkish from first architecture; board geometry remains language-independent | Highest balance of broad reach, accessibility, social-loop strength, low-end performance, feasibility, and maintenance |
+| I-2026-002 | Signal Sprint | Parked | Users may want a very short visual reaction challenge | 2D | Identical cue sequence and reaction/accuracy comparison | Pending if revisited | Arabic RTL, English, Turkish | Easy to build but crowded, device-latency-sensitive, and less inclusive for older and motor-impaired users |
+| I-2026-003 | Bridge Builder Dash | Parked | Users may want a more spectacular precision/physics challenge | 2.5D preferred; 2D and 3D possible | Identical gap seed, distance/precision/time comparison | Pending if revisited | Arabic RTL, English, Turkish | Stronger spectacle but premature physics, camera, asset, and performance cost before the core social funnel is proven |
 
 ## Rules
 
