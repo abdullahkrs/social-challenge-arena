@@ -12,29 +12,16 @@ This policy applies to concepts, visuals, animation, audio, text, rewards, monet
 - Deceptive monetization, child exploitation, manipulative dark patterns, or privacy invasion.
 - Content that attacks religions, peoples, cultures, families, or protected groups.
 
-## Required review
+## Conservative handling
 
-Every concept and release candidate must record:
+When an element is questionable or unclear:
 
-- content themes;
-- character and clothing treatment;
-- symbols and environments;
-- audio approach;
-- reward and monetization mechanics;
-- social pressure and safety risks;
-- regional or cultural sensitivities;
-- review result: `PASS`, `REVISE`, or `REJECT`.
+1. remove it;
+2. replace it with a clearly neutral alternative; or
+3. reject the concept and choose another.
 
-## Autonomous uncertainty rule
+The pipeline must not wait for owner guidance and agents must not issue religious rulings.
 
-Agents must never refer a decision to the repository owner.
+## Required record
 
-When a question depends on an unclear religious ruling or the policy does not clearly permit the content:
-
-1. Do not guess or issue a religious ruling.
-2. Choose the most conservative clearly compliant option.
-3. Remove the disputed element or replace it with a neutral alternative.
-4. If the concept cannot remain compelling after that change, reject it and select another concept.
-5. Record the rejected option and factual reason so it is not repeatedly proposed.
-
-Uncertainty must never block the delivery pipeline or wait for human guidance.
+Every user-facing delivery records the theme, characters/clothing if any, symbols, audio approach, rewards, social pressure, safety risks, and final result: `PASS` or `REVISE`.

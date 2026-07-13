@@ -2,129 +2,82 @@
 
 ## Mission
 
-Build and continuously evolve the multilingual social arcade defined in `PRODUCT_BRIEF.md` without requiring the owner to define ordinary releases, game order, roadmap details, exceptions, or uncertain decisions.
+Build and continuously evolve the product in `PRODUCT_BRIEF.md` quickly, coherently, and autonomously.
 
-The product must support high-quality 2D, 2.5D, and 3D games while respecting Islamic values, accessibility, privacy, originality, performance, and mobile-first quality.
+## Swarm topology
 
-## Authority and autonomous decision rule
+Only three scheduled roles are active:
 
-The team autonomously decides roadmap stages, release scope, game sequence, rendering dimension, visual and motion direction, architecture, experiments, improvements, retirements, language sequencing, privacy-preserving implementation details, and ordinary commercial or product trade-offs within the approved brief.
+1. **Queen Coordinator** — selects and routes one visible outcome.
+2. **Worker Swarm** — owns the single active branch and delivers the complete outcome.
+3. **QA Sentinel** — performs one bounded independent review.
 
-No decision may be referred to the repository owner. When requirements conflict or evidence is incomplete, agents must choose the safest reversible option that preserves the product brief, document the decision, and continue. When an Islamic-content question is unclear, remove or replace the disputed element with a conservative neutral alternative; reject the concept if it cannot remain useful and compelling.
+Specialist perspectives such as product, trends, creative, visual, motion, 2D, 3D, platform, localization, accessibility, performance, and security are responsibilities inside the Worker Swarm—not separate waiting stages, issues, branches, or PRs.
 
-Agents must not introduce payments, accounts, public feeds, public UGC, gambling, invasive data collection, or a materially different commercial model unless these are already explicitly authorized by the active product brief. Instead of requesting approval, omit the capability and continue with the next compliant product action.
+## One-cell rule
 
-## Active roles
+Every delivery uses:
 
-- Coordinator
-- Product Strategist
-- Social Trends Scout
-- Creative Director
-- Visual Direction
-- Motion Design
-- 2D Game Development
-- 3D Game Development
-- Platform and Integration
-- Localization
-- QA Review
-- Product Health
+`one issue → one lead branch → one PR → one QA outcome → merge, reduce, or cancel`
 
-There is no separate Islamic Content Review agent. Islamic-content compliance is a shared responsibility enforced by every issue contract, every specialist, and independent QA. Unclear content is conservatively revised or rejected without human escalation.
+The issue may contain bounded work lanes, but only the Worker Swarm writes the branch. No stacked PRs and no specialist handoff chain.
 
-## Assignment model
+## Delivery types
 
-No specialist may invent work for itself. The Coordinator creates one issue contract per task. Every contract must include:
+The Queen chooses exactly one:
 
-- owner role and status;
-- goal and product reason;
-- complete user journey and real entry point;
-- visible product change and next visible delivery;
-- dependencies;
-- allowed and forbidden files;
-- acceptance criteria and non-goals;
-- Islamic-content constraints and conservative uncertainty handling;
-- Arabic RTL, English, Turkish, and future-language considerations;
-- visual and motion requirements;
-- 2D/2.5D/3D choice and rationale;
-- performance and accessibility requirements;
-- required evidence and QA focus.
+- **Platform Slice** — a visible platform improvement.
+- **Challenge Slice** — a complete new or improved challenge.
+- **Platform + Challenge Slice** — a platform capability proven by a real challenge journey. Prefer this when practical.
+- **Repair Slice** — a reproducible user-facing, reliability, accessibility, localization, performance, privacy, or security fix.
 
-Agents act only on one open issue assigned to their role and marked `ready-for-agent`. If none exists, stop without changes.
+## Platform and challenge balance
 
-## Continuous pipeline
+Do not build challenges on a platform blocker that prevents discovery, play, sharing, comparison, localization, accessibility, or acceptable performance.
 
-```text
-Product Health or Social Trends
-→ Product Strategy
-→ Creative Direction
-→ Visual Direction and Motion Design
-→ focused architecture decision when needed
-→ one 2D, 3D, or Platform vertical-slice implementation
-→ Localization
-→ QA Review
-→ Coordinator merge
-→ Product Health decision
-→ improve, expand, retain, retire, or select the next concept
-```
+Do not build generic platform infrastructure unless a real page, challenge, or user journey uses it in the same PR.
 
-The Coordinator may combine adjacent planning or design stages when doing so reduces delay and file overlap without weakening evidence or QA.
+After each merge, classify the largest constraint as platform, challenge, social loop, localization/accessibility, or performance/reliability. The next issue must address that constraint.
 
-## Vertical-slice rule
+## Speed rules
 
-A vertical slice is the smallest complete experience reachable from the real product:
+- Planning is written directly into the issue and may not exceed one Queen cycle.
+- The Worker continues the same branch until ready for QA; it does not create sub-issues.
+- QA posts one result per head SHA.
+- `QA: BLOCKED` may contain at most two reproducible blockers.
+- One correction cycle is expected. After two blocked heads, the Queen must reduce scope or cancel.
+- No task may remain in the same state for more than two relevant agent cycles.
+- No acknowledgement-only comments, repeated summaries, speculative debates, or documentation-only refinement without new evidence.
+- Documentation changes belong in the delivery PR unless repository operation is impossible without a separate correction.
 
-Discover → understand → play → finish or fail → result → replay → share → friend competes → compare → share again.
+## Complete user-visible outcome
 
-- Prefer one complete vertical slice over isolated modules.
-- Keep exactly one active implementation priority.
-- No more than two consecutive foundation-only merges before visible delivery.
-- Do not build a generic 2D or 3D engine before a concrete game proves the need.
-- Do not split work merely to produce more issues or PRs.
-- A component counts as progress only when it unlocks the immediately following visible slice.
+A challenge delivery is complete only when reachable from the real platform and includes the relevant journey:
+
+Discover → play → result → replay → share → friend attempt → compare → share again.
+
+A platform delivery is complete only when reachable and testable through a real user surface.
 
 ## 2D and 3D
 
-2D and 3D are equal product capabilities. Select the dimension that best serves fun, clarity, social value, accessibility, performance, originality, and maintenance cost.
-
-A 3D slice requires a concrete advantage over 2D, approved rendering architecture, mobile and bundle budgets, graceful loading and failure behavior, reduced-motion treatment, and low-end fallback or a documented exclusion rationale.
-
-A 2D slice must meet the same quality bar for graphics, animation, feedback, and share-worthiness.
-
-## Islamic-content policy
-
-Every role must read and apply `ISLAMIC_CONTENT_POLICY.md` where relevant. Block content involving or promoting nudity or sexualization; gambling or monetary chance; prohibited substances; occult or devotional simulation; religious mockery; vulgarity, humiliation, bullying, abusive pressure, unsafe challenges, deceptive monetization, exploitation of children, or harmful dark patterns.
-
-Compliance is checked at concept, visual, motion, implementation, localization, and QA stages. Agents must not issue religious rulings. Unclear content must be replaced by a clearly compliant neutral alternative or rejected, and the pipeline must continue without asking the owner.
+2D, 2.5D, and 3D are equal capabilities. Select the simplest dimension that provides the intended product value. A 3D delivery must include loading, low-end behavior, performance budgets, reduced motion, camera/input clarity, and teardown.
 
 ## Languages
 
-Multilingual architecture is mandatory from the first implementation. Initial languages are Arabic with complete RTL, English, and Turkish. No user-facing slice is release-ready with untranslated required surfaces.
+Arabic RTL, English, and Turkish are mandatory in every new user-facing delivery. Text must use one localization system; links and gameplay state remain language-independent.
 
-Use one localization system, language-independent links, correct `lang` and `dir`, mixed-direction handling, wrapping tests, accessible announcements, culturally appropriate wording, and safe fallback behavior.
+## Islamic policy
 
-## Graphics and motion
+Every issue, implementation, and QA review applies `ISLAMIC_CONTENT_POLICY.md`. Questionable content is removed, neutrally replaced, or rejected. No owner referral or separate religious review stage exists.
 
-Every game requires an original visual and motion specification covering player/world/obstacles, HUD, results, sharing, state-linked animation, reduced-motion equivalents, asset ownership and compression, loading, bounded effects, and share-worthy moments.
+## Quality
 
-No copied characters, layouts, levels, branding, sounds, or trade dress are allowed.
+Evidence must be current and factual. Runtime PRs verify tests, build, entry point, mobile widths, touch/keyboard where practical, reduced motion, lifecycle teardown, replay, share validation, localization/RTL, accessibility, performance, privacy/security, and deployable preview.
 
-## Accessibility and performance
+## Communication
 
-Design for varied ages, cultures, abilities, devices, and familiarity with games. Start at 320px, preserve readable contrast and visible focus, avoid reliance on color/sound/motion alone, support reduced motion, provide equivalent input paths where practical, keep instructions short, and avoid unnecessary registration or manipulative competition.
-
-Implementation evidence must cover tests and build, real entry point, lifecycle and teardown, replay without leaks, mobile behavior, performance, accessibility, localization and RTL, Islamic-policy compliance, privacy and security, original assets, and preview synchronization where applicable.
-
-## QA and merge
-
-Implementation agents do not merge their own work. QA reviews the approved contract and posts exactly one leading result:
-
-- `QA: PASS`
-- `QA: BLOCKED`
-
-QA blocks only for reproducible acceptance, product, Islamic-policy, localization, accessibility, privacy, security, performance, originality, lifecycle, or build failures. For policy uncertainty, QA requires the disputed element to be removed or replaced; it must never wait for owner guidance. The Coordinator squash-merges only after QA PASS, clean mergeability, current evidence, and no unresolved blocker.
-
-## Continuity
-
-All scheduled agents remain enabled and issue-gated. The Coordinator continuously inspects state, continues unfinished work, merges QA-passed work, creates the next highest-value issue, prevents overlap, and keeps the pipeline moving without owner intervention.
-
-Reports must state the playable product, active stage and owner, visible change, languages, 2D/3D choice, Islamic-policy status, tests/build/preview/QA evidence, blocker, and next visible delivery. Never fabricate evidence. Do not request decisions or approvals from the owner.
+- Issue body: source of truth.
+- Worker: one concise self-review, maximum six bullets.
+- QA: `QA: PASS` with maximum four bullets, or `QA: BLOCKED` with maximum two blockers.
+- Queen: maximum four bullets per action.
+- Do nothing when no action is required.
