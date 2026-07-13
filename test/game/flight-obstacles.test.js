@@ -220,6 +220,25 @@ test('matches the exact QA full-precision adjacent grouping before and after res
   assert.deepEqual(advanceAll(second, grouped), advanceAll(first, fine));
 });
 
+test('matches the latest QA canonical-boundary grouping before and after reset', () => {
+  const config = options({ maxDeltaMs: 2000, maxRunMs: 10000 });
+  const fine = [
+    172.89967110750547,
+    97.826896548019036,
+    122.29634671371315,
+    123.88666472868341,
+    483.09042140207896
+  ];
+  const grouped = [fine[0] + fine[1], fine[2] + fine[3], fine[4]];
+  assert.equal(fine.reduce((sum, value) => sum + value, 0), grouped.reduce((sum, value) => sum + value, 0));
+  const first = createFlightObstacles(config);
+  const second = createFlightObstacles(config);
+  assert.deepEqual(advanceAll(second, grouped), advanceAll(first, fine));
+  assert.equal(first.getState().elapsedMs, 1000.000001);
+  assert.deepEqual(second.reset(), first.reset());
+  assert.deepEqual(advanceAll(second, grouped), advanceAll(first, fine));
+});
+
 test('keeps generated adjacent grouping partitions stable at emitted elapsed precision', () => {
   let seed = 0x9e3779b9;
   function random() {
