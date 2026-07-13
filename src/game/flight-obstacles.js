@@ -15,10 +15,6 @@
   const MAX_TOTAL_RECYCLES = 1000000;
   const OUTPUT_PRECISION_DIGITS = 12;
   const ELAPSED_PRECISION_DIGITS = 6;
-  const ELAPSED_DECIMAL_SCALE = 10n ** BigInt(ELAPSED_PRECISION_DIGITS);
-  const DOUBLE_UNITS_PER_MS = 1n << 1074n;
-  const DOUBLE_FRACTION_MASK = (1n << 52n) - 1n;
-  const DOUBLE_IMPLICIT_BIT = 1n << 52n;
 
   const DEFAULT_GAP_PATTERN = Object.freeze([
     Object.freeze({ gapTop: 0.12, gapBottom: 0.48 }),
@@ -53,27 +49,13 @@
     return Number(value.toFixed(OUTPUT_PRECISION_DIGITS));
   }
 
-  function positiveFiniteNumberToDoubleUnits(value) {
-    const view = new DataView(new ArrayBuffer(8));
-    view.setFloat64(0, value, false);
-    const bits = view.getBigUint64(0, false);
-    const exponentBits = Number((bits >> 52n) & 0x7ffn);
-    const fractionBits = bits & DOUBLE_FRACTION_MASK;
-    if (exponentBits === 0) return fractionBits;
-    return (DOUBLE_IMPLICIT_BIT | fractionBits) << BigInt(exponentBits - 1);
-  }
-
-  function canonicalElapsedMs(elapsedUnits) {
-    const scaledNumerator = elapsedUnits * ELAPSED_DECIMAL_SCALE;
-    let scaledElapsed = scaledNumerator / DOUBLE_UNITS_PER_MS;
-    const remainder = scaledNumerator % DOUBLE_UNITS_PER_MS;
-    if ((remainder * 2n) >= DOUBLE_UNITS_PER_MS) scaledElapsed += 1n;
-
-    const whole = scaledElapsed / ELAPSED_DECIMAL_SCALE;
-    const fraction = (scaledElapsed % ELAPSED_DECIMAL_SCALE)
-      .toString()
-      .padStart(ELAPSED_PRECISION_DIGITS, '0');
-    return Number(`${whole}.${fraction}`);
+  function canonicalElapsedMs(value) {
+    // Accepted time remains the caller-visible JavaScript Number sum for the run.
+    // Canonicalization happens only when deriving a snapshot, never after each advance,
+    // so adjacent groupings with the same accepted numeric total cannot diverge at a
+    // per-frame rounding boundary.
+    if (Object.is(value, -0)) return 0;
+    return Number(value.toFixed(ELAPSED_PRECISION_DIGITS));
   }
 
   function rejectUnknownKeys(object, allowedKeys, owner) {
@@ -248,7 +230,6 @@
       speedIncreasePerSecond,
       maxDeltaMs,
       maxRunMs,
-      maxRunUnits: BigInt(maxRunMs) * DOUBLE_UNITS_PER_MS,
       initialId,
       step,
       cycleSpan
@@ -259,10 +240,10 @@
 
   function createFlightObstacles(options = {}) {
     const config = createConfig(options);
-    let elapsedUnits = 0n;
+    let acceptedElapsedMs = 0;
 
     function buildState() {
-      const elapsedMs = canonicalElapsedMs(elapsedUnits);
+      const elapsedMs = canonicalElapsedMs(acceptedElapsedMs);
       const distance = distanceAt(config, elapsedMs);
       const firstSequenceIndex = firstSequenceIndexAt(config, distance);
       const firstRawLeft = config.initialLeft
@@ -299,20 +280,20 @@
     }
 
     function reset() {
-      elapsedUnits = 0n;
+      acceptedElapsedMs = 0;
       return buildState();
     }
 
     function advance(deltaMs) {
       if (typeof deltaMs !== 'number' || !Number.isFinite(deltaMs)
-        || deltaMs <= 0 || elapsedUnits >= config.maxRunUnits) {
+        || deltaMs <= 0 || acceptedElapsedMs >= config.maxRunMs) {
         return buildState();
       }
 
       const acceptedDeltaMs = Math.min(deltaMs, config.maxDeltaMs);
-      const remainingUnits = config.maxRunUnits - elapsedUnits;
-      const deltaUnits = positiveFiniteNumberToDoubleUnits(acceptedDeltaMs);
-      elapsedUnits += deltaUnits < remainingUnits ? deltaUnits : remainingUnits;
+      const remainingMs = config.maxRunMs - acceptedElapsedMs;
+      if (acceptedDeltaMs >= remainingMs) acceptedElapsedMs = config.maxRunMs;
+      else acceptedElapsedMs += acceptedDeltaMs;
       return buildState();
     }
 
