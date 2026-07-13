@@ -1,4 +1,4 @@
-import { angularDistance, challengePlan, clamp, scoreAttempt } from './core.mjs';
+import { angularDistance, challengePlan, clamp, isGameAttemptKey, scoreAttempt } from './core.mjs';
 
 const TAU = Math.PI * 2;
 
@@ -56,7 +56,7 @@ export class OrbitLockGame {
       this.attempt();
     }, { signal });
     window.addEventListener('keydown', (event) => {
-      if ((event.code === 'Space' || event.code === 'Enter') && this.running) {
+      if (this.running && isGameAttemptKey(event, this.canvas)) {
         event.preventDefault();
         this.attempt();
       }
