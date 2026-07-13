@@ -252,6 +252,25 @@ test('keeps valid fractional delta partitions frame-rate independent', () => {
   assert.deepEqual(threeFrames.reset(), oneFrame.reset());
 });
 
+test('keeps equivalent adjacent fractional groupings frame-rate independent', () => {
+  const config = options({ maxDeltaMs: 2000, maxRunMs: 10000 });
+  const fine = [473.041861, 700.624391, 927.781719, 353.490712, 801.493582];
+  const grouped = [1173.666252, 1281.272431, 801.493582];
+  const first = createFlightObstacles(config);
+  const second = createFlightObstacles(config);
+
+  for (const delta of fine) first.advance(delta);
+  for (const delta of grouped) second.advance(delta);
+
+  assert.equal(first.getState().elapsedMs, 3256.432265);
+  assert.deepEqual(second.getState(), first.getState());
+  assert.deepEqual(second.reset(), first.reset());
+
+  for (const delta of fine) first.advance(delta);
+  for (const delta of grouped) second.advance(delta);
+  assert.deepEqual(second.getState(), first.getState());
+});
+
 test('recycles multiple off-left obstacles canonically with fixed non-overlap spacing', () => {
   const stream = createFlightObstacles(options({
     initialLeft: 0,
