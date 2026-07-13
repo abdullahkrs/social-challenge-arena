@@ -10,6 +10,7 @@ const state = {
   seed: createSeed(),
   invite: null,
   result: null,
+  invalidInvite: false,
   events: []
 };
 
@@ -70,6 +71,7 @@ function applyLanguage() {
   });
   elements.targetText.textContent = state.invite ? t('beatScore', { score: state.invite.target }) : '';
   elements.instructionTarget.textContent = state.invite ? t('beatScore', { score: state.invite.target }) : t('sameRun');
+  if (state.invalidInvite) elements.errorBanner.textContent = t('invalidLink');
   renderResult();
 }
 
@@ -94,6 +96,7 @@ function updateInviteUI() {
 function parseLocationInvite() {
   const parsed = parseInvite(window.location.search);
   if (!parsed.ok) {
+    state.invalidInvite = true;
     elements.errorBanner.hidden = false;
     elements.errorBanner.textContent = t('invalidLink');
     history.replaceState({}, '', `${location.pathname}${location.hash}`);
@@ -167,14 +170,14 @@ async function shareResult() {
   const url = buildInviteUrl(location.href, { challengeId: CHALLENGE_ID, seed: state.seed, target: state.result.score });
   const shareData = { title: t('challengeName'), text: `${t('challengeName')} · ${state.result.score}`, url };
   try {
-    if (navigator.share && navigator.canShare?.(shareData)) {
+    if (navigator.share && (!navigator.canShare || navigator.canShare(shareData))) {
       await navigator.share(shareData);
       track('share_completed', { method: 'native', score: state.result.score });
       return;
     }
     await navigator.clipboard.writeText(url);
     announce(t('copied'));
-    elements.gameStatus.textContent = t('copied');
+    elements.shareButton.textContent = t('copied');
     track('share_completed', { method: 'clipboard', score: state.result.score });
   } catch (error) {
     if (error?.name === 'AbortError') return;
