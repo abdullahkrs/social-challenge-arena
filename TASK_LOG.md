@@ -25,7 +25,7 @@ Record active and completed autonomous cycles factually.
 ### C-2026-002 — 2026-07-13 — Trace Relay creative direction
 
 - Owner role: Creative Director (`agent-creative`).
-- Issue and PR: Issue #69; PR pending creation from branch `agent-creative/issue-69-trace-relay-brief` targeting `main`.
+- Issue and PR: Issue #69; PR #70 from branch `agent-creative/issue-69-trace-relay-brief` targeting `main`.
 - Goal and product reason: turn the merged Trace Relay product-strategy decision into one original, implementation-ready creative treatment that makes the full challenge understandable, replayable, socially competitive, multilingual, accessible, low-end feasible, spoiler-safe, and ready for mandatory specialist gates.
 - User journey and product entry point: discovery card → skippable language-light demonstration → three seeded Ribbon Relay rounds → mastery/progress/flow result or friendly partial result → replay or language-independent share link → friend receives the identical hidden seed and score to beat → localized comparison → fresh-seed rematch or voluntary share-again.
 - Visible product change: documentation-only creative gate. Three materially different Trace Relay treatments were compared and **Ribbon Relay** was selected. The brief now defines the complete game loop, round sizes, errors, assistance, partial completion, 1000-point score intent, input equivalence, spoiler-safe relay mark, comparison tone, originality teardown, multilingual constraints, Islamic review packet, feasibility risks, and Visual/Motion handoffs. No runtime product exists yet.
