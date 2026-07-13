@@ -1,14 +1,34 @@
 # Social Challenge Arena
 
-A continuously evolving multilingual social arcade platform.
+A mobile-first multilingual social arcade platform.
 
-The product combines a shared platform layer with original 2D, 2.5D, and 3D challenges. It is mobile-first, accessible, multilingual, socially shareable, and constrained by `ISLAMIC_CONTENT_POLICY.md`.
+## First playable experience
 
-## Current state
+**Orbit Lock** is an original 2D timing challenge: tap when the moving pulse enters each gate, build a precision score, and share a strict same-route link so a friend can compete and compare results.
 
-The repository was reset to a clean swarm-development baseline.
+The complete journey is available from the real entry point:
 
-There is no active legacy game, architecture, roadmap, catalog, or release plan.
+`discover → understand → play → result → replay → share → friend attempt → compare → share again`
+
+## Languages and access
+
+- Arabic with full RTL
+- English
+- Turkish
+- Touch, pointer, Space, and Enter controls
+- Reduced-effects mode and live accessibility announcements
+- No account, external analytics, third-party assets, or network API
+
+## Run locally
+
+```bash
+npm ci
+npm test
+npm run build
+python3 -m http.server 8000
+```
+
+Open `http://localhost:8000`. The deployable static output is generated in `dist/` and is published from `main` through GitHub Pages.
 
 ## Delivery model
 
@@ -16,4 +36,4 @@ Each visible delivery uses:
 
 `one issue → one branch → one playable PR → one QA result → merge, reduce, or cancel`
 
-Platform and game work are developed together when they form one user journey. Shared platform work must be proven by a real page, game, sharing flow, localization surface, performance improvement, or accessibility improvement.
+See `PRODUCT_BRIEF.md`, `AGENT.md`, `SWARM.md`, `ISLAMIC_CONTENT_POLICY.md`, and `DELIVERY_EVIDENCE.md`.
