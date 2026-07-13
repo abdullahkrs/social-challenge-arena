@@ -8,7 +8,6 @@
 | Product Strategist | `agents/product-strategist.md` | `agent-product` |
 | Social Trends Scout | `agents/social-trends.md` | `agent-trends` |
 | Creative Director | `agents/creative-director.md` | `agent-creative` |
-| Islamic Content Review | `agents/islamic-content-review.md` | `agent-islamic-review` |
 | Visual Direction | `agents/visual-direction.md` | `agent-visual` |
 | Motion Design | `agents/motion-design.md` | `agent-motion` |
 | 2D Game Development | `agents/game-2d.md` | `agent-2d` |
@@ -17,6 +16,8 @@
 | Localization | `agents/localization.md` | `agent-i18n` |
 | QA Review | `agents/qa-review.md` | `ready-for-qa` |
 | Product Health | `agents/product-health.md` | `agent-health` |
+
+Islamic-content compliance is shared across all roles through `ISLAMIC_CONTENT_POLICY.md` and independent QA. There is no standalone Islamic review role. Uncertain religious matters are escalated to the owner.
 
 ## Work gate
 
@@ -27,6 +28,7 @@ An agent may change the repository only when one open issue:
 - has merged dependencies;
 - defines allowed and forbidden files;
 - has measurable acceptance criteria and non-goals;
+- includes Islamic-content, language, accessibility, visual/motion, and 2D/3D considerations;
 - does not overlap another active issue.
 
 If no valid issue exists, stop without changes.
@@ -37,15 +39,16 @@ If no valid issue exists, stop without changes.
 Health or Trends
 → Product Strategy
 → Creative
-→ Islamic Review
 → Visual + Motion
-→ Coordinator
-→ 2D / 3D / Platform implementation
+→ focused architecture decision when needed
+→ 2D / 3D / Platform vertical slice
 → Localization
 → QA
 → Coordinator merge
 → Health review
 ```
+
+Adjacent planning stages may be combined by the Coordinator when this reduces delay without weakening evidence or QA.
 
 ## Shared rules
 
@@ -55,4 +58,4 @@ Health or Trends
 - No stacked PRs.
 - No implementation merge without independent `QA: PASS`.
 - No more than two foundation-only merges before a visible vertical slice.
-- All roles must respect `PRODUCT_BRIEF.md` and `AGENT.md`.
+- All roles must respect `PRODUCT_BRIEF.md`, `AGENT.md`, and `ISLAMIC_CONTENT_POLICY.md`.
