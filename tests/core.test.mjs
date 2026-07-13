@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { readFile } from 'node:fs/promises';
 import {
   angularDistance,
   buildInviteUrl,
@@ -63,4 +64,12 @@ test('all required languages have the same message keys', () => {
   assert.deepEqual(missingTranslations(), []);
   assert.equal(translate('ar', 'beatScore', { score: 99 }).includes('99'), true);
   assert.equal(translate('tr', 'beatScore', { score: 99 }).includes('99'), true);
+});
+
+test('compact motion control retains a localized accessible name', async () => {
+  const html = await readFile(new URL('../index.html', import.meta.url), 'utf8');
+  assert.match(
+    html,
+    /<input id="motion-toggle" type="checkbox" aria-label="Reduce effects" data-i18n-aria="reduceMotion">/
+  );
 });
