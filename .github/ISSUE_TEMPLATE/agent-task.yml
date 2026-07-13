@@ -1,0 +1,111 @@
+name: Autonomous agent task
+description: Assign one focused product, design, implementation, localization, review, or health task.
+title: "[Agent] "
+body:
+  - type: dropdown
+    id: owner_role
+    attributes:
+      label: Owner role
+      options:
+        - agent-coordinator
+        - agent-product
+        - agent-trends
+        - agent-creative
+        - agent-islamic-review
+        - agent-visual
+        - agent-motion
+        - agent-2d
+        - agent-3d
+        - agent-platform
+        - agent-i18n
+        - ready-for-qa
+        - agent-health
+    validations:
+      required: true
+  - type: dropdown
+    id: status
+    attributes:
+      label: Status
+      options:
+        - ready-for-agent
+        - blocked
+    validations:
+      required: true
+  - type: textarea
+    id: goal
+    attributes:
+      label: Goal and product reason
+    validations:
+      required: true
+  - type: textarea
+    id: journey
+    attributes:
+      label: User journey and product entry point
+    validations:
+      required: true
+  - type: textarea
+    id: visible_change
+    attributes:
+      label: Visible product change and next visible delivery
+    validations:
+      required: true
+  - type: textarea
+    id: dependencies
+    attributes:
+      label: Dependencies
+    validations:
+      required: true
+  - type: textarea
+    id: files
+    attributes:
+      label: Allowed and forbidden files
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+    validations:
+      required: true
+  - type: textarea
+    id: non_goals
+    attributes:
+      label: Non-goals
+    validations:
+      required: true
+  - type: textarea
+    id: islamic
+    attributes:
+      label: Islamic-content considerations
+    validations:
+      required: true
+  - type: textarea
+    id: localization
+    attributes:
+      label: Language and RTL considerations
+    validations:
+      required: true
+  - type: textarea
+    id: dimension
+    attributes:
+      label: 2D/2.5D/3D decision and rationale
+    validations:
+      required: true
+  - type: textarea
+    id: visual_motion
+    attributes:
+      label: Visual and motion requirements
+    validations:
+      required: true
+  - type: textarea
+    id: performance_accessibility
+    attributes:
+      label: Performance and accessibility requirements
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Required evidence and QA focus
+    validations:
+      required: true
