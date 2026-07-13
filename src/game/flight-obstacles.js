@@ -15,6 +15,7 @@
   const MAX_TOTAL_RECYCLES = 1000000;
   const OUTPUT_PRECISION_DIGITS = 12;
   const ELAPSED_PRECISION_DIGITS = 6;
+  const ELAPSED_ROUNDING_ULPS = 8;
 
   const DEFAULT_GAP_PATTERN = Object.freeze([
     Object.freeze({ gapTop: 0.12, gapBottom: 0.48 }),
@@ -50,12 +51,12 @@
   }
 
   function canonicalElapsedMs(value) {
-    // Accepted time remains the caller-visible JavaScript Number sum for the run.
-    // Canonicalization happens only when deriving a snapshot, never after each advance,
-    // so adjacent groupings with the same accepted numeric total cannot diverge at a
-    // per-frame rounding boundary.
     if (Object.is(value, -0)) return 0;
-    return Number(value.toFixed(ELAPSED_PRECISION_DIGITS));
+    const scale = 10 ** ELAPSED_PRECISION_DIGITS;
+    const boundaryTolerance = Number.EPSILON
+      * Math.max(1, Math.abs(value))
+      * ELAPSED_ROUNDING_ULPS;
+    return Math.round((value + boundaryTolerance) * scale) / scale;
   }
 
   function rejectUnknownKeys(object, allowedKeys, owner) {
@@ -241,9 +242,29 @@
   function createFlightObstacles(options = {}) {
     const config = createConfig(options);
     let acceptedElapsedMs = 0;
+    let acceptedElapsedCorrectionMs = 0;
+
+    function currentAcceptedElapsedMs() {
+      return acceptedElapsedMs + acceptedElapsedCorrectionMs;
+    }
+
+    function setAcceptedElapsedMs(value) {
+      acceptedElapsedMs = value;
+      acceptedElapsedCorrectionMs = 0;
+    }
+
+    function addAcceptedDeltaMs(deltaMs) {
+      const nextElapsedMs = acceptedElapsedMs + deltaMs;
+      if (Math.abs(acceptedElapsedMs) >= Math.abs(deltaMs)) {
+        acceptedElapsedCorrectionMs += (acceptedElapsedMs - nextElapsedMs) + deltaMs;
+      } else {
+        acceptedElapsedCorrectionMs += (deltaMs - nextElapsedMs) + acceptedElapsedMs;
+      }
+      acceptedElapsedMs = nextElapsedMs;
+    }
 
     function buildState() {
-      const elapsedMs = canonicalElapsedMs(acceptedElapsedMs);
+      const elapsedMs = canonicalElapsedMs(currentAcceptedElapsedMs());
       const distance = distanceAt(config, elapsedMs);
       const firstSequenceIndex = firstSequenceIndexAt(config, distance);
       const firstRawLeft = config.initialLeft
@@ -280,20 +301,27 @@
     }
 
     function reset() {
-      acceptedElapsedMs = 0;
+      setAcceptedElapsedMs(0);
       return buildState();
     }
 
     function advance(deltaMs) {
+      const elapsedBeforeAdvance = currentAcceptedElapsedMs();
       if (typeof deltaMs !== 'number' || !Number.isFinite(deltaMs)
-        || deltaMs <= 0 || acceptedElapsedMs >= config.maxRunMs) {
+        || deltaMs <= 0 || elapsedBeforeAdvance >= config.maxRunMs) {
         return buildState();
       }
 
       const acceptedDeltaMs = Math.min(deltaMs, config.maxDeltaMs);
-      const remainingMs = config.maxRunMs - acceptedElapsedMs;
-      if (acceptedDeltaMs >= remainingMs) acceptedElapsedMs = config.maxRunMs;
-      else acceptedElapsedMs += acceptedDeltaMs;
+      const remainingMs = config.maxRunMs - elapsedBeforeAdvance;
+      if (acceptedDeltaMs >= remainingMs) {
+        setAcceptedElapsedMs(config.maxRunMs);
+      } else {
+        addAcceptedDeltaMs(acceptedDeltaMs);
+        if (currentAcceptedElapsedMs() >= config.maxRunMs) {
+          setAcceptedElapsedMs(config.maxRunMs);
+        }
+      }
       return buildState();
     }
 
