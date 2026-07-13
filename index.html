@@ -61,11 +61,13 @@
       <section class="screen instructions" data-screen="instructions" hidden>
         <button class="icon-button back-button" type="button" data-action="back" data-i18n-aria="back" aria-label="Back">←</button>
         <div class="instruction-card">
+          <p id="instruction-eyebrow" class="eyebrow" hidden></p>
           <div id="instruction-icon" class="instruction-icon" aria-hidden="true">◎</div>
           <h2 id="instruction-title" tabindex="-1"></h2>
           <p id="instruction-copy"></p>
           <strong id="instruction-target" class="target-callout"></strong>
           <button id="start-button" class="primary large" type="button" data-i18n="start">Start</button>
+          <button id="invite-catalog-button" class="ghost invite-catalog" type="button" data-i18n="browseChallenges" hidden>Browse challenges</button>
         </div>
       </section>
 
@@ -95,8 +97,15 @@
           <h2 id="result-heading" tabindex="-1">Your result</h2>
           <p id="result-challenge" class="result-challenge"></p>
           <div id="result-score" class="result-score">0</div>
-          <div id="comparison" class="comparison" hidden>
-            <span data-i18n="compareTitle">Friend comparison</span><strong id="comparison-text"></strong>
+          <div id="comparison" class="comparison" role="group" aria-labelledby="comparison-title" hidden>
+            <span id="comparison-title" class="sr-only" data-i18n="compareTitle">Head-to-head</span>
+            <div class="duel-score"><span data-i18n="challenger">Challenger</span><strong id="challenger-score">0</strong></div>
+            <div class="comparison-outcome">
+              <span id="comparison-symbol" class="comparison-symbol" aria-hidden="true"></span>
+              <strong id="comparison-text"></strong>
+              <small id="difference-text"></small>
+            </div>
+            <div class="duel-score"><span data-i18n="you">You</span><strong id="player-score">0</strong></div>
           </div>
           <div class="result-actions">
             <button id="replay-button" class="secondary" type="button" data-i18n="replay">Replay</button>
