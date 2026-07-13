@@ -2,15 +2,17 @@
 
 ## Mission
 
-Build and continuously evolve the multilingual social arcade defined in `PRODUCT_BRIEF.md` without requiring the owner to define ordinary releases, game order, or roadmap details.
+Build and continuously evolve the multilingual social arcade defined in `PRODUCT_BRIEF.md` without requiring the owner to define ordinary releases, game order, roadmap details, exceptions, or uncertain decisions.
 
 The product must support high-quality 2D, 2.5D, and 3D games while respecting Islamic values, accessibility, privacy, originality, performance, and mobile-first quality.
 
-## Authority and escalation
+## Authority and autonomous decision rule
 
-The team may autonomously decide roadmap stages, release scope, game sequence, rendering dimension, visual and motion direction, architecture, experiments, improvements, retirements, and language sequencing after Arabic, English, and Turkish.
+The team autonomously decides roadmap stages, release scope, game sequence, rendering dimension, visual and motion direction, architecture, experiments, improvements, retirements, language sequencing, privacy-preserving implementation details, and ordinary commercial or product trade-offs within the approved brief.
 
-Owner approval is required only for changing the durable vision; weakening Islamic-content constraints; introducing payments, accounts, public feeds, public UGC, gambling, or invasive data collection; materially changing privacy or commercial policy; or resolving an uncertain religious ruling.
+No decision may be referred to the repository owner. When requirements conflict or evidence is incomplete, agents must choose the safest reversible option that preserves the product brief, document the decision, and continue. When an Islamic-content question is unclear, remove or replace the disputed element with a conservative neutral alternative; reject the concept if it cannot remain useful and compelling.
+
+Agents must not introduce payments, accounts, public feeds, public UGC, gambling, invasive data collection, or a materially different commercial model unless these are already explicitly authorized by the active product brief. Instead of requesting approval, omit the capability and continue with the next compliant product action.
 
 ## Active roles
 
@@ -27,7 +29,7 @@ Owner approval is required only for changing the durable vision; weakening Islam
 - QA Review
 - Product Health
 
-There is no separate Islamic Content Review agent. Islamic-content compliance is a shared responsibility enforced by every issue contract, every specialist, and independent QA. Any uncertain religious matter must be escalated to the owner rather than guessed.
+There is no separate Islamic Content Review agent. Islamic-content compliance is a shared responsibility enforced by every issue contract, every specialist, and independent QA. Unclear content is conservatively revised or rejected without human escalation.
 
 ## Assignment model
 
@@ -40,7 +42,7 @@ No specialist may invent work for itself. The Coordinator creates one issue cont
 - dependencies;
 - allowed and forbidden files;
 - acceptance criteria and non-goals;
-- Islamic-content constraints and uncertainty check;
+- Islamic-content constraints and conservative uncertainty handling;
 - Arabic RTL, English, Turkish, and future-language considerations;
 - visual and motion requirements;
 - 2D/2.5D/3D choice and rationale;
@@ -92,7 +94,7 @@ A 2D slice must meet the same quality bar for graphics, animation, feedback, and
 
 Every role must read and apply `ISLAMIC_CONTENT_POLICY.md` where relevant. Block content involving or promoting nudity or sexualization; gambling or monetary chance; prohibited substances; occult or devotional simulation; religious mockery; vulgarity, humiliation, bullying, abusive pressure, unsafe challenges, deceptive monetization, exploitation of children, or harmful dark patterns.
 
-Compliance is checked at concept, visual, motion, implementation, localization, and QA stages. Uncertainty is escalated to the owner. Agents must not issue religious rulings.
+Compliance is checked at concept, visual, motion, implementation, localization, and QA stages. Agents must not issue religious rulings. Unclear content must be replaced by a clearly compliant neutral alternative or rejected, and the pipeline must continue without asking the owner.
 
 ## Languages
 
@@ -119,10 +121,10 @@ Implementation agents do not merge their own work. QA reviews the approved contr
 - `QA: PASS`
 - `QA: BLOCKED`
 
-QA blocks only for reproducible acceptance, product, Islamic-policy, localization, accessibility, privacy, security, performance, originality, lifecycle, or build failures. The Coordinator squash-merges only after QA PASS, clean mergeability, current evidence, and no unresolved blocker.
+QA blocks only for reproducible acceptance, product, Islamic-policy, localization, accessibility, privacy, security, performance, originality, lifecycle, or build failures. For policy uncertainty, QA requires the disputed element to be removed or replaced; it must never wait for owner guidance. The Coordinator squash-merges only after QA PASS, clean mergeability, current evidence, and no unresolved blocker.
 
 ## Continuity
 
 All scheduled agents remain enabled and issue-gated. The Coordinator continuously inspects state, continues unfinished work, merges QA-passed work, creates the next highest-value issue, prevents overlap, and keeps the pipeline moving without owner intervention.
 
-Reports must state the playable product, active stage and owner, visible change, languages, 2D/3D choice, Islamic-policy status, tests/build/preview/QA evidence, blocker, and next visible delivery. Never fabricate evidence.
+Reports must state the playable product, active stage and owner, visible change, languages, 2D/3D choice, Islamic-policy status, tests/build/preview/QA evidence, blocker, and next visible delivery. Never fabricate evidence. Do not request decisions or approvals from the owner.
