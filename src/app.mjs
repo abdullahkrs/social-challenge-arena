@@ -3,9 +3,20 @@ import { getChallenge } from './catalog.mjs';
 import { isRtl, normalizeLanguage, supportedLanguages, translate } from './i18n.mjs';
 import { OrbitLockGame } from './game.mjs';
 
+function readPreference(key) {
+  try { return localStorage.getItem(key); } catch { return null; }
+}
+
+function writePreference(key, value) {
+  try { localStorage.setItem(key, value); } catch { /* Preferences remain session-only. */ }
+}
+
+const systemReducedMotion = typeof matchMedia === 'function'
+  && matchMedia('(prefers-reduced-motion: reduce)').matches;
+
 const state = {
-  language: normalizeLanguage(localStorage.getItem('sca-language') || navigator.language),
-  reducedMotion: localStorage.getItem('sca-reduced-motion') === 'true' || matchMedia('(prefers-reduced-motion: reduce)').matches,
+  language: normalizeLanguage(readPreference('sca-language') || navigator.language),
+  reducedMotion: readPreference('sca-reduced-motion') === 'true' || systemReducedMotion,
   screen: 'discovery',
   seed: createSeed(),
   invite: null,
@@ -61,6 +72,7 @@ function announce(message) {
 
 function applyLanguage() {
   document.documentElement.lang = state.language;
+  document.title = t('appName');
   document.documentElement.dir = isRtl(state.language) ? 'rtl' : 'ltr';
   elements.language.value = state.language;
   document.querySelectorAll('[data-i18n]').forEach((element) => {
@@ -186,25 +198,38 @@ async function shareResult() {
   }
 }
 
+function handleRunError(error) {
+  console.error(error);
+  game?.destroy();
+  elements.errorBanner.hidden = false;
+  elements.errorBanner.textContent = t('loadError');
+  announce(t('loadError'));
+  setScreen('discovery');
+}
+
+function safeBeginRun() {
+  try { beginRun(); } catch (error) { handleRunError(error); }
+}
+
 function bindEvents() {
   elements.language.addEventListener('change', () => {
     state.language = normalizeLanguage(elements.language.value);
-    localStorage.setItem('sca-language', state.language);
+    writePreference('sca-language', state.language);
     applyLanguage();
     track('language_changed', { language: state.language });
   });
   elements.motion.checked = state.reducedMotion;
   elements.motion.addEventListener('change', () => {
     state.reducedMotion = elements.motion.checked;
-    localStorage.setItem('sca-reduced-motion', String(state.reducedMotion));
+    writePreference('sca-reduced-motion', String(state.reducedMotion));
     document.documentElement.dataset.reducedMotion = String(state.reducedMotion);
     game?.setReducedMotion(state.reducedMotion);
     track('reduced_motion_changed', { enabled: state.reducedMotion });
   });
   elements.playButton.addEventListener('click', showInstructions);
-  elements.startButton.addEventListener('click', beginRun);
+  elements.startButton.addEventListener('click', safeBeginRun);
   elements.backButtons.forEach((button) => button.addEventListener('click', () => setScreen('discovery')));
-  elements.replayButton.addEventListener('click', beginRun);
+  elements.replayButton.addEventListener('click', safeBeginRun);
   elements.newButton.addEventListener('click', () => {
     state.seed = createSeed();
     state.invite = null;
