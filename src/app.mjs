@@ -1,4 +1,11 @@
-import { buildInviteUrl, CHALLENGE_ID, compareScores, createSeed, parseInvite } from './core.mjs';
+import {
+  buildInviteUrl,
+  CHALLENGE_ID,
+  compareScores,
+  createSeed,
+  parseInvite,
+  screenAfterPageShow
+} from './core.mjs';
 import { getChallenge } from './catalog.mjs';
 import { isRtl, normalizeLanguage, supportedLanguages, translate } from './i18n.mjs';
 import { OrbitLockGame } from './game.mjs';
@@ -56,6 +63,11 @@ const elements = {
 
 let game = null;
 
+function destroyGame() {
+  game?.destroy();
+  game = null;
+}
+
 function track(name, detail = {}) {
   state.events.push({ name, detail, at: Date.now() });
   if (state.events.length > 50) state.events.shift();
@@ -92,7 +104,7 @@ function setScreen(screen) {
   document.querySelectorAll('[data-screen]').forEach((section) => {
     section.hidden = section.dataset.screen !== screen;
   });
-  if (screen !== 'game') game?.destroy();
+  if (screen !== 'game') destroyGame();
   const focusTarget = document.querySelector(`[data-screen="${screen}"] h1, [data-screen="${screen}"] h2`);
   focusTarget?.focus({ preventScroll: true });
   track('screen_view', { screen });
@@ -200,7 +212,7 @@ async function shareResult() {
 
 function handleRunError(error) {
   console.error(error);
-  game?.destroy();
+  destroyGame();
   elements.errorBanner.hidden = false;
   elements.errorBanner.textContent = t('loadError');
   announce(t('loadError'));
@@ -209,6 +221,15 @@ function handleRunError(error) {
 
 function safeBeginRun() {
   try { beginRun(); } catch (error) { handleRunError(error); }
+}
+
+function handlePageShow(event) {
+  const nextScreen = screenAfterPageShow(event, state.screen);
+  if (nextScreen === state.screen) return;
+  state.result = null;
+  setScreen(nextScreen);
+  announce(t('ready'));
+  track('bfcache_restored', { screen: nextScreen });
 }
 
 function bindEvents() {
@@ -238,7 +259,8 @@ function bindEvents() {
     showInstructions();
   });
   elements.shareButton.addEventListener('click', shareResult);
-  window.addEventListener('pagehide', () => game?.destroy(), { once: true });
+  window.addEventListener('pagehide', destroyGame);
+  window.addEventListener('pageshow', handlePageShow);
 }
 
 function boot() {
