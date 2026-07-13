@@ -236,9 +236,11 @@
   function createFlightObstacles(options = {}) {
     const config = createConfig(options);
     let elapsedMs = 0;
+    let elapsedCompensationMs = 0;
 
     function buildState() {
-      const distance = distanceAt(config, elapsedMs);
+      const canonicalElapsedMs = normalizeFloat(elapsedMs);
+      const distance = distanceAt(config, canonicalElapsedMs);
       const firstSequenceIndex = firstSequenceIndexAt(config, distance);
       const firstRawLeft = config.initialLeft
         + (firstSequenceIndex * config.step)
@@ -265,8 +267,8 @@
 
       const nextId = config.initialId + firstSequenceIndex + config.obstacleCount;
       return Object.freeze({
-        elapsedMs: normalizeFloat(elapsedMs),
-        speed: normalizeFloat(speedAt(config, elapsedMs)),
+        elapsedMs: canonicalElapsedMs,
+        speed: normalizeFloat(speedAt(config, canonicalElapsedMs)),
         nextPatternIndex: (firstSequenceIndex + config.obstacleCount)
           % config.gapPattern.length,
         nextId,
@@ -280,6 +282,7 @@
 
     function reset() {
       elapsedMs = 0;
+      elapsedCompensationMs = 0;
       return buildState();
     }
 
@@ -294,7 +297,11 @@
         config.maxDeltaMs,
         config.maxRunMs - elapsedMs
       );
-      elapsedMs = normalizeFloat(elapsedMs + acceptedDeltaMs);
+      const compensatedDeltaMs = acceptedDeltaMs - elapsedCompensationMs;
+      const nextElapsedMs = elapsedMs + compensatedDeltaMs;
+      elapsedCompensationMs = (nextElapsedMs - elapsedMs) - compensatedDeltaMs;
+      elapsedMs = Math.min(config.maxRunMs, nextElapsedMs);
+      if (elapsedMs === config.maxRunMs) elapsedCompensationMs = 0;
       return buildState();
     }
 
