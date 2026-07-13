@@ -1,22 +1,21 @@
 # Social Challenge Arena
 
-A mobile-first multilingual social arcade platform.
+A mobile-first multilingual social arcade platform with two complete original skill challenges.
 
-## First playable experience
+## Playable catalog
 
-**Orbit Lock** is an original 2D timing challenge: tap when the moving pulse enters each gate, build a precision score, and share a strict same-route link so a friend can compete and compare results.
+- **Orbit Lock** — a 2D precision-timing challenge: lock a moving pulse inside twelve deterministic gates.
+- **Echo Grid** — a 2D visual-memory challenge: watch a deterministic tile pattern and repeat it in order across eight rounds.
 
-The complete journey is available from the real entry point:
+Both use the complete journey:
 
-`discover → understand → play → result → replay → share → friend attempt → compare → share again`
+`discover → choose → understand → play → result → replay → share → friend attempt → compare → share again`
 
 ## Languages and access
 
-- Arabic with full RTL
-- English
-- Turkish
-- Touch, pointer, Space, and Enter controls
-- Reduced-effects mode and live accessibility announcements
+- Arabic with full RTL, English, and Turkish
+- Touch and pointer throughout; Space/Enter for Orbit Lock and native keyboard buttons for Echo Grid
+- Reduced-effects mode, visible focus, non-color-only feedback, and live announcements
 - No account, external analytics, third-party assets, or network API
 
 ## Run locally
@@ -28,11 +27,9 @@ npm run build
 python3 -m http.server 8000
 ```
 
-Open `http://localhost:8000`. The deployable static output is generated in `dist/` and is published from `main` through GitHub Pages.
+Open `http://localhost:8000`. The deployable static output is generated in `dist/` and published from `main` through GitHub Pages.
 
 ## Delivery model
-
-Each visible delivery uses:
 
 `one issue → one branch → one playable PR → one QA result → merge, reduce, or cancel`
 

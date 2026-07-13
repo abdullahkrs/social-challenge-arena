@@ -23,9 +23,7 @@ export class OrbitLockGame {
     this.snapshot = this.emptySnapshot();
   }
 
-  emptySnapshot() {
-    return { score: 0, round: 0, rounds: 12, lives: 3, combo: 0, precision: 0 };
-  }
+  emptySnapshot() { return { score: 0, round: 0, rounds: 12, lives: 3, combo: 0, precision: 0 }; }
 
   start(seed) {
     this.destroy();
@@ -51,15 +49,9 @@ export class OrbitLockGame {
 
   installListeners() {
     const signal = this.abortController.signal;
-    this.canvas.addEventListener('pointerdown', (event) => {
-      event.preventDefault();
-      this.attempt();
-    }, { signal });
+    this.canvas.addEventListener('pointerdown', (event) => { event.preventDefault(); this.attempt(); }, { signal });
     window.addEventListener('keydown', (event) => {
-      if (this.running && isGameAttemptKey(event, this.canvas)) {
-        event.preventDefault();
-        this.attempt();
-      }
+      if (this.running && isGameAttemptKey(event, this.canvas)) { event.preventDefault(); this.attempt(); }
     }, { signal });
     window.addEventListener('resize', () => this.resize(), { signal, passive: true });
     if ('ResizeObserver' in window) {
@@ -94,21 +86,15 @@ export class OrbitLockGame {
       this.spawnParticles(stage.gateAngle);
       this.snapshot.round += 1;
       this.angle = 0;
-      this.onAnnounce({ type: 'hit', points: result.points, precision: result.precision });
-      if (this.snapshot.round >= this.snapshot.rounds) {
-        this.finish('complete');
-        return;
-      }
+      this.onAnnounce({ key: 'hit', values: { points: result.points }, extraKey: 'precision', extraValues: { value: result.precision } });
+      if (this.snapshot.round >= this.snapshot.rounds) return this.finish('complete');
     } else {
       this.snapshot.lives -= 1;
       this.snapshot.combo = 0;
       this.snapshot.precision = 0;
       this.feedback = { type: 'miss' };
-      this.onAnnounce({ type: 'miss' });
-      if (this.snapshot.lives <= 0) {
-        this.finish('failed');
-        return;
-      }
+      this.onAnnounce({ key: 'miss' });
+      if (this.snapshot.lives <= 0) return this.finish('failed');
     }
     this.feedbackUntil = performance.now() + (this.reducedMotion ? 260 : 520);
     this.onUpdate({ ...this.snapshot });
@@ -117,12 +103,7 @@ export class OrbitLockGame {
   spawnParticles(angle) {
     if (this.reducedMotion) return;
     for (let index = 0; index < 12; index += 1) {
-      this.particles.push({
-        angle: angle + (index - 5.5) * 0.035,
-        radius: 0.58,
-        speed: 0.14 + index * 0.004,
-        life: 1
-      });
+      this.particles.push({ angle: angle + (index - 5.5) * 0.035, radius: 0.58, speed: 0.14 + index * 0.004, life: 1 });
     }
   }
 
@@ -148,11 +129,7 @@ export class OrbitLockGame {
 
   updateParticles(delta) {
     this.particles = this.particles
-      .map((particle) => ({
-        ...particle,
-        radius: particle.radius + particle.speed * delta,
-        life: particle.life - delta * 1.8
-      }))
+      .map((particle) => ({ ...particle, radius: particle.radius + particle.speed * delta, life: particle.life - delta * 1.8 }))
       .filter((particle) => particle.life > 0);
   }
 
@@ -165,71 +142,30 @@ export class OrbitLockGame {
     const centerY = height / 2;
     const radius = size * 0.31;
     const pulse = this.reducedMotion ? 1 : 1 + Math.sin(time / 260) * 0.025;
-
     const background = context.createRadialGradient(centerX, centerY, 0, centerX, centerY, size * 0.7);
-    background.addColorStop(0, '#16234b');
-    background.addColorStop(0.52, '#0b1230');
-    background.addColorStop(1, '#060916');
-    context.fillStyle = background;
-    context.fillRect(0, 0, width, height);
-
-    context.save();
-    context.translate(centerX, centerY);
-    context.lineCap = 'round';
-
-    context.strokeStyle = 'rgba(133, 159, 255, 0.22)';
-    context.lineWidth = size * 0.018;
-    context.beginPath();
-    context.arc(0, 0, radius, 0, TAU);
-    context.stroke();
-
-    context.strokeStyle = '#7cf6d4';
-    context.shadowColor = '#7cf6d4';
-    context.shadowBlur = this.reducedMotion ? 6 : 18;
-    context.lineWidth = size * 0.036;
-    context.beginPath();
-    context.arc(0, 0, radius, stage.gateAngle - stage.gateWidth / 2, stage.gateAngle + stage.gateWidth / 2);
-    context.stroke();
-
-    const markerX = Math.cos(this.angle) * radius;
-    const markerY = Math.sin(this.angle) * radius;
-    context.fillStyle = '#ffffff';
-    context.shadowColor = '#8aa8ff';
-    context.shadowBlur = this.reducedMotion ? 8 : 22;
-    context.beginPath();
-    context.arc(markerX, markerY, size * 0.034 * pulse, 0, TAU);
-    context.fill();
-    context.strokeStyle = '#5e82ff';
-    context.lineWidth = size * 0.012;
-    context.stroke();
-
-    context.shadowBlur = 0;
-    context.fillStyle = '#f4f7ff';
-    context.textAlign = 'center';
-    context.textBaseline = 'middle';
-    context.font = `700 ${Math.round(size * 0.095)}px system-ui, sans-serif`;
-    context.fillText(String(this.snapshot.score), 0, -size * 0.01);
-    context.fillStyle = '#aebbe8';
-    context.font = `600 ${Math.round(size * 0.032)}px system-ui, sans-serif`;
-    context.fillText(`${this.snapshot.round + 1}/${this.snapshot.rounds}`, 0, size * 0.085);
-
+    background.addColorStop(0, '#16234b'); background.addColorStop(0.52, '#0b1230'); background.addColorStop(1, '#060916');
+    context.fillStyle = background; context.fillRect(0, 0, width, height);
+    context.save(); context.translate(centerX, centerY); context.lineCap = 'round';
+    context.strokeStyle = 'rgba(133, 159, 255, 0.22)'; context.lineWidth = size * 0.018;
+    context.beginPath(); context.arc(0, 0, radius, 0, TAU); context.stroke();
+    context.strokeStyle = '#7cf6d4'; context.shadowColor = '#7cf6d4'; context.shadowBlur = this.reducedMotion ? 6 : 18; context.lineWidth = size * 0.036;
+    context.beginPath(); context.arc(0, 0, radius, stage.gateAngle - stage.gateWidth / 2, stage.gateAngle + stage.gateWidth / 2); context.stroke();
+    const markerX = Math.cos(this.angle) * radius; const markerY = Math.sin(this.angle) * radius;
+    context.fillStyle = '#ffffff'; context.shadowColor = '#8aa8ff'; context.shadowBlur = this.reducedMotion ? 8 : 22;
+    context.beginPath(); context.arc(markerX, markerY, size * 0.034 * pulse, 0, TAU); context.fill();
+    context.strokeStyle = '#5e82ff'; context.lineWidth = size * 0.012; context.stroke(); context.shadowBlur = 0;
+    context.fillStyle = '#f4f7ff'; context.textAlign = 'center'; context.textBaseline = 'middle';
+    context.font = `700 ${Math.round(size * 0.095)}px system-ui, sans-serif`; context.fillText(String(this.snapshot.score), 0, -size * 0.01);
+    context.fillStyle = '#aebbe8'; context.font = `600 ${Math.round(size * 0.032)}px system-ui, sans-serif`; context.fillText(`${this.snapshot.round + 1}/${this.snapshot.rounds}`, 0, size * 0.085);
     for (const particle of this.particles) {
-      const x = Math.cos(particle.angle) * radius * particle.radius;
-      const y = Math.sin(particle.angle) * radius * particle.radius;
-      context.globalAlpha = particle.life;
-      context.fillStyle = '#7cf6d4';
-      context.beginPath();
-      context.arc(x, y, size * 0.009, 0, TAU);
-      context.fill();
+      const x = Math.cos(particle.angle) * radius * particle.radius; const y = Math.sin(particle.angle) * radius * particle.radius;
+      context.globalAlpha = particle.life; context.fillStyle = '#7cf6d4'; context.beginPath(); context.arc(x, y, size * 0.009, 0, TAU); context.fill();
     }
     context.globalAlpha = 1;
-
     if (this.feedback && time < this.feedbackUntil) {
-      context.fillStyle = this.feedback.type === 'hit' ? '#7cf6d4' : '#ff9fbc';
-      context.font = `800 ${Math.round(size * 0.05)}px system-ui, sans-serif`;
+      context.fillStyle = this.feedback.type === 'hit' ? '#7cf6d4' : '#ff9fbc'; context.font = `800 ${Math.round(size * 0.05)}px system-ui, sans-serif`;
       context.fillText(this.feedback.type === 'hit' ? `+${this.feedback.points}` : '×', 0, size * 0.18);
     }
-
     context.restore();
   }
 
@@ -237,10 +173,8 @@ export class OrbitLockGame {
     this.running = false;
     if (this.frame) cancelAnimationFrame(this.frame);
     this.frame = 0;
-    this.abortController?.abort();
-    this.abortController = null;
-    this.resizeObserver?.disconnect();
-    this.resizeObserver = null;
+    this.abortController?.abort(); this.abortController = null;
+    this.resizeObserver?.disconnect(); this.resizeObserver = null;
     this.particles = [];
   }
 }
