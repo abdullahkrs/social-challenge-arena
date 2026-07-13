@@ -1,29 +1,19 @@
 # Social Challenge Arena
 
-A continuously evolving multilingual social arcade platform for original 2D and 3D challenge games.
+A continuously evolving multilingual social arcade platform.
 
-## Vision
+The product combines a shared platform layer with original 2D, 2.5D, and 3D challenges. It is mobile-first, accessible, multilingual, socially shareable, and constrained by `ISLAMIC_CONTENT_POLICY.md`.
 
-Build polished mobile-first challenges that people can understand quickly, play, replay, share, and use to compete with friends across social media.
+## Current state
 
-The platform supports:
+The repository was reset to a clean swarm-development baseline.
 
-- 2D, 2.5D, and 3D games;
-- strong graphics, animation, and game feel;
-- multilingual experiences with Arabic RTL, English, Turkish, and future languages;
-- coordinated autonomous agents that decide roadmap stages and release scope;
-- broad social-media audiences and varied device capabilities;
-- Islamic values, safe content, accessibility, privacy, and originality.
+There is no active legacy game, architecture, roadmap, catalog, or release plan.
 
-## Source of truth
+## Delivery model
 
-- `PRODUCT_BRIEF.md`: durable product vision and constraints.
-- `AGENT.md`: autonomous operating rules.
+Each visible delivery uses:
 
-## Current status
+`one issue → one branch → one playable PR → one QA result → merge, reduce, or cancel`
 
-The new product definition is active. Architecture, roadmap, agent roles, and the first vertical slice must now be designed from this brief rather than restored from repository history.
-
-## Next action
-
-Create the new autonomous operating system and coordinated agent team, then let the Coordinator select and deliver the first complete user-visible vertical slice.
+Platform and game work are developed together when they form one user journey. Shared platform work must be proven by a real page, game, sharing flow, localization surface, performance improvement, or accessibility improvement.
