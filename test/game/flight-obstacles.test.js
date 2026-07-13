@@ -234,7 +234,7 @@ test('matches the latest QA canonical-boundary grouping before and after reset',
   const first = createFlightObstacles(config);
   const second = createFlightObstacles(config);
   assert.deepEqual(advanceAll(second, grouped), advanceAll(first, fine));
-  assert.equal(first.getState().elapsedMs, 1000.000001);
+  assert.equal(first.getState().elapsedMs, 1000);
   assert.deepEqual(second.reset(), first.reset());
   assert.deepEqual(advanceAll(second, grouped), advanceAll(first, fine));
 });
@@ -256,9 +256,25 @@ test('matches the QA one-ulp grouping boundary before and after reset', () => {
   const first = createFlightObstacles(config);
   const second = createFlightObstacles(config);
   assert.deepEqual(advanceAll(second, grouped), advanceAll(first, fine));
-  assert.equal(first.getState().elapsedMs, 1000.000001);
+  assert.equal(first.getState().elapsedMs, 1000);
   assert.deepEqual(second.reset(), first.reset());
   assert.deepEqual(advanceAll(second, grouped), advanceAll(first, fine));
+});
+
+test('keeps a proactive half-unit grouping regression stable', () => {
+  const config = options({ maxDeltaMs: 2000, maxRunMs: 10000 });
+  const fine = [
+    71.20701561099088,
+    197.6361443044076,
+    43.0745537613908,
+    11.57593873677945,
+    179.40209708643036
+  ];
+  const grouped = [fine[0] + fine[1], fine[2] + fine[3], fine[4]];
+  const first = createFlightObstacles(config);
+  const second = createFlightObstacles(config);
+  assert.deepEqual(advanceAll(second, grouped), advanceAll(first, fine));
+  assert.equal(first.getState().elapsedMs, 502.895749);
 });
 
 test('keeps generated adjacent grouping partitions stable at emitted elapsed precision', () => {
