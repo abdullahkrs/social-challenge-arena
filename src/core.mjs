@@ -1,8 +1,12 @@
 export const SHARE_VERSION = 1;
-export const CHALLENGE_ID = 'orbit-lock';
+export const ORBIT_LOCK_ID = 'orbit-lock';
+export const ECHO_GRID_ID = 'echo-grid';
+export const CHALLENGE_ID = ORBIT_LOCK_ID;
+export const CHALLENGE_IDS = Object.freeze([ORBIT_LOCK_ID, ECHO_GRID_ID]);
 export const SCORE_MAX = 9999;
 export const SEED_MAX = 0xffffffff;
 const ALLOWED_KEYS = ['c', 'ck', 's', 't', 'v'];
+// Kept stable so every previously generated Orbit Lock link remains valid.
 const CHECKSUM_SALT = 'sca-orbit-lock-v1';
 
 export function clamp(value, min, max) {
@@ -35,10 +39,22 @@ export function challengePlan(seed, rounds = 12) {
   }));
 }
 
+export function echoPlan(seed, rounds = 8) {
+  const rng = makeRng(seed ^ 0x9e3779b9);
+  return Array.from({ length: rounds }, (_, round) => {
+    const length = Math.min(6, 2 + Math.floor(round / 2));
+    const sequence = [];
+    while (sequence.length < length) {
+      const candidate = Math.floor(rng() * 9);
+      if (candidate !== sequence.at(-1)) sequence.push(candidate);
+    }
+    return sequence;
+  });
+}
+
 export function angularDistance(a, b) {
   const full = Math.PI * 2;
-  const delta = Math.abs(((a - b + Math.PI) % full + full) % full - Math.PI);
-  return delta;
+  return Math.abs(((a - b + Math.PI) % full + full) % full - Math.PI);
 }
 
 export function isGameAttemptKey(event, canvas) {
@@ -57,10 +73,14 @@ export function scoreAttempt({ distance, gateWidth, combo, round }) {
   const base = 90 + precision * 2;
   const comboBonus = Math.min(240, Math.max(0, combo - 1) * 30);
   const roundBonus = Math.min(120, Math.max(0, round) * 10);
-  return {
-    precision,
-    points: clamp(base + comboBonus + roundBonus, 0, 900)
-  };
+  return { precision, points: clamp(base + comboBonus + roundBonus, 0, 900) };
+}
+
+export function scoreEchoRound({ length, combo, round }) {
+  const base = Math.max(2, Math.min(6, Number(length) || 2)) * 85;
+  const comboBonus = Math.min(220, Math.max(0, combo - 1) * 35);
+  const roundBonus = Math.min(180, Math.max(0, round) * 20);
+  return clamp(base + comboBonus + roundBonus, 0, 900);
 }
 
 export function compareScores(score, target) {
@@ -85,6 +105,7 @@ function payload({ challengeId, seed, target }) {
 }
 
 export function encodeInvite({ challengeId = CHALLENGE_ID, seed, target }) {
+  if (!CHALLENGE_IDS.includes(challengeId)) throw new RangeError('Unknown challenge');
   const normalizedSeed = Number(seed) >>> 0;
   const normalizedTarget = clamp(Math.trunc(Number(target) || 0), 0, SCORE_MAX);
   const checksum = fnv1a(payload({ challengeId, seed: normalizedSeed, target: normalizedTarget }));
@@ -104,9 +125,9 @@ export function parseInvite(input) {
   if (keys.length !== ALLOWED_KEYS.length || keys.some((key, index) => key !== ALLOWED_KEYS[index])) {
     return { ok: false, reason: 'shape' };
   }
-  if (params.get('v') !== String(SHARE_VERSION) || params.get('c') !== CHALLENGE_ID) {
-    return { ok: false, reason: 'version' };
-  }
+  const challengeId = params.get('c') || '';
+  if (params.get('v') !== String(SHARE_VERSION)) return { ok: false, reason: 'version' };
+  if (!CHALLENGE_IDS.includes(challengeId)) return { ok: false, reason: 'challenge' };
   const seedText = params.get('s') || '';
   const targetText = params.get('t') || '';
   if (!/^[0-9a-z]{1,7}$/.test(seedText) || !/^(0|[1-9]\d{0,3})$/.test(targetText)) {
@@ -117,9 +138,9 @@ export function parseInvite(input) {
   if (!Number.isSafeInteger(seed) || seed < 0 || seed > SEED_MAX || target < 0 || target > SCORE_MAX) {
     return { ok: false, reason: 'bounds' };
   }
-  const expected = fnv1a(payload({ challengeId: CHALLENGE_ID, seed, target }));
+  const expected = fnv1a(payload({ challengeId, seed, target }));
   if (params.get('ck') !== expected) return { ok: false, reason: 'checksum' };
-  return { ok: true, invite: { challengeId: CHALLENGE_ID, seed, target } };
+  return { ok: true, invite: { challengeId, seed, target } };
 }
 
 export function buildInviteUrl(baseUrl, invite) {

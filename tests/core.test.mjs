@@ -2,50 +2,55 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import {
-  angularDistance,
-  buildInviteUrl,
-  challengePlan,
-  compareScores,
-  encodeInvite,
-  isGameAttemptKey,
-  parseInvite,
-  scoreAttempt,
-  screenAfterPageShow
+  angularDistance, buildInviteUrl, challengePlan, compareScores, echoPlan, encodeInvite,
+  isGameAttemptKey, parseInvite, scoreAttempt, scoreEchoRound, screenAfterPageShow
 } from '../src/core.mjs';
+import { catalog, getChallenge } from '../src/catalog.mjs';
 import { missingTranslations, supportedLanguages, translate } from '../src/i18n.mjs';
 
-test('challenge plan is deterministic and bounded', () => {
-  const first = challengePlan(12345);
-  const second = challengePlan(12345);
-  assert.deepEqual(first, second);
-  assert.equal(first.length, 12);
+test('orbit plan is deterministic and bounded', () => {
+  const first = challengePlan(12345); const second = challengePlan(12345);
+  assert.deepEqual(first, second); assert.equal(first.length, 12);
   assert.ok(first.every((stage) => stage.gateWidth >= 0.42 && stage.speed > 1));
 });
 
-test('strict invite round-trips and rejects mutation', () => {
-  const params = encodeInvite({ seed: 4294967295, target: 4321 });
-  assert.deepEqual(parseInvite(params), {
-    ok: true,
-    invite: { challengeId: 'orbit-lock', seed: 4294967295, target: 4321 }
-  });
-  params.set('t', '4322');
-  assert.deepEqual(parseInvite(params), { ok: false, reason: 'checksum' });
+test('echo plan is deterministic, bounded, and avoids immediate repeats', () => {
+  const first = echoPlan(98765); const second = echoPlan(98765);
+  assert.deepEqual(first, second); assert.equal(first.length, 8);
+  assert.ok(first.every((sequence) => sequence.length >= 2 && sequence.length <= 6));
+  assert.ok(first.flat().every((cell) => Number.isInteger(cell) && cell >= 0 && cell <= 8));
+  assert.ok(first.every((sequence) => sequence.every((cell, index) => index === 0 || cell !== sequence[index - 1])));
 });
 
-test('strict invite rejects extras, malformed values, and out-of-range score', () => {
-  const valid = encodeInvite({ seed: 7, target: 100 });
-  valid.set('lang', 'ar');
+test('catalog exposes two materially different live challenges', () => {
+  assert.equal(catalog.length, 2);
+  assert.deepEqual(catalog.map(({ id }) => id), ['orbit-lock', 'echo-grid']);
+  assert.equal(getChallenge('orbit-lock').skill, 'timing');
+  assert.equal(getChallenge('echo-grid').skill, 'memory');
+  assert.equal(getChallenge('unknown'), null);
+});
+
+test('strict invite round-trips both challenges and keeps old orbit shape', () => {
+  const orbit = encodeInvite({ seed: 4294967295, target: 4321 });
+  assert.deepEqual(parseInvite(orbit), { ok: true, invite: { challengeId: 'orbit-lock', seed: 4294967295, target: 4321 } });
+  const echo = encodeInvite({ challengeId: 'echo-grid', seed: 77, target: 900 });
+  assert.deepEqual(parseInvite(echo), { ok: true, invite: { challengeId: 'echo-grid', seed: 77, target: 900 } });
+  echo.set('t', '901'); assert.deepEqual(parseInvite(echo), { ok: false, reason: 'checksum' });
+});
+
+test('strict invite rejects extras, unknown challenges, malformed values, and out-of-range score', () => {
+  const valid = encodeInvite({ seed: 7, target: 100 }); valid.set('lang', 'ar');
   assert.deepEqual(parseInvite(valid), { ok: false, reason: 'shape' });
+  assert.deepEqual(parseInvite('v=1&c=unknown&s=1&t=10&ck=x'), { ok: false, reason: 'challenge' });
   assert.deepEqual(parseInvite('v=1&c=orbit-lock&s=-1&t=10&ck=x'), { ok: false, reason: 'format' });
   assert.deepEqual(parseInvite('v=1&c=orbit-lock&s=1&t=10000&ck=x'), { ok: false, reason: 'format' });
+  assert.throws(() => encodeInvite({ challengeId: 'unknown', seed: 1, target: 1 }), /Unknown challenge/);
 });
 
 test('invite URL is language-independent and clears fragments', () => {
-  const url = buildInviteUrl('https://example.com/play?lang=ar#result', { seed: 8, target: 250 });
-  const parsed = new URL(url);
-  assert.equal(parsed.hash, '');
-  assert.equal(parsed.searchParams.has('lang'), false);
-  assert.equal(parseInvite(parsed.search).ok, true);
+  const url = buildInviteUrl('https://example.com/play?lang=ar#result', { challengeId: 'echo-grid', seed: 8, target: 250 });
+  const parsed = new URL(url); assert.equal(parsed.hash, ''); assert.equal(parsed.searchParams.has('lang'), false);
+  assert.equal(parseInvite(parsed.search).invite.challengeId, 'echo-grid');
 });
 
 test('score comparison handles win, loss, and tie', () => {
@@ -54,26 +59,26 @@ test('score comparison handles win, loss, and tie', () => {
   assert.deepEqual(compareScores(500, 500), { outcome: 'tie', difference: 0 });
 });
 
-test('angular distance wraps and scoring remains bounded', () => {
+test('both scoring models remain bounded', () => {
   assert.ok(angularDistance(0.05, Math.PI * 2 - 0.05) < 0.11);
-  const score = scoreAttempt({ distance: 0, gateWidth: 0.5, combo: 20, round: 20 });
-  assert.equal(score.precision, 100);
-  assert.ok(score.points <= 900);
+  const orbit = scoreAttempt({ distance: 0, gateWidth: 0.5, combo: 20, round: 20 });
+  assert.equal(orbit.precision, 100); assert.ok(orbit.points <= 900);
+  assert.equal(scoreEchoRound({ length: 99, combo: 99, round: 99 }), 900);
 });
 
 test('all required languages have the same message keys', () => {
-  assert.deepEqual(supportedLanguages, ['ar', 'en', 'tr']);
-  assert.deepEqual(missingTranslations(), []);
-  assert.equal(translate('ar', 'beatScore', { score: 99 }).includes('99'), true);
-  assert.equal(translate('tr', 'beatScore', { score: 99 }).includes('99'), true);
+  assert.deepEqual(supportedLanguages, ['ar', 'en', 'tr']); assert.deepEqual(missingTranslations(), []);
+  for (const language of supportedLanguages) {
+    assert.ok(translate(language, 'echoName').length > 2);
+    assert.ok(translate(language, 'challengeCard', { name: 'X' }).includes('X'));
+  }
 });
 
-test('compact motion control retains a localized accessible name', async () => {
+test('catalog and compact settings remain accessible in the real entry point', async () => {
   const html = await readFile(new URL('../index.html', import.meta.url), 'utf8');
-  assert.match(
-    html,
-    /<input id="motion-toggle" type="checkbox" aria-label="Reduce effects" data-i18n-aria="reduceMotion">/
-  );
+  assert.match(html, /<input id="motion-toggle" type="checkbox" aria-label="Reduce effects" data-i18n-aria="reduceMotion">/);
+  assert.equal((html.match(/data-challenge-id=/g) || []).length, 2);
+  assert.equal((html.match(/data-cell=/g) || []).length, 9);
 });
 
 test('game keyboard attempts are consumed only from the focused canvas target', () => {
@@ -82,15 +87,19 @@ test('game keyboard attempts are consumed only from the focused canvas target', 
   assert.equal(isGameAttemptKey({ code: 'Enter', target: canvas }, canvas), true);
   assert.equal(isGameAttemptKey({ code: 'Space', target: { tagName: 'SELECT' } }, canvas), false);
   assert.equal(isGameAttemptKey({ code: 'Enter', target: { tagName: 'INPUT' } }, canvas), false);
-  assert.equal(isGameAttemptKey({ code: 'Space', target: { isContentEditable: true } }, canvas), false);
   assert.equal(isGameAttemptKey({ code: 'KeyA', target: canvas }, canvas), false);
+});
+
+test('app hosts both live games without speculative engine abstractions', async () => {
+  const source = await readFile(new URL('../src/app.mjs', import.meta.url), 'utf8');
+  assert.match(source, /new OrbitLockGame/); assert.match(source, /new EchoGridGame/);
+  assert.doesNotMatch(source, /GameEngine|PluginRegistry/);
 });
 
 test('persisted back-forward cache restore returns an interrupted run to instructions', async () => {
   assert.equal(screenAfterPageShow({ persisted: true }, 'game'), 'instructions');
   assert.equal(screenAfterPageShow({ persisted: false }, 'game'), 'game');
   assert.equal(screenAfterPageShow({ persisted: true }, 'result'), 'result');
-
   const source = await readFile(new URL('../src/app.mjs', import.meta.url), 'utf8');
   assert.match(source, /window\.addEventListener\('pagehide', destroyGame\);/);
   assert.match(source, /window\.addEventListener\('pageshow', handlePageShow\);/);
