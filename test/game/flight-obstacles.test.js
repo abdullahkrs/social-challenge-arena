@@ -241,6 +241,17 @@ test('uses analytic elapsed-time progression so equivalent accepted partitions m
   assert.deepEqual(fourFrames.getState(), expected);
 });
 
+test('keeps valid fractional delta partitions frame-rate independent', () => {
+  const oneFrame = createFlightObstacles(options({ maxDeltaMs: 1000 }));
+  const threeFrames = createFlightObstacles(options({ maxDeltaMs: 1000 }));
+
+  const expected = oneFrame.advance(100);
+  for (let count = 0; count < 3; count += 1) threeFrames.advance(100 / 3);
+
+  assert.deepEqual(threeFrames.getState(), expected);
+  assert.deepEqual(threeFrames.reset(), oneFrame.reset());
+});
+
 test('recycles multiple off-left obstacles canonically with fixed non-overlap spacing', () => {
   const stream = createFlightObstacles(options({
     initialLeft: 0,
