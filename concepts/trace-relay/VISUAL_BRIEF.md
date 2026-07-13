@@ -239,7 +239,7 @@ Below the board:
 - English and Turkish shell use LTR.
 - The board, anchor coordinates, route, crossings, and focus traversal IDs do not mirror.
 - Button groups use CSS logical properties; icon-only directional arrows are forbidden for core actions.
-- Long labels wrap to two lines outside the board and preserve a 44 CSS px control height.
+- Long labels wrap to two lines outside the board. Every interactive control retains a minimum `48 × 48 CSS px` target or hit area at every viewport; a smaller visual surface is allowed only inside that target.
 - Mixed-direction challenge links use directional isolation.
 - Numeric formatting follows locale, but score comparison preserves clear label-value association.
 
