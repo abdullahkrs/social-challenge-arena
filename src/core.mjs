@@ -6,7 +6,7 @@ export const CHALLENGE_IDS = Object.freeze([ORBIT_LOCK_ID, ECHO_GRID_ID]);
 export const SCORE_MAX = 9999;
 export const SEED_MAX = 0xffffffff;
 const ALLOWED_KEYS = ['c', 'ck', 's', 't', 'v'];
-// Kept stable so every previously generated Orbit Lock link remains valid.
+// Kept stable so every previously generated Orbit Lock and Echo Grid v1 link remains valid.
 const CHECKSUM_SALT = 'sca-orbit-lock-v1';
 
 export function clamp(value, min, max) {
@@ -67,6 +67,10 @@ export function screenAfterPageShow(event, screen) {
   return event?.persisted && screen === 'game' ? 'instructions' : screen;
 }
 
+export function initialScreenForInvite(invite) {
+  return invite ? 'instructions' : 'discovery';
+}
+
 export function scoreAttempt({ distance, gateWidth, combo, round }) {
   const normalized = clamp(1 - distance / (gateWidth / 2), 0, 1);
   const precision = Math.round(normalized * 100);
@@ -89,6 +93,20 @@ export function compareScores(score, target) {
   if (safeScore > safeTarget) return { outcome: 'win', difference: safeScore - safeTarget };
   if (safeScore < safeTarget) return { outcome: 'lose', difference: safeTarget - safeScore };
   return { outcome: 'tie', difference: 0 };
+}
+
+export function comparisonSymbol(outcome) {
+  return ({ win: '↑', lose: '↓', tie: '=' })[outcome] || '•';
+}
+
+export function buildResultSharePayload({ title, text, url }) {
+  const normalizedTitle = String(title || '').trim();
+  const normalizedText = String(text || '').trim();
+  const normalizedUrl = new URL(url).toString();
+  return {
+    shareData: { title: normalizedTitle, text: normalizedText, url: normalizedUrl },
+    clipboardText: normalizedText ? `${normalizedText}\n${normalizedUrl}` : normalizedUrl
+  };
 }
 
 function fnv1a(value) {
