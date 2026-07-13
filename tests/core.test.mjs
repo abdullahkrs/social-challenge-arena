@@ -7,8 +7,10 @@ import {
   challengePlan,
   compareScores,
   encodeInvite,
+  isGameAttemptKey,
   parseInvite,
-  scoreAttempt
+  scoreAttempt,
+  screenAfterPageShow
 } from '../src/core.mjs';
 import { missingTranslations, supportedLanguages, translate } from '../src/i18n.mjs';
 
@@ -72,4 +74,25 @@ test('compact motion control retains a localized accessible name', async () => {
     html,
     /<input id="motion-toggle" type="checkbox" aria-label="Reduce effects" data-i18n-aria="reduceMotion">/
   );
+});
+
+test('game keyboard attempts are consumed only from the focused canvas target', () => {
+  const canvas = {};
+  assert.equal(isGameAttemptKey({ code: 'Space', target: canvas }, canvas), true);
+  assert.equal(isGameAttemptKey({ code: 'Enter', target: canvas }, canvas), true);
+  assert.equal(isGameAttemptKey({ code: 'Space', target: { tagName: 'SELECT' } }, canvas), false);
+  assert.equal(isGameAttemptKey({ code: 'Enter', target: { tagName: 'INPUT' } }, canvas), false);
+  assert.equal(isGameAttemptKey({ code: 'Space', target: { isContentEditable: true } }, canvas), false);
+  assert.equal(isGameAttemptKey({ code: 'KeyA', target: canvas }, canvas), false);
+});
+
+test('persisted back-forward cache restore returns an interrupted run to instructions', async () => {
+  assert.equal(screenAfterPageShow({ persisted: true }, 'game'), 'instructions');
+  assert.equal(screenAfterPageShow({ persisted: false }, 'game'), 'game');
+  assert.equal(screenAfterPageShow({ persisted: true }, 'result'), 'result');
+
+  const source = await readFile(new URL('../src/app.mjs', import.meta.url), 'utf8');
+  assert.match(source, /window\.addEventListener\('pagehide', destroyGame\);/);
+  assert.match(source, /window\.addEventListener\('pageshow', handlePageShow\);/);
+  assert.doesNotMatch(source, /pagehide[^\n]*once/);
 });
