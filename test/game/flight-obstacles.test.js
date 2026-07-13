@@ -239,6 +239,28 @@ test('matches the latest QA canonical-boundary grouping before and after reset',
   assert.deepEqual(advanceAll(second, grouped), advanceAll(first, fine));
 });
 
+test('matches the QA one-ulp grouping boundary before and after reset', () => {
+  const config = options({ maxDeltaMs: 2000, maxRunMs: 10000 });
+  const fine = [
+    224.8161852462906,
+    256.09235101909076,
+    192.9749484594686,
+    235.78527915382975,
+    90.33123662132027
+  ];
+  const grouped = [fine[0] + fine[1], fine[2] + fine[3], fine[4]];
+  assert.notEqual(
+    fine.reduce((sum, value) => sum + value, 0),
+    grouped.reduce((sum, value) => sum + value, 0)
+  );
+  const first = createFlightObstacles(config);
+  const second = createFlightObstacles(config);
+  assert.deepEqual(advanceAll(second, grouped), advanceAll(first, fine));
+  assert.equal(first.getState().elapsedMs, 1000.000001);
+  assert.deepEqual(second.reset(), first.reset());
+  assert.deepEqual(advanceAll(second, grouped), advanceAll(first, fine));
+});
+
 test('keeps generated adjacent grouping partitions stable at emitted elapsed precision', () => {
   let seed = 0x9e3779b9;
   function random() {
