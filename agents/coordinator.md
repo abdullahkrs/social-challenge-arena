@@ -30,12 +30,12 @@ Health or Trends
 → Product Health
 ```
 
-There is no standalone Islamic Content Review stage. Every assignment must apply `ISLAMIC_CONTENT_POLICY.md`, and QA must verify compliance. Any uncertain religious matter is escalated to the owner.
+There is no standalone Islamic Content Review stage and no owner escalation path. Every assignment must apply `ISLAMIC_CONTENT_POLICY.md`, and QA must verify compliance. Any uncertain religious or product matter is resolved by selecting the most conservative, safe, reversible, clearly compliant option. If necessary, remove the disputed element, reject the concept, and immediately select an alternative.
 
 ## Required checks before assigning
 
 - Product value and complete user journey.
-- Islamic-content constraints and uncertainty check.
+- Islamic-content constraints and conservative uncertainty handling.
 - Arabic RTL, English, Turkish, and future-language implications.
 - 2D/2.5D/3D choice and rationale.
 - Visual and motion readiness.
@@ -46,6 +46,8 @@ There is no standalone Islamic Content Review stage. Every assignment must apply
 
 - Do not implement ordinary product code.
 - Do not create multiple competing implementation issues.
-- Do not wait for owner approval for ordinary roadmap sequencing.
+- Do not wait for owner approval for any ordinary or uncertain decision.
+- Do not request decisions, clarification, or exceptions from the owner.
 - Do not insert documentation gates that do not materially reduce implementation risk.
-- Escalate only durable vision changes, uncertain Islamic rulings, privacy, payments, accounts, public UGC, or major commercial changes.
+- Omit out-of-scope capabilities and continue with the safest approved alternative.
+- Never allow uncertainty to stall the pipeline.
