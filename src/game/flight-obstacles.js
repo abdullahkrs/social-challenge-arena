@@ -14,6 +14,10 @@
   const MAX_RECYCLES_PER_ADVANCE = 4096;
   const MAX_TOTAL_RECYCLES = 1000000;
   const PRECISION_DIGITS = 12;
+  const ELAPSED_DECIMAL_SCALE = 10n ** BigInt(PRECISION_DIGITS);
+  const DOUBLE_UNITS_PER_MS = 1n << 1074n;
+  const DOUBLE_FRACTION_MASK = (1n << 52n) - 1n;
+  const DOUBLE_IMPLICIT_BIT = 1n << 52n;
 
   const DEFAULT_GAP_PATTERN = Object.freeze([
     Object.freeze({ gapTop: 0.12, gapBottom: 0.48 }),
@@ -46,6 +50,30 @@
   function normalizeFloat(value) {
     if (Object.is(value, -0)) return 0;
     return Number(value.toFixed(PRECISION_DIGITS));
+  }
+
+  function positiveFiniteNumberToDoubleUnits(value) {
+    const view = new DataView(new ArrayBuffer(8));
+    view.setFloat64(0, value, false);
+    const bits = view.getBigUint64(0, false);
+    const exponentBits = Number((bits >> 52n) & 0x7ffn);
+    const fractionBits = bits & DOUBLE_FRACTION_MASK;
+    if (exponentBits === 0) return fractionBits;
+    const significand = DOUBLE_IMPLICIT_BIT | fractionBits;
+    return significand << BigInt(exponentBits - 1);
+  }
+
+  function canonicalElapsedMs(elapsedUnits) {
+    const scaledNumerator = elapsedUnits * ELAPSED_DECIMAL_SCALE;
+    let scaledElapsed = scaledNumerator / DOUBLE_UNITS_PER_MS;
+    const remainder = scaledNumerator % DOUBLE_UNITS_PER_MS;
+    if ((remainder * 2n) >= DOUBLE_UNITS_PER_MS) scaledElapsed += 1n;
+
+    const whole = scaledElapsed / ELAPSED_DECIMAL_SCALE;
+    const fraction = (scaledElapsed % ELAPSED_DECIMAL_SCALE)
+      .toString()
+      .padStart(PRECISION_DIGITS, '0');
+    return Number(`${whole}.${fraction}`);
   }
 
   function rejectUnknownKeys(object, allowedKeys, owner) {
@@ -225,6 +253,7 @@
       speedIncreasePerSecond,
       maxDeltaMs,
       maxRunMs,
+      maxRunUnits: BigInt(maxRunMs) * DOUBLE_UNITS_PER_MS,
       initialId,
       step,
       cycleSpan
@@ -235,12 +264,11 @@
 
   function createFlightObstacles(options = {}) {
     const config = createConfig(options);
-    let elapsedMs = 0;
-    let elapsedCompensationMs = 0;
+    let elapsedUnits = 0n;
 
     function buildState() {
-      const canonicalElapsedMs = normalizeFloat(elapsedMs);
-      const distance = distanceAt(config, canonicalElapsedMs);
+      const canonicalElapsed = canonicalElapsedMs(elapsedUnits);
+      const distance = distanceAt(config, canonicalElapsed);
       const firstSequenceIndex = firstSequenceIndexAt(config, distance);
       const firstRawLeft = config.initialLeft
         + (firstSequenceIndex * config.step)
@@ -267,8 +295,8 @@
 
       const nextId = config.initialId + firstSequenceIndex + config.obstacleCount;
       return Object.freeze({
-        elapsedMs: canonicalElapsedMs,
-        speed: normalizeFloat(speedAt(config, canonicalElapsedMs)),
+        elapsedMs: canonicalElapsed,
+        speed: normalizeFloat(speedAt(config, canonicalElapsed)),
         nextPatternIndex: (firstSequenceIndex + config.obstacleCount)
           % config.gapPattern.length,
         nextId,
@@ -281,27 +309,20 @@
     }
 
     function reset() {
-      elapsedMs = 0;
-      elapsedCompensationMs = 0;
+      elapsedUnits = 0n;
       return buildState();
     }
 
     function advance(deltaMs) {
       if (typeof deltaMs !== 'number' || !Number.isFinite(deltaMs)
-        || deltaMs <= 0 || elapsedMs >= config.maxRunMs) {
+        || deltaMs <= 0 || elapsedUnits >= config.maxRunUnits) {
         return buildState();
       }
 
-      const acceptedDeltaMs = Math.min(
-        deltaMs,
-        config.maxDeltaMs,
-        config.maxRunMs - elapsedMs
-      );
-      const compensatedDeltaMs = acceptedDeltaMs - elapsedCompensationMs;
-      const nextElapsedMs = elapsedMs + compensatedDeltaMs;
-      elapsedCompensationMs = (nextElapsedMs - elapsedMs) - compensatedDeltaMs;
-      elapsedMs = Math.min(config.maxRunMs, nextElapsedMs);
-      if (elapsedMs === config.maxRunMs) elapsedCompensationMs = 0;
+      const acceptedDeltaMs = Math.min(deltaMs, config.maxDeltaMs);
+      const remainingUnits = config.maxRunUnits - elapsedUnits;
+      const deltaUnits = positiveFiniteNumberToDoubleUnits(acceptedDeltaMs);
+      elapsedUnits += deltaUnits < remainingUnits ? deltaUnits : remainingUnits;
       return buildState();
     }
 
