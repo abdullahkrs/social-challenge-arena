@@ -17,7 +17,7 @@
 | QA Review | `agents/qa-review.md` | `ready-for-qa` |
 | Product Health | `agents/product-health.md` | `agent-health` |
 
-Islamic-content compliance is shared across all roles through `ISLAMIC_CONTENT_POLICY.md` and independent QA. There is no standalone Islamic review role. Uncertain religious matters are escalated to the owner.
+Islamic-content compliance is shared across all roles through `ISLAMIC_CONTENT_POLICY.md` and independent QA. There is no standalone Islamic review role and no owner-referral path. When permissibility or policy application is unclear, use the most conservative clearly compliant option, remove or replace the disputed element, or reject the concept and continue with a safe alternative.
 
 ## Work gate
 
