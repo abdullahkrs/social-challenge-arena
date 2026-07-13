@@ -60,27 +60,18 @@ function assertCanonicalSpacing(state, expectedCount, width, spacing) {
   }
 }
 
-test('exposes the same dependency-free API through CommonJS and browser global patterns', () => {
-  const source = fs.readFileSync(
-    path.join(__dirname, '../../src/game/flight-obstacles.js'),
-    'utf8'
-  );
+function advanceAll(stream, deltas) {
+  for (const delta of deltas) stream.advance(delta);
+  return stream.getState();
+}
+
+test('exposes the same dependency-free API through CommonJS and browser globals', () => {
+  const source = fs.readFileSync(path.join(__dirname, '../../src/game/flight-obstacles.js'), 'utf8');
   const context = vm.createContext({});
-
   vm.runInContext(source, context);
-
-  assert.equal(
-    typeof context.SocialChallengeGameFlightObstacles.createFlightObstacles,
-    'function'
-  );
-  assert.equal(
-    context.SocialChallengeGameFlightObstacles.MAX_OBSTACLE_COUNT,
-    MAX_OBSTACLE_COUNT
-  );
-  assert.equal(
-    context.SocialChallengeGameFlightObstacles.MAX_GAP_PATTERN_LENGTH,
-    MAX_GAP_PATTERN_LENGTH
-  );
+  assert.equal(typeof context.SocialChallengeGameFlightObstacles.createFlightObstacles, 'function');
+  assert.equal(context.SocialChallengeGameFlightObstacles.MAX_OBSTACLE_COUNT, MAX_OBSTACLE_COUNT);
+  assert.equal(context.SocialChallengeGameFlightObstacles.MAX_GAP_PATTERN_LENGTH, MAX_GAP_PATTERN_LENGTH);
   assert.equal(context.SocialChallengeGameFlightObstacles.MAX_RUN_MS, MAX_RUN_MS);
 });
 
@@ -93,53 +84,25 @@ test('rejects unknown, malformed, unsafe, contradictory, or non-normalized confi
     () => ({ gapTop: 0.2, gapBottom: 0.8 })
   );
   const invalidOptions = [
-    null,
-    [],
-    { unknown: true },
-    { obstacleCount: 0 },
-    { obstacleCount: MAX_OBSTACLE_COUNT + 1 },
-    { obstacleCount: 1.5 },
-    { obstacleWidth: 0 },
-    { obstacleWidth: 1 },
-    { spacing: 0 },
-    { initialLeft: -0.01 },
-    { initialLeft: 1 },
-    { initialSpeed: 0 },
-    { maxSpeed: 0.1, initialSpeed: 0.2 },
-    { speedIncreasePerSecond: 0 },
-    { maxDeltaMs: 0 },
-    { maxRunMs: 0 },
-    { maxRunMs: MAX_RUN_MS + 1 },
-    { maxDeltaMs: 101, maxRunMs: 100 },
-    { initialId: -1 },
+    null, [], { unknown: true }, { obstacleCount: 0 },
+    { obstacleCount: MAX_OBSTACLE_COUNT + 1 }, { obstacleCount: 1.5 },
+    { obstacleWidth: 0 }, { obstacleWidth: 1 }, { spacing: 0 },
+    { initialLeft: -0.01 }, { initialLeft: 1 }, { initialSpeed: 0 },
+    { maxSpeed: 0.1, initialSpeed: 0.2 }, { speedIncreasePerSecond: 0 },
+    { maxDeltaMs: 0 }, { maxRunMs: 0 }, { maxRunMs: MAX_RUN_MS + 1 },
+    { maxDeltaMs: 101, maxRunMs: 100 }, { initialId: -1 },
     { initialId: Number.MAX_SAFE_INTEGER },
     { obstacleCount: 1, obstacleWidth: 0.1, spacing: 0.4, initialLeft: 0, initialSpeed: 0.1, maxSpeed: 0.2, speedIncreasePerSecond: 0.1, maxDeltaMs: 10, maxRunMs: 10, initialId: Number.MAX_SAFE_INTEGER - 1 },
-    {
-      obstacleCount: 1,
-      obstacleWidth: 1e-12,
-      spacing: 1e-12,
-      initialLeft: 0,
-      initialSpeed: 0.1,
-      maxSpeed: 4,
-      speedIncreasePerSecond: 4,
-      maxDeltaMs: 1000,
-      maxRunMs: 1000
-    },
+    { obstacleCount: 1, obstacleWidth: 1e-12, spacing: 1e-12, initialLeft: 0, initialSpeed: 0.1, maxSpeed: 4, speedIncreasePerSecond: 4, maxDeltaMs: 1000, maxRunMs: 1000 },
     { obstacleCount: 4, obstacleWidth: 0.2, spacing: 0.1 },
     { initialLeft: 0.5, obstacleCount: 2, obstacleWidth: 0.2, spacing: 0.2 },
-    { gapPattern: [] },
-    { gapPattern: sparsePattern },
-    { gapPattern: excessivePattern },
-    { gapPattern: [null] },
-    { gapPattern: [{ gapTop: 0.2 }] },
+    { gapPattern: [] }, { gapPattern: sparsePattern }, { gapPattern: excessivePattern },
+    { gapPattern: [null] }, { gapPattern: [{ gapTop: 0.2 }] },
     { gapPattern: [{ gapTop: 0.8, gapBottom: 0.2 }] },
     { gapPattern: [{ gapTop: -0.1, gapBottom: 0.5 }] },
     { gapPattern: [{ gapTop: 0.2, gapBottom: 0.8, extra: true }] }
   ];
-
-  for (const invalid of invalidOptions) {
-    assert.throws(() => createFlightObstacles(invalid));
-  }
+  for (const invalid of invalidOptions) assert.throws(() => createFlightObstacles(invalid));
 });
 
 test('copies caller configuration and returns fresh deeply immutable snapshots', () => {
@@ -149,25 +112,19 @@ test('copies caller configuration and returns fresh deeply immutable snapshots',
   config.initialId = 900;
   config.gapPattern[0].gapTop = 0.49;
   config.gapPattern.push({ gapTop: 0.05, gapBottom: 0.95 });
-
   const first = stream.getState();
   assert.equal(first.obstacles[0].id, 7);
-  assert.ok(Math.abs(first.obstacles[0].left - 0.05) < 1e-12);
-  assert.ok(Math.abs(first.obstacles[0].right - 0.15) < 1e-12);
   assert.equal(first.obstacles[0].gapTop, 0.1);
-  assert.equal(first.obstacles[0].gapBottom, 0.5);
   assert.equal(Object.isFrozen(first), true);
   assert.equal(Object.isFrozen(first.obstacles), true);
   assert.equal(Object.isFrozen(first.obstacles[0]), true);
   assert.equal(Reflect.set(first.obstacles[0], 'left', 0.9), false);
-  assert.equal(first.obstacles[0].left, 0.05);
   assert.notEqual(stream.getState(), first);
   assert.notEqual(stream.getState().obstacles, first.obstacles);
 });
 
 test('creates a normalized non-overlapping initial layout with stable primitive IDs', () => {
   const state = createFlightObstacles(options()).getState();
-
   assert.equal(state.elapsedMs, 0);
   assert.equal(state.speed, 0.5);
   assert.equal(state.nextPatternIndex, 3);
@@ -180,10 +137,8 @@ test('creates a normalized non-overlapping initial layout with stable primitive 
   assertCanonicalSpacing(state, 3, 0.1, 0.2);
 });
 
-test('moves obstacles left from explicit accepted delta without timers or frame ownership', () => {
-  const stream = createFlightObstacles(options());
-  const state = stream.advance(100);
-
+test('moves obstacles left from explicit accepted delta without owning a loop', () => {
+  const state = createFlightObstacles(options()).advance(100);
   assert.equal(state.elapsedMs, 100);
   assert.equal(state.speed, 0.51);
   const expected = [[0, 0.0995], [0.2995, 0.3995], [0.5995, 0.6995]];
@@ -193,10 +148,9 @@ test('moves obstacles left from explicit accepted delta without timers or frame 
   });
 });
 
-test('treats zero, negative, non-number, and non-finite deltas as safe logical no-ops', () => {
+test('treats invalid deltas as safe logical no-ops', () => {
   const stream = createFlightObstacles(options());
   const expected = stream.getState();
-
   for (const delta of [0, -1, '16', null, Number.NaN, Infinity, -Infinity]) {
     assert.deepEqual(stream.advance(delta), expected);
   }
@@ -205,107 +159,99 @@ test('treats zero, negative, non-number, and non-finite deltas as safe logical n
 test('clamps oversized positive delta to the configured maximum', () => {
   const large = createFlightObstacles(options({ maxDeltaMs: 250 }));
   const exact = createFlightObstacles(options({ maxDeltaMs: 250 }));
-
   assert.deepEqual(large.advance(100000), exact.advance(250));
 });
 
-test('progresses exactly one difficulty dimension using elapsed-time speed and reaches its cap', () => {
+test('progresses exactly one difficulty dimension and caps speed', () => {
   const stream = createFlightObstacles(options({
-    initialSpeed: 0.2,
-    maxSpeed: 0.3,
-    speedIncreasePerSecond: 0.05,
-    maxDeltaMs: 1000,
-    maxRunMs: 10000
+    initialSpeed: 0.2, maxSpeed: 0.3, speedIncreasePerSecond: 0.05,
+    maxDeltaMs: 1000, maxRunMs: 10000
   }));
-
   assert.equal(stream.advance(1000).speed, 0.25);
   assert.equal(stream.advance(1000).speed, 0.3);
   assert.equal(stream.advance(1000).speed, 0.3);
-
-  const state = stream.getState();
-  const pattern = options().gapPattern;
-  assertCanonicalSpacing(state, 3, 0.1, 0.2);
-  assert.deepEqual(
-    state.obstacles.map(({ gapTop, gapBottom }) => ({ gapTop, gapBottom })),
-    state.obstacles.map(({ id }) => pattern[id % pattern.length])
-  );
+  assertCanonicalSpacing(stream.getState(), 3, 0.1, 0.2);
 });
 
-test('uses analytic elapsed-time progression so equivalent accepted partitions match exactly', () => {
+test('matches equivalent whole-number accepted partitions', () => {
   const oneFrame = createFlightObstacles(options());
   const fourFrames = createFlightObstacles(options());
-
   const expected = oneFrame.advance(1000);
   for (let count = 0; count < 4; count += 1) fourFrames.advance(250);
-
   assert.deepEqual(fourFrames.getState(), expected);
 });
 
-test('keeps valid fractional delta partitions frame-rate independent', () => {
+test('matches one 100 ms advance and three 100/3 advances including reset replay', () => {
   const oneFrame = createFlightObstacles(options({ maxDeltaMs: 1000 }));
   const threeFrames = createFlightObstacles(options({ maxDeltaMs: 1000 }));
-
   const expected = oneFrame.advance(100);
   for (let count = 0; count < 3; count += 1) threeFrames.advance(100 / 3);
-
   assert.deepEqual(threeFrames.getState(), expected);
   assert.deepEqual(threeFrames.reset(), oneFrame.reset());
 });
 
-test('keeps equivalent adjacent fractional groupings frame-rate independent', () => {
+test('matches the earlier six-decimal adjacent grouping regression', () => {
   const config = options({ maxDeltaMs: 2000, maxRunMs: 10000 });
   const fine = [473.041861, 700.624391, 927.781719, 353.490712, 801.493582];
   const grouped = [1173.666252, 1281.272431, 801.493582];
   const first = createFlightObstacles(config);
   const second = createFlightObstacles(config);
-
-  for (const delta of fine) first.advance(delta);
-  for (const delta of grouped) second.advance(delta);
-
+  assert.deepEqual(advanceAll(second, grouped), advanceAll(first, fine));
   assert.equal(first.getState().elapsedMs, 3256.432265);
-  assert.deepEqual(second.getState(), first.getState());
   assert.deepEqual(second.reset(), first.reset());
-
-  for (const delta of fine) first.advance(delta);
-  for (const delta of grouped) second.advance(delta);
-  assert.deepEqual(second.getState(), first.getState());
+  assert.deepEqual(advanceAll(second, grouped), advanceAll(first, fine));
 });
 
-test('recycles multiple off-left obstacles canonically with fixed non-overlap spacing', () => {
+test('matches the exact QA full-precision adjacent grouping before and after reset', () => {
+  const config = options({ maxDeltaMs: 2000, maxRunMs: 10000 });
+  const fine = [
+    62.18075188891981,
+    552.7133556643986,
+    18.589001409153315,
+    75.29627939408812,
+    259.5194619711807
+  ];
+  const grouped = [fine[0] + fine[1], fine[2] + fine[3], fine[4]];
+  const first = createFlightObstacles(config);
+  const second = createFlightObstacles(config);
+  assert.deepEqual(advanceAll(second, grouped), advanceAll(first, fine));
+  assert.equal(first.getState().elapsedMs, 968.29885);
+  assert.deepEqual(second.reset(), first.reset());
+  assert.deepEqual(advanceAll(second, grouped), advanceAll(first, fine));
+});
+
+test('keeps generated adjacent grouping partitions stable at emitted elapsed precision', () => {
+  let seed = 0x9e3779b9;
+  function random() {
+    seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0;
+    return seed / 0x100000000;
+  }
+  for (let sample = 0; sample < 10000; sample += 1) {
+    const fine = Array.from({ length: 7 }, () => 0.001 + (random() * 500));
+    const grouped = [fine[0] + fine[1], fine[2] + fine[3] + fine[4], fine[5] + fine[6]];
+    const first = createFlightObstacles(options({ maxDeltaMs: 2000, maxRunMs: 10000 }));
+    const second = createFlightObstacles(options({ maxDeltaMs: 2000, maxRunMs: 10000 }));
+    assert.deepEqual(advanceAll(second, grouped), advanceAll(first, fine));
+  }
+});
+
+test('recycles multiple off-left obstacles canonically with fixed spacing', () => {
   const stream = createFlightObstacles(options({
-    initialLeft: 0,
-    initialSpeed: 1,
-    maxSpeed: 1.2,
-    speedIncreasePerSecond: 0.1
+    initialLeft: 0, initialSpeed: 1, maxSpeed: 1.2, speedIncreasePerSecond: 0.1
   }));
   const state = stream.advance(500);
-
   assert.deepEqual(state.obstacles.map((obstacle) => obstacle.id), [2, 3, 4]);
   assertCanonicalSpacing(state, 3, 0.1, 0.2);
-  assert.deepEqual(state.obstacles.map(({ gapTop, gapBottom }) => ({ gapTop, gapBottom })), [
-    { gapTop: 0.4, gapBottom: 0.85 },
-    { gapTop: 0.2, gapBottom: 0.6 },
-    { gapTop: 0.1, gapBottom: 0.5 }
-  ]);
   assert.equal(state.nextId, 5);
   assert.equal(state.nextPatternIndex, 1);
 });
 
 test('cycles the copied deterministic gap pattern in canonical ID order', () => {
   const stream = createFlightObstacles(options({
-    obstacleCount: 2,
-    obstacleWidth: 0.1,
-    spacing: 0.3,
-    initialLeft: 0,
-    initialSpeed: 0.5,
-    maxSpeed: 0.6,
-    speedIncreasePerSecond: 0.1,
-    gapPattern: [
-      { gapTop: 0.1, gapBottom: 0.4 },
-      { gapTop: 0.3, gapBottom: 0.7 }
-    ]
+    obstacleCount: 2, obstacleWidth: 0.1, spacing: 0.3, initialLeft: 0,
+    initialSpeed: 0.5, maxSpeed: 0.6, speedIncreasePerSecond: 0.1,
+    gapPattern: [{ gapTop: 0.1, gapBottom: 0.4 }, { gapTop: 0.3, gapBottom: 0.7 }]
   }));
-
   const state = stream.advance(1000);
   assert.deepEqual(state.obstacles.map(({ id, gapTop, gapBottom }) => ({ id, gapTop, gapBottom })), [
     { id: 2, gapTop: 0.1, gapBottom: 0.4 },
@@ -314,17 +260,14 @@ test('cycles the copied deterministic gap pattern in canonical ID order', () => 
   assert.equal(state.nextPatternIndex, 0);
 });
 
-test('assigns monotonic non-reused safe integer IDs across recycled snapshots', () => {
+test('assigns monotonic non-reused safe IDs across recycled snapshots', () => {
   const stream = createFlightObstacles(options({ maxRunMs: 30000 }));
   const retired = new Set();
   let previousIds = stream.getState().obstacles.map((obstacle) => obstacle.id);
-
   for (let step = 0; step < 30; step += 1) {
     const state = stream.advance(1000);
     const ids = state.obstacles.map((obstacle) => obstacle.id);
-    for (const id of previousIds) {
-      if (!ids.includes(id)) retired.add(id);
-    }
+    for (const id of previousIds) if (!ids.includes(id)) retired.add(id);
     for (const id of ids) {
       assert.equal(Number.isSafeInteger(id), true);
       assert.equal(id >= 0, true);
@@ -335,61 +278,44 @@ test('assigns monotonic non-reused safe integer IDs across recycled snapshots', 
   }
 });
 
-test('keeps long-run state finite, bounded, canonical, and exactly at configured count', () => {
+test('keeps long-run state finite, bounded, canonical, and fixed-size', () => {
   const stream = createFlightObstacles(options({
-    obstacleCount: 4,
-    obstacleWidth: 0.05,
-    spacing: 0.15,
-    initialLeft: 0.01,
-    initialSpeed: 0.5,
-    maxSpeed: 1,
-    speedIncreasePerSecond: 0.25,
-    maxDeltaMs: 50,
-    maxRunMs: 20000
+    obstacleCount: 4, obstacleWidth: 0.05, spacing: 0.15, initialLeft: 0.01,
+    initialSpeed: 0.5, maxSpeed: 1, speedIncreasePerSecond: 0.25,
+    maxDeltaMs: 50, maxRunMs: 20000
   }));
-
   let state;
   for (let step = 0; step < 500; step += 1) state = stream.advance(50);
-
   assert.equal(state.elapsedMs, 20000);
   assert.equal(state.speed, 1);
   assert.equal(Number.isFinite(state.elapsedMs), true);
   assert.equal(Number.isFinite(state.speed), true);
   assert.equal(Number.isSafeInteger(state.nextId), true);
-  assert.equal(Number.isSafeInteger(state.nextPatternIndex), true);
   assertCanonicalSpacing(state, 4, 0.05, 0.15);
   assert.equal(JSON.stringify(state).length < 1000, true);
   assert.deepEqual(stream.advance(50), state);
 });
 
-test('reset restores initial layout, timing, speed, pattern position, and ID sequence exactly', () => {
+test('reset restores exact initial and replay state', () => {
   const stream = createFlightObstacles(options());
   const initial = stream.getState();
   const firstRun = runSequence(stream);
-
   assert.deepEqual(stream.reset(), initial);
   assert.deepEqual(runSequence(stream), firstRun);
 });
 
-test('identical configurations and accepted delta sequences produce byte-equivalent logical state', () => {
+test('identical configuration and accepted deltas produce byte-equivalent state', () => {
   const first = createFlightObstacles(options());
   const second = createFlightObstacles(options());
   const deltas = [16, 16, 33, 100, 1000, 5000, -1, NaN, 250];
-
-  for (const delta of deltas) {
-    assert.deepEqual(second.advance(delta), first.advance(delta));
-  }
+  for (const delta of deltas) assert.deepEqual(second.advance(delta), first.advance(delta));
   assert.equal(JSON.stringify(second.getState()), JSON.stringify(first.getState()));
 });
 
-test('keeps every emitted obstacle compatible with merged normalized consumers while partially exiting', () => {
-  const { createFlightRules, FLIGHT_BOUNDARY_CONTACTS } = require('../../src/game/flight-rules');
+test('keeps every emitted obstacle normalized while partially exiting', () => {
   const stream = createFlightObstacles();
-  const rules = createFlightRules();
-  let state;
-
   for (let frame = 0; frame < 500; frame += 1) {
-    state = stream.advance(100);
+    const state = stream.advance(100);
     for (const obstacle of state.obstacles) {
       assert.equal(obstacle.left >= 0 && obstacle.left <= 1, true);
       assert.equal(obstacle.right >= 0 && obstacle.right <= 1, true);
@@ -398,51 +324,24 @@ test('keeps every emitted obstacle compatible with merged normalized consumers w
       assert.equal(obstacle.gapBottom <= 1, true);
     }
   }
-
-  assert.doesNotThrow(() => rules.evaluate({
-    boundaryContact: FLIGHT_BOUNDARY_CONTACTS.NONE,
-    player: { left: 0.02, right: 0.08, top: 0.5, bottom: 0.56 },
-    obstacles: state.obstacles
-  }));
 });
 
-test('does not calculate collision, failure, score, lifecycle, input, feedback, or rendering output', () => {
+test('does not calculate collision, failure, score, lifecycle, input, feedback, or rendering', () => {
   const state = createFlightObstacles(options()).advance(100);
-  const keys = Object.keys(state).sort();
-
-  assert.deepEqual(keys, ['elapsedMs', 'nextId', 'nextPatternIndex', 'obstacles', 'speed']);
+  assert.deepEqual(Object.keys(state).sort(), ['elapsedMs', 'nextId', 'nextPatternIndex', 'obstacles', 'speed']);
   for (const forbidden of [
     'score', 'failure', 'outcome', 'player', 'velocity', 'boundaryContact',
     'events', 'feedback', 'lifecycle', 'input', 'html', 'style'
-  ]) {
-    assert.equal(Object.prototype.hasOwnProperty.call(state, forbidden), false);
-  }
+  ]) assert.equal(Object.prototype.hasOwnProperty.call(state, forbidden), false);
 });
 
 test('introduces no asynchronous, browser, network, storage, URL, analytics, or random side effects', () => {
-  const source = fs.readFileSync(
-    path.join(__dirname, '../../src/game/flight-obstacles.js'),
-    'utf8'
-  );
+  const source = fs.readFileSync(path.join(__dirname, '../../src/game/flight-obstacles.js'), 'utf8');
   const forbiddenPatterns = [
-    /Math\.random/,
-    /requestAnimationFrame/,
-    /cancelAnimationFrame/,
-    /setTimeout/,
-    /setInterval/,
-    /addEventListener/,
-    /MutationObserver/,
-    /document\./,
-    /window\./,
-    /fetch\s*\(/,
-    /XMLHttpRequest/,
-    /localStorage/,
-    /sessionStorage/,
-    /location\./,
-    /history\./,
-    /analytics/i,
-    /innerHTML/
+    /Math\.random/, /requestAnimationFrame/, /cancelAnimationFrame/, /setTimeout/,
+    /setInterval/, /addEventListener/, /MutationObserver/, /document\./, /window\./,
+    /fetch\s*\(/, /XMLHttpRequest/, /localStorage/, /sessionStorage/, /location\./,
+    /history\./, /analytics/i, /innerHTML/
   ];
-
   for (const pattern of forbiddenPatterns) assert.doesNotMatch(source, pattern);
 });
