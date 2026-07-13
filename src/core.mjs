@@ -41,6 +41,16 @@ export function angularDistance(a, b) {
   return delta;
 }
 
+export function isGameAttemptKey(event, canvas) {
+  return Boolean(event)
+    && (event.code === 'Space' || event.code === 'Enter')
+    && event.target === canvas;
+}
+
+export function screenAfterPageShow(event, screen) {
+  return event?.persisted && screen === 'game' ? 'instructions' : screen;
+}
+
 export function scoreAttempt({ distance, gateWidth, combo, round }) {
   const normalized = clamp(1 - distance / (gateWidth / 2), 0, 1);
   const precision = Math.round(normalized * 100);
