@@ -11,6 +11,7 @@
   <link rel="stylesheet" href="./ui.css">
   <link rel="stylesheet" href="./ui-accessibility.css">
   <link rel="stylesheet" href="./mirror.css">
+  <link rel="stylesheet" href="./src/echo.css">
   <link rel="stylesheet" href="./src/lumen.css">
 </head>
 <body>
@@ -114,10 +115,22 @@
         </div>
         <div class="arena-shell">
           <canvas id="game-canvas" tabindex="0" role="button" aria-label="Orbit Lock game arena" aria-keyshortcuts="Space Enter"></canvas>
-          <div id="echo-grid" class="echo-grid" role="group" aria-label="Echo Grid game board" hidden>
-            <button type="button" data-cell="0"></button><button type="button" data-cell="1"></button><button type="button" data-cell="2"></button>
-            <button type="button" data-cell="3"></button><button type="button" data-cell="4"></button><button type="button" data-cell="5"></button>
-            <button type="button" data-cell="6"></button><button type="button" data-cell="7"></button><button type="button" data-cell="8"></button>
+          <div id="echo-grid" class="echo-grid" role="group" aria-label="Endless Echo Grid route puzzle" dir="ltr" hidden>
+            <div class="echo-run-head" aria-hidden="true">
+              <span><b data-echo-zone>Origin field</b><i>•</i><em data-echo-rule>Trace the route</em></span>
+              <strong data-echo-distance>Path 1</strong>
+            </div>
+            <div class="echo-board" data-echo-board tabindex="-1" aria-keyshortcuts="ArrowUp ArrowRight ArrowDown ArrowLeft">
+              <button type="button" data-cell="0"></button><button type="button" data-cell="1"></button><button type="button" data-cell="2"></button>
+              <button type="button" data-cell="3"></button><button type="button" data-cell="4"></button><button type="button" data-cell="5"></button>
+              <button type="button" data-cell="6"></button><button type="button" data-cell="7"></button><button type="button" data-cell="8"></button>
+            </div>
+            <p class="sr-only" data-echo-accessible-route aria-live="polite" aria-atomic="true"></p>
+            <div class="result-actions echo-memory-actions" data-echo-memory-actions hidden>
+              <button class="ghost" type="button" data-echo-repeat>Replay</button>
+              <button class="secondary" type="button" data-echo-ready>Ready</button>
+            </div>
+            <button class="ghost echo-exit" type="button" data-echo-exit>End run</button>
           </div>
           <div id="lumen-lanes" class="lumen-lanes" role="group" aria-label="Endless Lumen Lanes game arena" dir="ltr" hidden>
             <div class="lumen-run-head" aria-hidden="true">
@@ -190,6 +203,7 @@
     <div id="live-region" class="sr-only" aria-live="assertive" aria-atomic="true"></div>
   </div>
   <script type="module" src="./src/app.mjs"></script>
+  <script type="module" src="./src/echo-integration.mjs"></script>
   <script type="module" src="./src/lumen-integration.mjs"></script>
 </body>
 </html>

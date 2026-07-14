@@ -15,12 +15,12 @@ for (const file of files) {
 const html = await readFile(join(dist, 'index.html'), 'utf8');
 for (const required of [
   './styles.css', './ui.css', './ui-accessibility.css', './mirror.css',
-  './src/lumen.css', './src/app.mjs', './src/lumen-integration.mjs'
+  './src/echo.css', './src/lumen.css', './src/app.mjs', './src/echo-integration.mjs', './src/lumen-integration.mjs'
 ]) {
   if (!html.includes(required)) throw new Error(`Missing runtime reference: ${required}`);
 }
 
-const budgetBytes = 180 * 1024;
+const budgetBytes = 232 * 1024;
 async function sizeOf(path) {
   const info = await stat(path);
   if (info.isFile()) return info.size;
