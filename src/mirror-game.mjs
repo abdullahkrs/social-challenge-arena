@@ -1,5 +1,22 @@
-import { clamp, mirrorPlan, scoreMirrorRound } from './core.mjs';
+import { clamp, mirrorPlan, reflectPattern, scoreMirrorRound } from './core.mjs';
 import { normalizeLanguage, translate } from './i18n.mjs';
+
+export const MIRROR_ROWS = 4;
+export const MIRROR_COLUMNS = 3;
+export const MIRROR_CELL_COUNT = MIRROR_ROWS * MIRROR_COLUMNS;
+
+export function describeMirrorPattern(pattern, t) {
+  if (!Array.isArray(pattern) || pattern.length !== MIRROR_CELL_COUNT || typeof t !== 'function') {
+    throw new RangeError('Invalid Mirror Fuse pattern description');
+  }
+  return Array.from({ length: MIRROR_ROWS }, (_, row) => {
+    const cells = pattern
+      .slice(row * MIRROR_COLUMNS, (row + 1) * MIRROR_COLUMNS)
+      .map((cell) => t(cell === 1 ? 'mirrorCellOn' : 'mirrorCellOff'))
+      .join(', ');
+    return t('mirrorPatternRow', { row: row + 1, cells });
+  }).join('. ');
+}
 
 export class MirrorFuseGame {
   constructor({ container, onUpdate, onFinish, onAnnounce, reducedMotion = false }) {
@@ -29,8 +46,10 @@ export class MirrorFuseGame {
   }
 
   ensureCells(grid) {
-    if (grid.children.length === 12) return;
-    grid.replaceChildren(...Array.from({ length: 12 }, () => {
+    grid.style.gridTemplateColumns = `repeat(${MIRROR_COLUMNS}, 1fr)`;
+    grid.style.gridTemplateRows = `repeat(${MIRROR_ROWS}, 1fr)`;
+    if (grid.children.length === MIRROR_CELL_COUNT) return;
+    grid.replaceChildren(...Array.from({ length: MIRROR_CELL_COUNT }, () => {
       const cell = document.createElement('span');
       cell.setAttribute('aria-hidden', 'true');
       return cell;
@@ -50,13 +69,7 @@ export class MirrorFuseGame {
   }
 
   describePattern(pattern) {
-    return Array.from({ length: 3 }, (_, row) => {
-      const cells = pattern
-        .slice(row * 4, row * 4 + 4)
-        .map((cell) => this.t(cell === 1 ? 'mirrorCellOn' : 'mirrorCellOff'))
-        .join(', ');
-      return this.t('mirrorPatternRow', { row: row + 1, cells });
-    }).join('. ');
+    return describeMirrorPattern(pattern, (key, values = {}) => this.t(key, values));
   }
 
   refreshAccessibility(stage = this.visibleStage) {
@@ -74,7 +87,13 @@ export class MirrorFuseGame {
   start(seed) {
     this.destroy();
     this.abortController = new AbortController();
-    this.plan = mirrorPlan(seed, 10);
+    this.plan = mirrorPlan(seed, 10).map((stage) => {
+      const correct = reflectPattern(stage.source, MIRROR_COLUMNS);
+      return {
+        ...stage,
+        options: stage.options.map((option, index) => (index === stage.correctIndex ? correct : option))
+      };
+    });
     this.snapshot = this.emptySnapshot();
     this.running = true;
     this.accepting = false;
