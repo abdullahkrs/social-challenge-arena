@@ -11,6 +11,7 @@
   <link rel="stylesheet" href="./ui.css">
   <link rel="stylesheet" href="./ui-accessibility.css">
   <link rel="stylesheet" href="./mirror.css">
+  <link rel="stylesheet" href="./src/lumen.css">
 </head>
 <body>
   <div id="loading" class="loading" aria-live="polite" data-i18n="loading">Loading challenges</div>
@@ -43,7 +44,7 @@
         <div class="catalog-header">
           <p class="eyebrow" data-i18n="discoveryEyebrow">Pick your skill</p>
           <h1 tabindex="-1" data-i18n="catalogTitle">Choose a challenge</h1>
-          <p class="tagline" data-i18n="catalogHint">Four fast games. One score to beat.</p>
+          <p class="tagline" data-i18n="catalogHint">Four games. One score to beat.</p>
           <div id="invited-badge" class="invite-badge" hidden>
             <span class="fa-icon fa-user-group" aria-hidden="true"></span>
             <strong data-i18n="invited">Friend challenge</strong><span id="target-text"></span>
@@ -118,16 +119,26 @@
             <button type="button" data-cell="3"></button><button type="button" data-cell="4"></button><button type="button" data-cell="5"></button>
             <button type="button" data-cell="6"></button><button type="button" data-cell="7"></button><button type="button" data-cell="8"></button>
           </div>
-          <div id="lumen-lanes" class="lumen-lanes" role="group" aria-label="Lumen Lanes game arena" hidden>
+          <div id="lumen-lanes" class="lumen-lanes" role="group" aria-label="Endless Lumen Lanes game arena" dir="ltr" hidden>
+            <div class="lumen-run-head" aria-hidden="true">
+              <span><b data-lumen-zone>Prism reach</b><i>•</i><em data-lumen-rule>Follow the signal</em></span>
+              <strong data-lumen-distance>Gate 1</strong>
+            </div>
             <div class="lumen-stage" aria-hidden="true">
               <span class="lumen-rail"></span><span class="lumen-rail"></span><span class="lumen-rail"></span>
-              <strong data-lumen-cue>◆</strong>
+              <span class="lumen-player" data-lumen-player></span>
+              <div class="lumen-signal">
+                <small data-lumen-rule>Follow the signal</small>
+                <strong data-lumen-cue>◆</strong>
+                <span class="lumen-sequence" data-lumen-sequence hidden></span>
+              </div>
             </div>
             <div class="lumen-controls">
               <button type="button" data-lane="0" aria-label="Left lane"><span aria-hidden="true">←</span></button>
               <button type="button" data-lane="1" aria-label="Center lane"><span aria-hidden="true">◆</span></button>
               <button type="button" data-lane="2" aria-label="Right lane"><span aria-hidden="true">→</span></button>
             </div>
+            <button class="ghost lumen-exit" type="button" data-lumen-exit>End run</button>
           </div>
           <div id="mirror-fuse" class="mirror-fuse" role="group" aria-label="Mirror Fuse reflection puzzle" dir="ltr" hidden>
             <div class="mirror-stage" aria-hidden="true">
@@ -154,6 +165,7 @@
           <h2 id="result-heading" tabindex="-1">Your result</h2>
           <p id="result-challenge" class="result-challenge"></p>
           <div id="result-score" class="result-score">0</div>
+          <p id="result-detail" class="result-detail" hidden></p>
           <p id="daily-result" class="daily-result" hidden></p>
           <div id="comparison" class="comparison" role="group" aria-labelledby="comparison-title" hidden>
             <span id="comparison-title" class="sr-only" data-i18n="compareTitle">Head-to-head</span>
@@ -177,5 +189,6 @@
     <div id="live-region" class="sr-only" aria-live="assertive" aria-atomic="true"></div>
   </div>
   <script type="module" src="./src/app.mjs"></script>
+  <script type="module" src="./src/lumen-integration.mjs"></script>
 </body>
 </html>
