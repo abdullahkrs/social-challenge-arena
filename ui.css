@@ -1,0 +1,139 @@
+/* Font Awesome Free 6.7.2 — selected solid glyph subset; see THIRD_PARTY_NOTICES.md. */
+@font-face {
+  font-family: "Font Awesome 6 Free";
+  font-style: normal;
+  font-weight: 900;
+  font-display: block;
+  src: url("data:font/woff2;base64,d09GMgABAAAAAAVIAAoAAAAACYwAAAT+AwcFAAAAAAAAAAAAAAAAAAAAAAAAAAAABmAAXAqLRIkdATYCJAMcCxAABCAFgxgHIBumB1GUTE6Y4Odh7JgYK9MriSVXh0+yZqYL1oIHPi97Pxk4UzmVpmQqr+mboBt9Wl87/tea7nOZv9lLkawAYOFzsnc2hKDaKYdsEz6+/nBtu7q9OiqykCntI5+oNFLkak3txwHZk0EHOD7Kx5j9UwnvBwBU5mWACqQqcXyNBGAFbEyFqqqtOR1JAvEXS2u8xrMN4g9O3gKdJMvz0YNoEAOB6qL8TwDzWxJmmaJwcihap3aNzP7Ve8QDdxEnpJ4ggAhNHCGoIEJSyYC3V8j/0FEDODAhYfjV2xoHC/qzddxuwL+heJUxSifHD/swqwGBio3s7gD8QbKAVEn4dMpDIGOG7y6jGzF7lISQaApLOg0tsGLLrrOruiVSAwLQqzswElU3g6ztQmDTM2Et9vBARdm+I04BxYB8lRAwRpXsoNqpJoKqEflhGRMUJm8kfA4bgQMBuGMq3Kv32rU8tSVpciJ5zu0VR64zUxrGiqnoRaMeD7kphyefSF/pDYINZJvDimqcuBUFjD1h7dGPP56+DZoVAlv6S+5UWDUngm4ygvn5UXvXuW8PMhafmZXaSUXTv9kRD2iGZMjbHU3eh60qF5k+0Fj3KT8anoGf++jy+xCY3AZ0fP17ai+CptWwxEOWzbantmsMJzoui4KhtXsIVmIg6JQITNAIAHBAPC8HMJkB/dM3UQ+fk+5jOO7sP7By/Jr2nnshw5KYh2CCwVe2gS4ctPdgJqq6A2sqbO3CBEA4tQjLxrb4HFSw0l2gYdu+YjKQsJFpTRzJOSCei1/FTLQhyE9HCFaysS1gf3IDBpTjj+jLeLWvcOgLcTIDIBdTXZmohJMMmo3dUjYd679SvFXMRF1HOlLXjAPBEMHPzb6ssARCvL7uWY1J77fUAmCPaUgp9nTi8/+vnmSe1NePvE3GobTxoUJrURVN+6Y7cFBx7t/vDEwIXgUQUeJZlYMHdN80LczZolHh02YoRpP3o9epPUe1b9/eUPb2rb2XOtFTSt25Qu1lhxCc1J5USVpIryvhrvO4wh0+mVa5ZqLwzGmaGBU2XsyVPhOO3j4zaMPRzRf6/VGk3bsdyh+/hc/ONAaduX10AsfNDBtmXIyLZuD5VmrRUUaiBT1n4fiBF5twe/cAvAFXZrURHaCD2CfadOhgHMiI9aQM6n183brjvZ3doEWGxLy8RMMG7wb5tGnjo6LiAFCbEB9+lUozBJy4Vl5+7USAmcpl1B61p0PVvv55J1l6MgODT3AHKmsq5vvVEG0w+uyL89vnVnb/xseQwcmtJ4nvv67qJKMTE0ef7Gl+3MH0Kom0ge3Z04iIp89stkgdsQ179RF1nhBeJ7rTYrinbGxfNNk+H/vkRfbeIUvKj5nhacIV42tFyHIx5eL1I1FuX7zYftTt53N9vPNky6+frYqu9ecvABAgG/XcOi359FIK/5u4BMCnuUPXAXyddmQxuK9Is8U1wIQEgOBbhTgMbkHx8QnFbKG4KpJKBcyZvYUQJMdIWQvwce7eFRmhMwOZgHSCdDJ1EhYG6mSKGT1Xx+r09OfwWxlIEp6UM4rRTGEsQxjEYMajEkc/4lGpYhQjA77GJAYwztY2ggFxWiV7OD2WAdDdTtYNZwj9wUxnuJOJw1zk4CKdjgxgLOOUprnVEKQ9CxeppJEH3BkmSF+rStyN8yemLc1HvSkYPz6BBbOf6JgclqmcuV8RAAA=") format("woff2");
+}
+
+:root {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --ui-radius-sm: 14px;
+  --ui-radius: 20px;
+  --ui-transition: 160ms ease;
+}
+
+.fa-icon {
+  font-family: "Font Awesome 6 Free";
+  font-style: normal;
+  font-weight: 900;
+  line-height: 1;
+  text-rendering: auto;
+}
+.fa-gamepad::before { content: "\f11b"; }
+.fa-globe::before { content: "\f0ac"; }
+.fa-universal-access::before { content: "\f29a"; }
+.fa-arrow-left::before { content: "\f060"; }
+.fa-trophy::before { content: "\f091"; }
+.fa-user-group::before { content: "\f500"; }
+
+
+.topbar { padding-bottom: 8px; }
+.brand-mark { font-size: 1.05rem; }
+.controls { min-width: 0; }
+.select-wrap { position: relative; display: inline-flex; align-items: center; min-width: 0; }
+.select-wrap .control-icon { position: absolute; inset-inline-start: 14px; z-index: 1; color: var(--accent); pointer-events: none; }
+.select-wrap select { min-width: 126px; max-width: 150px; padding-inline: 38px 30px; text-overflow: ellipsis; }
+.motion-control { transition: border-color var(--ui-transition), background var(--ui-transition); }
+.motion-control:hover { border-color: rgba(124, 246, 212, .4); background: rgba(22, 32, 69, .9); }
+.motion-control .fa-icon { color: var(--accent); }
+
+.discovery { align-content: start; gap: 16px; padding-top: clamp(16px, 4vw, 32px); }
+.catalog-header { max-width: 660px; }
+.catalog-header h1 { font-size: clamp(2.2rem, 7vw, 4.7rem); }
+.catalog-header .tagline { margin-top: 10px; }
+.invite-badge { gap: 9px; }
+.invite-badge > .fa-icon { color: var(--accent); }
+
+.daily-entry { border-radius: var(--ui-radius); padding: 14px 16px; box-shadow: 0 14px 38px rgba(0, 0, 0, .2); }
+.daily-icon { width: 58px; height: 58px; border-radius: 17px; }
+.daily-start { min-width: 136px; }
+
+.challenge-card {
+  min-height: 218px;
+  border-radius: var(--ui-radius);
+  box-shadow: 0 18px 52px rgba(0, 0, 0, .25);
+  transition: transform var(--ui-transition), border-color var(--ui-transition), background var(--ui-transition);
+}
+.challenge-card:active { transform: scale(.99); }
+.card-copy small { line-height: 1.35; }
+.card-meta { padding-top: 2px; border-top: 1px solid rgba(176, 193, 255, .1); }
+
+.primary, .secondary, .ghost, .icon-button { border-radius: var(--ui-radius-sm); transition: transform var(--ui-transition), filter var(--ui-transition), border-color var(--ui-transition), background var(--ui-transition); }
+.primary:active, .secondary:active, .ghost:active, .icon-button:active { transform: scale(.98); }
+.secondary:hover, .ghost:hover, .icon-button:hover { border-color: rgba(124, 246, 212, .38); }
+
+.back-button { transform: none !important; display: grid; place-items: center; }
+.back-button .fa-icon { transition: transform var(--ui-transition); }
+[dir=rtl] .back-button .fa-icon { transform: rotate(180deg); }
+
+.instruction-card, .result-card { border-radius: var(--ui-radius); gap: 16px; }
+.instruction-card h2, .result-card h2 { font-size: clamp(2rem, 7vw, 3.6rem); }
+.instruction-icon { width: 84px; height: 84px; border-radius: 24px; font-size: 2.6rem; }
+
+.game { gap: 10px; }
+.hud { gap: 6px; padding: 5px; border: 1px solid var(--line); border-radius: 18px; background: rgba(8, 13, 34, .42); }
+.hud div { min-height: 52px; border: 0; border-radius: 13px; background: rgba(24, 35, 77, .72); }
+.hud span { font-size: .68rem; }
+.hud strong { font-size: 1.08rem; }
+
+.result-mark { display: grid; place-items: center; width: 52px; height: 52px; border-radius: 16px; color: var(--accent-ink); background: linear-gradient(145deg, #ffd47a, var(--accent)); font-size: 1.25rem; }
+.result-card .eyebrow { margin-bottom: -6px; }
+.result-score { font-size: clamp(4.8rem, 21vw, 8rem); }
+.comparison { border-radius: var(--ui-radius); }
+.result-actions button { min-width: 0; padding-inline: 14px; }
+.result-actions .primary { order: -1; }
+
+@media (max-width: 720px) {
+  .catalog-header { text-align: start; justify-items: start; }
+  .challenge-card {
+    min-height: 148px;
+    grid-template-columns: 94px minmax(0, 1fr);
+    gap: 12px;
+    padding: 14px;
+    border-radius: 18px;
+  }
+  .card-visual { grid-row: 1 / 3; min-height: 90px; }
+  .card-meta { grid-column: 2; }
+  .orbit-visual { width: 76px; height: 76px; border-width: 8px; }
+  .echo-visual { width: 78px; height: 78px; gap: 5px; }
+  .lumen-visual { width: 82px; height: 78px; gap: 5px; }
+  .lumen-visual b { width: 38px; height: 38px; border-radius: 12px; font-size: 1.25rem; }
+  .card-copy strong { font-size: 1.25rem; }
+  .card-copy small { font-size: .86rem; }
+}
+
+@media (max-width: 620px) {
+  .topbar { align-items: center; padding-inline: 12px; }
+  .controls { gap: 7px; }
+  .select-wrap select { min-width: 112px; max-width: 122px; }
+  .motion-control { width: 48px; padding: 0; justify-content: center; }
+  .motion-control input { position: absolute; width: 1px; height: 1px; opacity: 0; }
+  .motion-control .fa-icon { font-size: 1.05rem; }
+  .motion-control:has(input:checked) { color: var(--accent-ink); border-color: var(--accent); background: var(--accent); }
+  .motion-control:has(input:checked) .fa-icon { color: var(--accent-ink); }
+  .screen { min-height: calc(100svh - 70px); }
+  .daily-entry { grid-template-columns: 54px minmax(0, 1fr); padding: 12px; }
+  .daily-icon { width: 50px; height: 50px; border-radius: 15px; }
+  .daily-start { min-height: 48px; }
+  .instruction-card, .result-card { padding: 22px 18px; }
+  .hud { position: sticky; top: 4px; z-index: 2; backdrop-filter: blur(12px); }
+  .result-actions { gap: 8px; }
+  .result-actions .primary { order: -1; }
+}
+
+@media (max-width: 360px) {
+  .brand-mark { width: 38px; height: 38px; }
+  .select-wrap select { min-width: 104px; max-width: 108px; font-size: .88rem; }
+  .catalog-header h1 { font-size: 2.05rem; }
+  .tagline { font-size: .95rem; }
+  .challenge-card { grid-template-columns: 78px minmax(0, 1fr); min-height: 136px; padding: 12px; }
+  .card-visual { min-height: 76px; }
+  .orbit-visual { width: 66px; height: 66px; }
+  .echo-visual, .lumen-visual { width: 68px; height: 68px; }
+  .card-copy strong { font-size: 1.12rem; }
+  .card-meta { font-size: .68rem; }
+  .hud { gap: 3px; padding: 4px; }
+  .hud div { min-height: 48px; }
+}
