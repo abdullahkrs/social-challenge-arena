@@ -1,110 +1,118 @@
 # Delivery Evidence
 
-## Issue #96 — Endless procedural Lumen Lanes
+## Issue #98 — Endless procedural Echo Grid
 
 ### Delivered outcome
 
-Lumen Lanes is transformed from a fixed eighteen-response lane test into **Lumen Current**, an original endless abstract focus run that ends only when all three chances are lost or the player confirms a deliberate two-step exit.
+Echo Grid is transformed from a fixed eight-round watch-and-copy board into **Echo Trail**, an original endless route-memory journey. The player watches a generated path, interprets its current rule, then moves a marker through the same board until all chances are lost or a deliberate two-step exit is confirmed.
 
 The complete journey remains:
 
-`catalog or daily or invitation → concise instruction → endless seeded run → result → replay same route or new route → localized visual share + strict URL → friend plays identical route → comparison → rematch share`
+`catalog or daily or invitation → concise instruction → endless seeded trail → truthful result → replay same route or new route → localized visual share + strict URL → friend plays the identical trail → comparison → rematch share`
 
 ### Autonomous concept decision
 
 The swarm compared four reversible directions:
 
-- continuous momentum runner with lane hazards;
-- collapsing route maze with keys;
-- rule-switching light current;
-- energy-path puzzle with timed junctions.
+- an expanding tile-reconstruction board with changing shapes;
+- a route-memory maze with a movable marker;
+- a symbol-command trail where cues change meaning;
+- a rotating ring memory puzzle with route choices.
 
-The rule-switching light current was selected because it preserves Lumen Lanes while providing the strongest combination of mobile clarity, endless replay, deterministic friend fairness, procedural depth, concentration, accessibility, static performance, originality, Islamic-content safety, maintainability, and bounded implementation risk.
+The route-memory maze and symbol-command trail were combined into Echo Trail. It was selected because it keeps memory dominant while adding meaningful movement, transformed rules, endless deterministic generation, broad mobile clarity, strong same-seed friend fairness, accessible ordered cues, low static-runtime risk, and a visual identity distinct from Lumen Current.
 
-- **Dominant dimension:** focused lane movement and response.
-- **Secondary dimensions:** rule interpretation, short memory, and safe-versus-risky route choice.
-- **Pressure:** timing, combined rules, reduced assistance, special phases, and mastery decisions rather than speed alone.
+- **Dominant dimension:** route observation, storage, transformation, and reconstruction.
+- **Secondary dimension:** deliberate marker movement across meaningful board positions.
+- **Focused attention:** cue order, start position, rule meaning, echo marks, timing, and stage state.
+- **Pressure:** longer routes, transformed instructions, reduced assistance, deadlines after learning, combined rule families, recovery windows, special events, and mastery tests rather than speed alone.
 
-### Endless structure and generator
+### Endless structure, progression, and tension
 
-- The runtime holds only one deterministic eighteen-stage chunk and replaces it at each chunk boundary.
-- There is no fixed completion condition or prebuilt unbounded route.
-- The same seed reproduces the same stage stream independent of animation frame rate.
-- Different seeds alter targets, mechanic order, zones, timing, blocked/risk routes, tension phases, and special events.
-- Mechanics arrive gradually: direct signals, mirrored signals, route choice, then first/last-signal memory.
-- Progression moves through understanding, application, combination, deception, pressure, and mastery.
-- A fourteen-stage tension rhythm alternates rising pressure, recovery, reveal, pressure, special events, and mastery tests.
-- Four recurring but non-identical zones change mechanic bias and decision rhythm: Prism Reach, Current Split, Signal Field, and Focus Vault.
-- The player marker moves only after input; it never reveals the generated correct lane before the decision.
+- The runtime holds one deterministic twelve-stage chunk and replaces it at the chunk boundary; no unbounded route is prebuilt.
+- The same seed reproduces starts, paths, rule sequence, zones, timing, echo marks, recovery, special events, and scoring truth independent of frame rate.
+- Different seeds materially change routes, starts, path geometry, transformed answers, cue marks, rule order, zones, deadlines, and decision rhythm.
+- Four decision families arrive gradually: direct route, reverse route, rotate-right transformation, and echo-mark opposition.
+- Progression changes decisions through understanding, application, combination, deception, pressure, and mastery.
+- The twelve-stage rhythm alternates rising pressure, recovery, reveal, pressure, special event, and mastery tests.
+- Four recurring but non-identical zones alter route shape and mechanic bias: Quiet Garden, Echo Bridge, Memory Vault, and Signal Storm.
+- Recovery stages briefly lower route complexity and can restore one chance without exceeding three.
+- The player may replay a cue at most twice before committing; assistance reduces score, and the answer is never exposed after response begins.
 
 ### Scoring and result truth
 
-- Score rewards progress, response quality, streak, mechanic complexity, risk-route mastery, and special/mastery phases.
-- A single gate is capped at seventy-eight points, keeping a long strong session below the strict 9,999 invitation score bound.
-- Results add only three useful mastery values: gates reached, best streak, and accuracy.
-- Failure and deliberate exit remain truthful and reuse the existing replay, invitation, comparison, and rematch flow.
+- Score rewards route length, transformed-rule success, streak, remaining response time, and special/mastery phases, while cue assistance reduces the award.
+- Each stage award is bounded and total score remains inside the existing strict 9,999 invitation limit.
+- Results report only useful mastery detail: trails cleared, best streak, and movement accuracy.
+- Failure and deliberate exit are distinct truthful outcomes and preserve replay, new route, invitation, comparison, and rematch behavior.
+
+### Purposeful sound feedback
+
+- A shared platform audio module synthesizes short original cues through the Web Audio API; no downloaded audio asset, recognizable game sound, remote request, or third-party sound license is involved.
+- Cue reveal, marker movement, correct trail, wrong move, zone transition, and run finish use distinct restrained sounds with rate limits and a consistent volume hierarchy.
+- Audio starts only after a user gesture, is optional, and is controlled by one localized top-bar switch whose mute preference is stored locally.
+- Replay, challenge teardown, page hide, and repeated runs do not create permanent listeners or duplicated sound playback.
+- No background music or continuous audio was added, and every sound has simultaneous visual and textual feedback.
 
 ## Visual Reference Evidence
 
-The visual pass reviewed public gameplay screenshots and public gameplay recordings linked from these inspectable pages:
+The pass reviewed gameplay screenshots and recordings available from these public pages:
 
-1. **Flappy Bird — gameplay screenshot plus the linked “FLAPPY BIRD - DONT PLAY THIS GAME!” recording**  
+1. **Flappy Bird**  
    https://en.wikipedia.org/wiki/Flappy_Bird  
-   https://en.wikipedia.org/wiki/PewDiePie_videography  
-   Extracted: immediate response, readable hazard boundaries, fast failure/restart, and one glanceable primary decision.
+   Extracted: immediate input feedback, one glanceable primary decision, readable failure, and fast restart.
 
-2. **Pepsiman — gameplay screenshots plus linked Summer Games Done Quick runs**  
+2. **Pepsiman**  
    https://en.wikipedia.org/wiki/Pepsiman_%28video_game%29  
-   Extracted: forward pressure, lane-scale hazard readability, temporary rule-changing gimmicks, recovery checkpoints, and special pressure sequences.
+   Extracted: forward pressure, obstacle-scale readability, temporary rule changes, recovery beats, and special pressure sequences.
 
-3. **Sonic Mania — gameplay screenshots and gameplay analysis**  
+3. **Sonic Mania**  
    https://en.wikipedia.org/wiki/Sonic_Mania  
    https://www.wired.com/story/sonic-mania-review  
-   Extracted: anticipation before pressure, readable flow, controlled acceleration, reaction room, and recognizable zone transitions.
+   Extracted: anticipation before pressure, controlled acceleration, reaction room, recognizable zones, and flow that remains readable at higher intensity.
 
-4. **Minecraft — procedural generation and biome gameplay references**  
+4. **Minecraft**  
    https://en.wikipedia.org/wiki/Minecraft  
    https://www.wired.com/2010/10/minecrafts-biomes  
-   Extracted: deterministic seed fairness, bounded modular construction, recognizable regions, and variety that changes play rather than only color.
+   Extracted: deterministic seed fairness, bounded modular generation, recognizable regions, and procedural variety that changes play rather than only decoration.
 
 ### Original transformation and non-copying
 
-Lumen Current uses a neutral luminous three-lane current, deterministic discrete decisions, abstract signals, and generated zones. It does not reproduce characters, brands, pipes, branded items, level layouts, block textures, authored stages, camera compositions, UI, audio, music, trade dress, signature poses, signature animations, or recognizable compositions from any reference.
+Echo Trail uses a neutral five-by-five signal board, a geometric marker, generated cardinal paths, abstract rule transformations, and original synthesized tones. It does not reproduce characters, brands, pipes, consumable items, authored levels, block textures, UI, audio, music, camera compositions, signature poses, signature animations, trade dress, or recognizable asset combinations from any reference.
 
 ### UI, localization, and accessibility
 
-- The challenge reuses the platform palette, radii, buttons, HUD, result hierarchy, focus treatment, and action order.
-- The fixed `round/total` cell becomes an endless gate measure only while Lumen is active.
-- Arabic surrounding UI remains RTL while the language-independent lane geometry remains explicitly LTR.
-- Arabic, English, and Turkish cover instructions, zones, rules, prompts, exit confirmation, result detail, controls, and lane names.
-- Hazards and risk routes use `×` and `★` in addition to color.
-- Memory sequences expose a localized live-region equivalent, so the task is not visual-only.
-- Touch/pointer and Left/Up/Down/Right keyboard controls are supported.
-- Reduced effects remove decorative transitions without changing stages, deadlines, score, route, or invitation fairness.
+- The challenge reuses the platform palette, radii, buttons, HUD, result hierarchy, focus treatment, action order, and locally embedded Font Awesome control language.
+- The fixed round fraction becomes an endless trail count only while Echo is active; the catalog truthfully displays “Endless”.
+- Arabic surrounding UI remains RTL while the language-independent board geometry remains explicitly LTR.
+- Arabic, English, and Turkish cover instructions, zones, rules, cue controls, movement controls, exit confirmation, results, and sound settings.
+- Arrow symbols, marker position, ordered cue text, and state text provide non-color feedback.
+- Before response, assistive technology receives one ordered localized cue path with explicit Ready and Replay controls; after response begins, the answer is removed.
+- Touch/pointer and arrow-key controls are supported with native buttons and visible focus.
+- Reduced effects remove decorative transitions without changing seed, path, timing truth, score, invitation, comparison, or sound preference.
 - Deliberate exit requires two presses within three seconds.
 
 ### Lifecycle, privacy, security, and performance
 
-- One owned `AbortController` covers listeners.
-- Every timeout is tracked and cleared on failure, exit, replay, challenge switch, page hide, and bfcache recovery.
-- Generated state is bounded to one eighteen-stage chunk.
-- The build validates the Lumen stylesheet and integration module as required runtime references.
-- No account, backend, analytics, cookie, contacts, tracking, external API, remote asset/font, audio, game engine, UI framework, or runtime dependency was added.
-- The no-network Content Security Policy remains unchanged.
+- One owned `AbortController` bounds gameplay listeners and every timeout is tracked and cleared on failure, exit, replay, challenge switch, page hide, and bfcache recovery.
+- Generated state is bounded to one twelve-stage chunk; board DOM and cue history remain bounded during long runs.
+- Audio uses one shared context, rate-limited synthesized oscillators, local mute preference only, and no media files.
+- No account, backend, analytics, cookies, contacts, tracking, fingerprinting, external API, remote font/image/audio, UI framework, game engine, or new runtime dependency was added.
+- The existing no-network Content Security Policy remains unchanged.
 
 ### Islamic content policy — PASS
 
-- **Theme:** neutral abstract light, concentration, memory, and route choice.
+- **Theme:** neutral abstract memory, paths, concentration, and optional private competition.
 - **Characters/clothing:** none.
-- **Symbols:** arrows, geometric diamonds, check, cross, and star used only as gameplay cues.
-- **Audio:** none.
-- **Rewards:** bounded non-monetary score and optional private comparison; no wagering, chance reward, purchase, loot box, or monetary incentive.
-- **Social pressure:** optional private invitation/rematch; no public ranking, humiliation, urgency, shaming, or missed-day pressure.
-- **Safety risks:** no physical imitation, dangerous instruction, sensor use, flashing requirement, or personal-data request.
+- **Symbols:** arrows, geometric diamonds, check/cross feedback, and neutral route marks used only as mechanics.
+- **Audio:** short original synthesized non-musical feedback; no background music, voice, copied sound, or questionable theme.
+- **Rewards:** bounded non-monetary score and optional private comparison; no wagering, loot boxes, chance reward, purchase, or monetary incentive.
+- **Social pressure:** optional invitation/rematch without public ranking, humiliation, urgency, shaming, or missed-day pressure.
+- **Safety risks:** no physical imitation, dangerous instruction, sensor use, rapid flashing, personal-data request, or manipulative pattern.
 - **Decision:** **PASS**.
 
 ### Verification
 
-- Automated coverage validates seeded replay fairness, cross-seed variation, all mechanics/zones/layers/tension phases, fair risk routes, memory/mirror decisions, score bounds, bounded lifecycle, non-telegraphed decisions, deliberate exit, accessible memory cues, and absence of remote runtime dependencies.
-- Pull-request CI runs the complete `npm test` suite, production `npm run build`, static budget validation, and deployable preview upload.
-- Browser QA remains the final gate for touch/keyboard play, 320–430px mobile layout, Arabic RTL, Turkish/English copy, reduced effects, lifecycle teardown, sharing, friend comparison, and rematch.
+- Focused deterministic model coverage validates bounded chunks, same-seed reproducibility, cross-seed mechanical variation, legal transformed paths, all mechanics, zones, progression layers, tension phases, scoring bounds, and mastery bonuses.
+- Local focused result: **4/4 tests passing**; all new JavaScript modules pass `node --check`; localization key parity returns no missing or extra keys.
+- Pull-request CI must run the complete `npm test` suite, production `npm run build`, static-budget validation, and deployable preview upload.
+- Browser QA remains the final gate for touch/keyboard play, 320–430 CSS-pixel layouts, Arabic RTL, Turkish/English copy, screen-reader cue flow, reduced effects, sound/mute behavior, lifecycle teardown, sharing, friend comparison, and rematch.
