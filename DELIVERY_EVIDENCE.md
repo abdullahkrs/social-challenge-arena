@@ -1,64 +1,65 @@
-# Mirror Fuse and Stable Daily Expansion Evidence
+# Delivery Evidence
 
-## Product outcome
+## Issue #94 — Visual result share cards
 
-- **Constraint addressed:** the coherent platform had only three abstract skills. Mirror Fuse adds a materially different spatial-reflection decision without rebuilding the shared platform.
-- **Challenge:** each seeded round presents a 4×3 source pattern and three candidate answers. The player chooses the exact horizontal reflection across ten rounds with three chances.
-- **Complete journey:** catalog discovery → concise instruction → play → result → replay/new route → localized strict share → direct friend attempt → comparison → rematch share → catalog return.
-- **Bounded delivery:** existing Orbit Lock, Echo Grid, Lumen Lanes, result, comparison, sharing, and platform controls retain their established behavior and visual language.
+### Delivered outcome
 
-## Stable daily expansion
+The existing result action now generates one local, privacy-safe 720 × 900 PNG result card for all four live challenges before sharing. The renderer preserves the established 900 × 1125 composition in a scaled 4:5 output, reducing real-browser PNG size without changing card content. The visual artifact uses the established platform palette and challenge-owned geometry, includes the localized challenge identity and bounded score, and adds challenger/player scores plus a non-color win/loss/tie symbol for invited results.
 
-- The rollout boundary is **2026-08-01 UTC**.
-- Dates through **2026-07-31** continue to use the original ordered pool `[orbit-lock, echo-grid, lumen-lanes]` and therefore preserve the exact challenge and seed produced by the previous selector.
-- Dates from **2026-08-01** use the ordered four-challenge pool and can deterministically select Mirror Fuse.
-- Focused fixtures preserve exact legacy assignments and prove all four IDs occur after the boundary.
-- Daily storage remains only `dateKey`, `challengeId`, `seed`, and bounded `best`; stale, corrupt, or unavailable storage never prevents play.
-- The route remains optional with unlimited replay and no streak, countdown, missed-day pressure, expiry, urgency, or public ranking.
+The complete journey remains:
 
-## UI and UX consistency
+`play or daily → result → primary share action → visual card + localized invitation + strict URL → friend attempt on the same route → comparison → visual rematch share`
 
-- Mirror Fuse reuses the existing compact challenge card, instruction card, four-value HUD, result hierarchy, comparison surface, and action order.
-- Platform controls continue to use the existing locally bundled Font Awesome subset; gameplay patterns, mirror axis, diamonds, checks, and crosses are mechanic-owned CSS or semantic text.
-- The fourth card extends the established catalog to four columns on wide screens, a balanced two-column layout at tablet widths, and one compact card per row on phones.
-- The arena is explicitly left-to-right because reflection geometry is language-independent; Arabic RTL still applies to surrounding platform text and navigation.
-- Responsive rules cover 320–430 CSS px without introducing a parallel component system or unrelated redesign.
+### Sharing and fallback behavior
 
-## Localization and accessibility
+- Native file sharing is used only after explicit `navigator.canShare({ files })` support.
+- Unsupported or failed file sharing falls back to localized native text plus the unchanged strict version-1 URL.
+- Native text failure falls back to clipboard text plus URL, then the existing manual copy prompt.
+- User cancellation is announced as cancellation and does not trigger an error path.
+- Rendering failure never blocks text sharing, replay, catalog navigation, or another run.
+- The version-1 invitation shape, challenge allowlist, checksum salt, seed, score bounds, tamper rejection, and sender/friend equivalence are unchanged.
 
-- Arabic RTL, English, and Turkish use the existing key-parity localization system for name, tagline, instruction, prompt, feedback, controls, arena, option labels, card metadata, sharing, and comparison.
-- The three answers are native buttons with localized accessible names, visible focus, touch/pointer/keyboard operation, and practical targets above 48 CSS px.
-- Every round now exposes the source as localized row-and-cell text, includes each candidate pattern in its button name, and announces the source through the existing live region so the puzzle is solvable without sight.
-- Mid-round language changes refresh the active pattern descriptions; the owned language observer is disconnected in `destroy()`.
-- Source and candidate cells use shape and text glyphs in addition to color. Correct, wrong, and timeout outcomes include `✓` or `×`, localized live announcements, and score/chance changes.
-- Option order and challenge geometry are not mirrored merely because the interface language is Arabic.
-- Reduced effects changes transition duration only; source patterns, candidates, answer index, deadlines, scoring, route, and result remain identical.
+### UI and UX consistency
 
-## Reliability, privacy, security, and performance
+- The existing result hierarchy, comparison card, one primary share button, action order, spacing, radii, focus treatment, locally bundled Font Awesome controls, and 320–430px mobile layout are preserved.
+- No platform-specific share row, modal, preview surface, redesign, or unrelated visual pattern was added.
+- The primary button exposes localized preparing state with `aria-busy`; success, cancellation, clipboard, and manual fallback use the existing live region.
+- Arabic RTL, English, and Turkish share/card copy have exact localization-key parity.
+- The visual image is enhancement-only; challenge, score/comparison, invitation text, and strict URL remain independently available.
 
-- Mirror Fuse owns one abort controller, one tracked timeout set, the active deadline timer, the language observer, transient classes, feedback marks, disabled state, and focus transition; `destroy()` clears and resets all of them.
-- Replay, challenge switching, page hide, and bfcache recovery use the existing shared destruction path before another host starts.
-- Strict version-1 invitations keep the same fields, checksum salt, bounds, and tamper rejection while adding only the known `mirror-fuse` ID to the allowlist.
-- No account, backend, analytics, cookie, contact access, tracking, remote font, remote image, API, UI framework, runtime dependency, or network permission was added.
-- Content Security Policy remains no-network with `connect-src 'none'`.
+### Lifecycle and reliability
 
-## Islamic content policy — PASS
+- One owned `AbortController` bounds each share attempt.
+- Temporary canvas memory is released after success, cancellation, error, repeated share, replay/navigation, language change, page hide, and bfcache recovery.
+- Oversized or empty blobs are rejected before file sharing.
+- Generated filenames contain only the challenge ID and bounded score; the image contains no URL, personal data, device data, or hidden identifier.
+- Reduced effects do not change card data, score, comparison, URL, image content, or fallback behavior.
 
-- Theme: neutral abstract pattern reflection and spatial reasoning.
-- Characters/clothing: none.
-- Symbols: geometric cells, a mirror divider, question mark, numbers, checks, and crosses; no devotional or questionable symbolism.
-- Audio: none.
-- Rewards: bounded non-monetary score and optional private daily best only; no wagering, chance reward, loot box, purchase, or monetary incentive.
-- Social pressure: optional private invitation and rematch only; no humiliation, public ranking, urgency, streak pressure, missed-day message, or fear of missing out.
-- Safety risks: no physical imitation, dangerous instruction, sensor access, contact access, or personal-data request.
-- Final decision: **PASS**.
+### Privacy and security
 
-## Verification
+No account, backend, analytics, cookies, fingerprinting, contacts, storage permission, notification permission, social authentication, remote rendering, remote asset, remote font, external API, screenshot library, UI framework, or new runtime dependency was added. The existing no-network Content Security Policy boundary remains unchanged.
 
-- Accessibility implementation head: `e2e1c95b42f5738fd64e6785697531ac9d83a1a2`.
-- GitHub Actions CI run **#88** passed `npm ci --ignore-scripts`, the complete `npm test` suite, production `npm run build`, and preview upload.
-- Focused accessibility coverage verifies the referenced source description, three described option buttons, localized row/cell wording in Arabic, English, and Turkish, live source announcement, and language-observer teardown.
-- Existing tests continue to cover deterministic reflection plans, unique distractors, exact scoring bounds, zero-millisecond input, sender/friend equivalence, all four strict invitations, comparison/rematch, localization parity, native controls, lifecycle teardown, reduced-effects equivalence, exact legacy daily fixtures, and future four-ID selection.
-- The production preview contains **14 files totaling 128,210 bytes**, within the unchanged **184,320-byte** uncompressed budget.
-- The uploaded preview ZIP is **37,965 bytes** with SHA-256 digest `578085ec1bd3ba2954a8bc3fec2a94efc7c42fc716d7ad066a711aa5b1639daa`.
-- Static preview inspection confirmed the expected entry point, four catalog cards, all four hosts, local styles, localization module, no remote asset, and complete deployable file set.
+### Islamic content policy
+
+- **Theme:** neutral abstract skill challenges and optional friendly competition.
+- **Characters/clothing:** none.
+- **Symbols:** mechanic-owned geometric marks and clear ↑ / ↓ / = comparison symbols only.
+- **Audio:** none.
+- **Rewards:** score and private head-to-head comparison only; no monetary or chance reward.
+- **Social pressure:** optional invitation/rematch wording without humiliation, public ranking, urgency, or shaming.
+- **Safety risks:** none identified; no unsafe imitation or physical instruction.
+- **Decision:** **PASS**.
+
+### Verification
+
+- Reviewed implementation head: `db10cb23ce3e487ffc423b19c3d740634b387bb9`.
+- GitHub Actions CI **#99** passed dependency installation, the complete repository test suite, production build, and preview upload.
+- Focused unit coverage remains **9/9 passing** for deterministic models across all four challenge IDs, solo/invited win-loss-tie content, Arabic RTL metadata, score bounds, explicit file support, native text fallback support, payload construction, cancellation, blob limits, PNG file generation, and canvas cleanup.
+- A dependency-free real Chromium regression renders **48 cards**: all four challenges × Arabic/English/Turkish × solo/win/loss/tie. Every generated PNG stays inside the unchanged **665,600-byte** file bound at the production 720 × 900 output size.
+- Production static preview: **15 files / 144,980 bytes**, within the unchanged **184,320-byte** budget.
+- Uploaded preview ZIP: **42,649 bytes**.
+- Existing regression coverage remains current for all four mechanics, daily selection and persistence, strict links and checksum behavior, sender/friend equivalence, result comparison/rematch, localization parity, accessibility entry points, keyboard/touch controls, lifecycle teardown, and bfcache recovery.
+
+### Scope review
+
+Changed runtime surfaces remain limited to the share orchestrator, localized share/card copy, and card renderer. The QA correction only scales the existing composition to a smaller 4:5 PNG and adds a real-browser size regression. Challenge mechanics, scoring, daily rotation, result truth, invitation compatibility, CSP, existing interface layout, and runtime dependencies are unchanged.
