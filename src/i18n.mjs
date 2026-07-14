@@ -4,6 +4,9 @@ export const messages = {
   en: {
     appName: 'Social Challenge Arena', language: 'Language', reduceMotion: 'Reduce effects',
     discoveryEyebrow: 'Pick your skill', catalogTitle: 'Choose a challenge', catalogHint: 'Two fast games. One score to beat.',
+    dailyTitle: "Today's challenge", dailyPlay: 'Play daily', dailyPlayLabel: "Play today's {name}",
+    dailyBest: 'Best today {score}', dailyNoBest: 'No score yet', dailyNewBest: 'New daily best {score}', dailySessionOnly: 'Best stays for this visit',
+    dailySameRoute: 'Fixed daily route',
     orbitName: 'Orbit Lock', orbitTagline: 'Precision timing', orbitHowTo: 'Tap or press Space when the pulse enters the bright gate.',
     echoName: 'Echo Grid', echoTagline: 'Visual memory', echoHowTo: 'Watch the numbered tiles, then tap the same pattern in order.',
     play: 'Play', invited: 'Friend challenge', beatScore: 'Beat {score}', sameRun: 'Same route. Beat the score.',
@@ -26,6 +29,9 @@ export const messages = {
   ar: {
     appName: 'ساحة التحديات الاجتماعية', language: 'اللغة', reduceMotion: 'تقليل المؤثرات',
     discoveryEyebrow: 'اختر مهارتك', catalogTitle: 'اختر تحديًا', catalogHint: 'لعبتان سريعتان ونتيجة واحدة للتجاوز.',
+    dailyTitle: 'تحدي اليوم', dailyPlay: 'العب تحدي اليوم', dailyPlayLabel: 'العب {name} اليوم',
+    dailyBest: 'أفضل نتيجة اليوم {score}', dailyNoBest: 'لا توجد نتيجة بعد', dailyNewBest: 'أفضل نتيجة يومية جديدة {score}', dailySessionOnly: 'أفضل نتيجة لهذه الزيارة فقط',
+    dailySameRoute: 'مسار اليوم الثابت',
     orbitName: 'قفل المدار', orbitTagline: 'دقة التوقيت', orbitHowTo: 'المس أو اضغط مسافة عندما تدخل النبضة داخل البوابة المضيئة.',
     echoName: 'شبكة الصدى', echoTagline: 'ذاكرة بصرية', echoHowTo: 'راقب المربعات المرقمة ثم المس النمط نفسه بالترتيب.',
     play: 'العب', invited: 'تحدي صديق', beatScore: 'تجاوز {score}', sameRun: 'المسار نفسه. تجاوز النتيجة.',
@@ -48,6 +54,9 @@ export const messages = {
   tr: {
     appName: 'Sosyal Mücadele Arenası', language: 'Dil', reduceMotion: 'Efektleri azalt',
     discoveryEyebrow: 'Becerini seç', catalogTitle: 'Bir mücadele seç', catalogHint: 'İki hızlı oyun. Geçilecek tek puan.',
+    dailyTitle: 'Günün mücadelesi', dailyPlay: 'Günlük oyna', dailyPlayLabel: 'Bugünün {name} mücadelesini oyna',
+    dailyBest: 'Bugünün en iyisi {score}', dailyNoBest: 'Henüz puan yok', dailyNewBest: 'Yeni günlük rekor {score}', dailySessionOnly: 'En iyi puan bu ziyaret için saklanır',
+    dailySameRoute: 'Sabit günlük rota',
     orbitName: 'Yörünge Kilidi', orbitTagline: 'Hassas zamanlama', orbitHowTo: 'Nabız parlak kapıya girdiğinde dokun veya Boşluk tuşuna bas.',
     echoName: 'Yankı Izgarası', echoTagline: 'Görsel hafıza', echoHowTo: 'Numaralı kareleri izle, sonra aynı desene sırayla dokun.',
     play: 'Oyna', invited: 'Arkadaş mücadelesi', beatScore: '{score} puanı geç', sameRun: 'Aynı rota. Puanı geç.',
