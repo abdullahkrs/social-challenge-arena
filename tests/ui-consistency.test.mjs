@@ -31,10 +31,11 @@ test('shared platform actions expose consistent Font Awesome treatments', () => 
   assert.ok(css.includes('[dir=rtl] .back-button .fa-icon'));
 });
 
-test('dynamic localized buttons keep icons outside their text content', () => {
-  for (const id of ['daily-start-button', 'start-button', 'replay-button', 'share-button', 'new-button', 'catalog-button']) {
+test('dynamic localized icon buttons keep glyphs outside their text content', () => {
+  for (const id of ['start-button', 'replay-button', 'share-button', 'new-button', 'catalog-button']) {
     const element = html.match(new RegExp(`<button[^>]*id="${id}"[^>]*>`))?.[0] || '';
     assert.ok(element.includes('action-icon'), `${id} should use the shared icon treatment`);
   }
+  assert.match(html, /id="daily-start-button" class="primary daily-start"/);
   assert.match(html, /font-src 'self' data:/);
 });
