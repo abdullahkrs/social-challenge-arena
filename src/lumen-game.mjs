@@ -138,7 +138,6 @@ export class LumenLanesGame {
     this.container.dataset.zone = stage.zone;
     this.container.dataset.target = stage.targetLane === null ? String(stage.cueLane) : String(stage.targetLane);
     this.container.style.setProperty('--lane-drift', String(stage.drift));
-    this.player.style.setProperty('--player-lane', String(stage.targetLane ?? stage.riskLane ?? 1));
     this.buttons.forEach((button) => {
       button.disabled = false;
       button.classList.remove('is-correct', 'is-wrong', 'is-blocked', 'is-risk');
@@ -210,6 +209,7 @@ export class LumenLanesGame {
 
   activate(index) {
     if (!this.running || !this.accepting || !this.currentStage) return;
+    this.player.style.setProperty('--player-lane', String(index));
     const outcome = evaluateLumenChoice(this.currentStage, index);
     if (outcome.correct) {
       this.resolveHit(index, this.currentStage, outcome.risk);
