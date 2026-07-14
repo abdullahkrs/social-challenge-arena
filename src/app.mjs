@@ -476,7 +476,8 @@ function bindEvents() {
     state.activeDaily = null; state.seed = createSeed(); state.invite = null; history.replaceState({}, '', location.pathname); updateEntryUI(); setScreen('discovery');
   });
   elements.shareButton.addEventListener('click', shareResult);
-  window.addEventListener('pagehide', () => { destroyGame(); cancelShare(); });
+  window.addEventListener('pagehide', destroyGame);
+  window.addEventListener('pagehide', cancelShare);
   window.addEventListener('pageshow', handlePageShow);
 }
 
