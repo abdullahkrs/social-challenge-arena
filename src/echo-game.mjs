@@ -53,6 +53,7 @@ export class EchoGridGame {
     this.reducedMotion = Boolean(reducedMotion);
     this.abortController = null;
     this.timers = new Set();
+    this.exitTimer = null;
     this.running = false;
     this.phase = 'idle';
   }
@@ -111,6 +112,17 @@ export class EchoGridGame {
   clearTimers() {
     this.timers.forEach(clearTimeout);
     this.timers.clear();
+    this.clearExitConfirmation();
+  }
+
+  clearExitConfirmation() {
+    if (this.exitTimer !== null) {
+      clearTimeout(this.exitTimer);
+      this.exitTimer = null;
+    }
+    if (!this.exitArmed) return;
+    this.exitArmed = false;
+    this.dispatch('exit-disarmed');
   }
 
   currentStage() {
@@ -160,7 +172,6 @@ export class EchoGridGame {
     this.phase = 'watch';
     this.assists = 0;
     this.inputIndex = 0;
-    this.exitArmed = false;
     this.stage = this.currentStage();
     this.clearBoard();
     this.setControlsEnabled(false);
@@ -301,9 +312,9 @@ export class EchoGridGame {
       this.exitArmed = true;
       this.dispatch('exit-armed');
       this.onAnnounce({ key: 'echoExitConfirm' });
-      this.schedule(() => {
-        this.exitArmed = false;
-        this.dispatch('exit-disarmed');
+      this.exitTimer = setTimeout(() => {
+        this.exitTimer = null;
+        if (this.running) this.clearExitConfirmation();
       }, 3000);
       return;
     }
