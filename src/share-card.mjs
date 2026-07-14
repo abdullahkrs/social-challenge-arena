@@ -1,7 +1,9 @@
 import { CHALLENGE_IDS, SCORE_MAX, clamp, compareScores, comparisonSymbol } from './core.mjs';
 
-export const SHARE_CARD_WIDTH = 900;
-export const SHARE_CARD_HEIGHT = 1125;
+const CARD_LAYOUT_WIDTH = 900;
+const CARD_LAYOUT_HEIGHT = 1125;
+export const SHARE_CARD_WIDTH = 720;
+export const SHARE_CARD_HEIGHT = 900;
 export const SHARE_CARD_MAX_BYTES = 650 * 1024;
 
 const THEMES = Object.freeze({
@@ -156,18 +158,19 @@ export async function renderResultCard(model, {
   canvas.height = SHARE_CARD_HEIGHT;
   const ctx = canvas.getContext('2d', { alpha: false });
   if (!ctx) throw new Error('Canvas unavailable');
+  ctx.scale(SHARE_CARD_WIDTH / CARD_LAYOUT_WIDTH, SHARE_CARD_HEIGHT / CARD_LAYOUT_HEIGHT);
   const { accent, secondary } = model.theme;
   const rtl = model.direction === 'rtl';
   const startX = rtl ? 810 : 90;
   const startAlign = rtl ? 'right' : 'left';
   ctx.direction = model.direction;
 
-  const background = ctx.createLinearGradient(0, 0, SHARE_CARD_WIDTH, SHARE_CARD_HEIGHT);
+  const background = ctx.createLinearGradient(0, 0, CARD_LAYOUT_WIDTH, CARD_LAYOUT_HEIGHT);
   background.addColorStop(0, '#121b3e'); background.addColorStop(.58, '#080d22'); background.addColorStop(1, '#111a39');
-  ctx.fillStyle = background; ctx.fillRect(0, 0, SHARE_CARD_WIDTH, SHARE_CARD_HEIGHT);
+  ctx.fillStyle = background; ctx.fillRect(0, 0, CARD_LAYOUT_WIDTH, CARD_LAYOUT_HEIGHT);
   const glow = ctx.createRadialGradient(700, 160, 20, 700, 160, 520);
   glow.addColorStop(0, `${accent}44`); glow.addColorStop(1, `${secondary}00`);
-  ctx.fillStyle = glow; ctx.fillRect(0, 0, SHARE_CARD_WIDTH, 600);
+  ctx.fillStyle = glow; ctx.fillRect(0, 0, CARD_LAYOUT_WIDTH, 600);
 
   fillRounded(ctx, 55, 55, 790, 1015, 48, 'rgba(8,13,34,.68)');
   ctx.strokeStyle = 'rgba(176,193,255,.22)'; ctx.lineWidth = 2; roundedRect(ctx, 55, 55, 790, 1015, 48); ctx.stroke();
