@@ -55,7 +55,7 @@
 
 ## Verification
 
-- Final correction head: `e2e1c95b42f5738fd64e6785697531ac9d83a1a2`.
+- Accessibility implementation head: `e2e1c95b42f5738fd64e6785697531ac9d83a1a2`.
 - GitHub Actions CI run **#88** passed `npm ci --ignore-scripts`, the complete `npm test` suite, production `npm run build`, and preview upload.
 - Focused accessibility coverage verifies the referenced source description, three described option buttons, localized row/cell wording in Arabic, English, and Turkish, live source announcement, and language-observer teardown.
 - Existing tests continue to cover deterministic reflection plans, unique distractors, exact scoring bounds, zero-millisecond input, sender/friend equivalence, all four strict invitations, comparison/rematch, localization parity, native controls, lifecycle teardown, reduced-effects equivalence, exact legacy daily fixtures, and future four-ID selection.
