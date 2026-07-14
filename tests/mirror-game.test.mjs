@@ -127,6 +127,14 @@ test('Mirror Fuse is endless in the catalog and its runtime owns lifecycle, exit
   assert.doesNotMatch(source, /setInterval|requestAnimationFrame|fetch\(|WebSocket|Audio\(/);
 });
 
+test('stage transitions preserve one announcement owner and return keyboard focus to the board', async () => {
+  const integration = await readFile(new URL('../src/mirror-integration.mjs', import.meta.url), 'utf8');
+  assert.match(integration, /sourceDescription\?\.removeAttribute\('aria-live'\)/);
+  assert.match(integration, /sourceDescription\?\.removeAttribute\('aria-atomic'\)/);
+  assert.match(integration, /\[data-mirror-target-cell\]\[data-current="true"\]/);
+  assert.match(integration, /\.focus\(\{ preventScroll: true \}\)/);
+});
+
 test('Arabic, English, and Turkish provide complete endless Mirror copy and non-audio equivalents', () => {
   const keys = [
     'mirrorTagline', 'mirrorHowTo', 'mirrorControlsHint', 'mirrorArenaLabel', 'mirrorPattern', 'mirrorSource', 'mirrorTarget',
