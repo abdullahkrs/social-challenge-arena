@@ -1,5 +1,9 @@
 import './mirror-copy.mjs';
-import { normalizeLanguage, translate } from './i18n.mjs';
+import { messages, normalizeLanguage, translate } from './i18n.mjs';
+
+Object.assign(messages.en, { mirrorDirectionUp: 'Up', mirrorDirectionRight: 'Right', mirrorDirectionDown: 'Down', mirrorDirectionLeft: 'Left' });
+Object.assign(messages.ar, { mirrorDirectionUp: 'أعلى', mirrorDirectionRight: 'يمين', mirrorDirectionDown: 'أسفل', mirrorDirectionLeft: 'يسار' });
+Object.assign(messages.tr, { mirrorDirectionUp: 'Yukarı', mirrorDirectionRight: 'Sağ', mirrorDirectionDown: 'Aşağı', mirrorDirectionLeft: 'Sol' });
 
 if (typeof document !== 'undefined') {
   const mirror = document.querySelector('#mirror-fuse');
