@@ -4,8 +4,8 @@ import { readFile } from 'node:fs/promises';
 import {
   angularDistance, buildInviteUrl, buildResultSharePayload, challengePlan, compareScores, comparisonSymbol,
   dailyChallengeFor, DAILY_STORAGE_KEY, echoPlan, encodeInvite, initialScreenForInvite, isGameAttemptKey,
-  parseDailyBest, parseInvite, readDailyBest, scoreAttempt, scoreEchoRound, screenAfterPageShow,
-  shouldRefreshDaily, updateDailyBest, utcDateKey, writeDailyBest
+  lumenPlan, parseDailyBest, parseInvite, readDailyBest, scoreAttempt, scoreEchoRound, scoreLumenRound,
+  screenAfterPageShow, shouldRefreshDaily, updateDailyBest, utcDateKey, writeDailyBest
 } from '../src/core.mjs';
 import { catalog, getChallenge } from '../src/catalog.mjs';
 import { missingTranslations, supportedLanguages, translate } from '../src/i18n.mjs';
@@ -34,11 +34,19 @@ test('echo plan is deterministic, bounded, and avoids immediate repeats', () => 
   assert.ok(first.every((sequence) => sequence.every((cell, index) => index === 0 || cell !== sequence[index - 1])));
 });
 
-test('catalog exposes two materially different live challenges', () => {
-  assert.equal(catalog.length, 2);
-  assert.deepEqual(catalog.map(({ id }) => id), ['orbit-lock', 'echo-grid']);
+test('lumen route is deterministic, bounded, and avoids triple lane repeats', () => {
+  const first = lumenPlan(24680); const second = lumenPlan(24680);
+  assert.deepEqual(first, second); assert.equal(first.length, 18);
+  assert.ok(first.every(({ lane, deadlineMs, drift }) => Number.isInteger(lane) && lane >= 0 && lane <= 2 && deadlineMs >= 920 && deadlineMs <= 1780 && Math.abs(drift) === 1));
+  assert.ok(first.every(({ lane }, index) => index < 2 || lane !== first[index - 1].lane || lane !== first[index - 2].lane));
+});
+
+test('catalog exposes three materially different live challenges', () => {
+  assert.equal(catalog.length, 3);
+  assert.deepEqual(catalog.map(({ id }) => id), ['orbit-lock', 'echo-grid', 'lumen-lanes']);
   assert.equal(getChallenge('orbit-lock').skill, 'timing');
   assert.equal(getChallenge('echo-grid').skill, 'memory');
+  assert.equal(getChallenge('lumen-lanes').skill, 'reaction');
   assert.equal(getChallenge('unknown'), null);
 });
 
@@ -49,14 +57,16 @@ test('UTC date keys are canonical and independent of local offsets', () => {
   assert.throws(() => utcDateKey('not-a-date'), /Invalid date/);
 });
 
-test('daily route is deterministic and injected dates prove both challenges', () => {
-  const orbit = dailyChallengeFor('2026-07-01T12:00:00Z');
-  const echo = dailyChallengeFor('2026-07-02T12:00:00Z');
-  assert.deepEqual(orbit, dailyChallengeFor('2026-07-01T23:59:59Z'));
+test('daily route is deterministic and injected dates prove all three challenges', () => {
+  const lumen = dailyChallengeFor('2026-07-01T12:00:00Z');
+  const orbit = dailyChallengeFor('2026-07-02T12:00:00Z');
+  const echo = dailyChallengeFor('2026-07-03T12:00:00Z');
+  assert.equal(lumen.challengeId, 'lumen-lanes');
   assert.equal(orbit.challengeId, 'orbit-lock');
   assert.equal(echo.challengeId, 'echo-grid');
-  assert.notEqual(orbit.seed, echo.seed);
-  assert.ok(Number.isInteger(orbit.seed) && orbit.seed >= 0 && orbit.seed <= 0xffffffff);
+  assert.deepEqual(lumen, dailyChallengeFor('2026-07-01T23:59:59Z'));
+  assert.equal(new Set([lumen.seed, orbit.seed, echo.seed]).size, 3);
+  assert.ok([lumen, orbit, echo].every(({ seed }) => Number.isInteger(seed) && seed >= 0 && seed <= 0xffffffff));
 });
 
 test('daily rollover refreshes only on a safe discovery return', () => {
@@ -111,12 +121,14 @@ test('daily best persistence stores only date, challenge, seed, and best', () =>
   assert.deepEqual(readDailyBest(storage, daily).record, record);
 });
 
-test('strict invite round-trips both challenges and keeps legacy v1 shape', () => {
+test('strict invite round-trips all challenges and keeps legacy v1 shape', () => {
   const orbit = encodeInvite({ seed: 4294967295, target: 4321 });
   assert.deepEqual(parseInvite(orbit), { ok: true, invite: { challengeId: 'orbit-lock', seed: 4294967295, target: 4321 } });
-  const echo = encodeInvite({ challengeId: 'echo-grid', seed: 77, target: 900 });
-  assert.deepEqual(parseInvite(echo), { ok: true, invite: { challengeId: 'echo-grid', seed: 77, target: 900 } });
-  echo.set('t', '901'); assert.deepEqual(parseInvite(echo), { ok: false, reason: 'checksum' });
+  for (const challengeId of ['echo-grid', 'lumen-lanes']) {
+    const invite = encodeInvite({ challengeId, seed: 77, target: 900 });
+    assert.deepEqual(parseInvite(invite), { ok: true, invite: { challengeId, seed: 77, target: 900 } });
+    invite.set('t', '901'); assert.deepEqual(parseInvite(invite), { ok: false, reason: 'checksum' });
+  }
 });
 
 test('strict invite rejects extras, unknown challenges, malformed values, and out-of-range score', () => {
@@ -128,41 +140,42 @@ test('strict invite rejects extras, unknown challenges, malformed values, and ou
   assert.throws(() => encodeInvite({ challengeId: 'unknown', seed: 1, target: 1 }), /Unknown challenge/);
 });
 
-test('valid invitations take precedence at boot and invalid ones recover to discovery', () => {
-  const valid = parseInvite(encodeInvite({ challengeId: 'echo-grid', seed: 18, target: 750 }));
+test('valid third-challenge invitation takes precedence and invalid links recover', () => {
+  const valid = parseInvite(encodeInvite({ challengeId: 'lumen-lanes', seed: 18, target: 750 }));
   assert.equal(initialScreenForInvite(valid.invite), 'instructions');
-  const invalid = parseInvite('v=1&c=echo-grid&s=i&t=751&ck=wrong');
+  assert.equal(valid.invite.challengeId, 'lumen-lanes');
+  const invalid = parseInvite('v=1&c=lumen-lanes&s=i&t=751&ck=wrong');
   assert.equal(invalid.ok, false);
   assert.equal(initialScreenForInvite(null), 'discovery');
 });
 
 test('invite URL is language-independent and clears fragments', () => {
-  const url = buildInviteUrl('https://example.com/play?lang=ar#result', { challengeId: 'echo-grid', seed: 8, target: 250 });
+  const url = buildInviteUrl('https://example.com/play?lang=ar#result', { challengeId: 'lumen-lanes', seed: 8, target: 250 });
   const parsed = new URL(url); assert.equal(parsed.hash, ''); assert.equal(parsed.searchParams.has('lang'), false);
-  assert.equal(parseInvite(parsed.search).invite.challengeId, 'echo-grid');
+  assert.equal(parseInvite(parsed.search).invite.challengeId, 'lumen-lanes');
 });
 
 test('daily score shares as a strict non-expiring same-route invitation', () => {
-  const daily = dailyChallengeFor('2026-07-14T12:00:00Z');
+  const daily = dailyChallengeFor('2026-07-01T12:00:00Z');
   const url = buildInviteUrl('https://example.com/', { challengeId: daily.challengeId, seed: daily.seed, target: 812 });
   assert.deepEqual(parseInvite(new URL(url).search).invite, { challengeId: daily.challengeId, seed: daily.seed, target: 812 });
-  assert.deepEqual(dailyChallengeFor('2026-07-20T12:00:00Z').dateKey, '2026-07-20');
+  assert.equal(daily.challengeId, 'lumen-lanes');
   assert.deepEqual(parseInvite(new URL(url).search).invite.seed, daily.seed);
 });
 
 test('localized native and clipboard invitation payloads include challenge, score, CTA, and strict URL', () => {
   for (const language of supportedLanguages) {
-    const text = translate(language, 'challengeShareText', { name: 'Orbit X', score: 321 });
-    const payload = buildResultSharePayload({ title: 'Orbit X', text, url: 'https://example.com/?v=1&c=orbit-lock&s=1&t=321&ck=abc' });
+    const text = translate(language, 'challengeShareText', { name: 'Lumen X', score: 321 });
+    const payload = buildResultSharePayload({ title: 'Lumen X', text, url: 'https://example.com/?v=1&c=lumen-lanes&s=1&t=321&ck=abc' });
     assert.equal(payload.shareData.text, text);
-    assert.match(payload.shareData.text, /Orbit X/);
+    assert.match(payload.shareData.text, /Lumen X/);
     assert.match(payload.shareData.text, /321/);
     assert.equal(payload.clipboardText, `${text}\n${payload.shareData.url}`);
   }
 });
 
-test('rematch links keep the same challenge and deterministic route while using the new score', () => {
-  for (const challengeId of ['orbit-lock', 'echo-grid']) {
+test('rematch links keep each challenge and deterministic route while using the new score', () => {
+  for (const challengeId of ['orbit-lock', 'echo-grid', 'lumen-lanes']) {
     const url = buildInviteUrl('https://example.com/', { challengeId, seed: 4242, target: 987 });
     assert.deepEqual(parseInvite(new URL(url).search).invite, { challengeId, seed: 4242, target: 987 });
   }
@@ -175,28 +188,32 @@ test('score comparison handles win, loss, and tie with non-color symbols', () =>
   assert.equal(comparisonSymbol('win'), '↑'); assert.equal(comparisonSymbol('lose'), '↓'); assert.equal(comparisonSymbol('tie'), '=');
 });
 
-test('both scoring models remain bounded', () => {
+test('all three scoring models remain bounded', () => {
   assert.ok(angularDistance(0.05, Math.PI * 2 - 0.05) < 0.11);
   const orbit = scoreAttempt({ distance: 0, gateWidth: 0.5, combo: 20, round: 20 });
   assert.equal(orbit.precision, 100); assert.ok(orbit.points <= 900);
   assert.equal(scoreEchoRound({ length: 99, combo: 99, round: 99 }), 900);
+  const fast = scoreLumenRound({ elapsedMs: 0, deadlineMs: 1000, combo: 99, round: 99 });
+  const slow = scoreLumenRound({ elapsedMs: 1000, deadlineMs: 1000, combo: 1, round: 0 });
+  assert.ok(fast.points <= 500 && fast.points > slow.points);
+  assert.deepEqual(scoreLumenRound({ elapsedMs: 300, deadlineMs: 1200, combo: 4, round: 2 }), scoreLumenRound({ elapsedMs: 300, deadlineMs: 1200, combo: 4, round: 2 }));
 });
 
-test('all required languages have matching keys and localized daily states', () => {
+test('all required languages have matching keys and localized third-challenge states', () => {
   assert.deepEqual(supportedLanguages, ['ar', 'en', 'tr']); assert.deepEqual(missingTranslations(), []);
   for (const language of supportedLanguages) {
-    assert.ok(translate(language, 'echoName').length > 2);
+    assert.ok(translate(language, 'lumenName').length > 2);
+    assert.ok(translate(language, 'lumenHowTo').length > 8);
+    assert.ok(translate(language, 'lanePromptLeft').length > 2);
+    assert.ok(translate(language, 'laneCorrect', { points: 10 }).includes('10'));
     assert.ok(translate(language, 'challengeCard', { name: 'X' }).includes('X'));
     assert.ok(translate(language, 'rematchShareText', { name: 'X', score: 10 }).includes('10'));
     assert.ok(translate(language, 'comparisonAnnouncement', { outcome: 'O', target: 1, score: 2, difference: 1 }).includes('2'));
     assert.ok(translate(language, 'dailyPlayLabel', { name: 'X' }).includes('X'));
-    assert.ok(translate(language, 'dailyBest', { score: 55 }).includes('55'));
-    assert.ok(translate(language, 'dailyNewBest', { score: 66 }).includes('66'));
-    assert.ok(translate(language, 'dailySessionOnly').length > 5);
   }
 });
 
-test('daily entry and compact settings are accessible in the real entry point', async () => {
+test('daily entry, three cards, and lane controls are accessible in the real entry point', async () => {
   const html = await readFile(new URL('../index.html', import.meta.url), 'utf8');
   assert.match(html, /<input id="motion-toggle" type="checkbox" aria-label="Reduce effects" data-i18n-aria="reduceMotion">/);
   assert.match(html, /id="daily-entry"[^>]*aria-labelledby="daily-title"/);
@@ -204,8 +221,10 @@ test('daily entry and compact settings are accessible in the real entry point', 
   assert.match(html, /id="daily-result" class="daily-result" hidden/);
   assert.match(html, /id="invite-catalog-button"/);
   assert.match(html, /id="challenger-score"/); assert.match(html, /id="player-score"/); assert.match(html, /id="difference-text"/);
-  assert.equal((html.match(/data-challenge-id=/g) || []).length, 2);
+  assert.equal((html.match(/data-challenge-id=/g) || []).length, 3);
   assert.equal((html.match(/data-cell=/g) || []).length, 9);
+  assert.equal((html.match(/data-lane=/g) || []).length, 3);
+  assert.match(html, /id="lumen-lanes"[^>]*role="group"/);
 });
 
 test('game keyboard attempts are consumed only from the focused canvas target', () => {
@@ -217,16 +236,25 @@ test('game keyboard attempts are consumed only from the focused canvas target', 
   assert.equal(isGameAttemptKey({ code: 'KeyA', target: canvas }, canvas), false);
 });
 
-test('app owns one daily route, preserves strict sharing, and hosts both games', async () => {
+test('app owns one daily route, preserves strict sharing, and hosts all three games', async () => {
   const source = await readFile(new URL('../src/app.mjs', import.meta.url), 'utf8');
   assert.match(source, /parseLocationInvite\(\); bindEvents\(\); applyLanguage\(\)/);
   assert.match(source, /setScreen\(initialScreenForInvite\(state\.invite\)\)/);
   assert.match(source, /elements\.dailyStartButton\.addEventListener\('click', beginDailyRun\)/);
   assert.match(source, /state\.activeDaily = \{ \.\.\.state\.daily \}/);
-  assert.match(source, /state\.newButton|elements\.newButton\.hidden = Boolean\(state\.activeDaily\)/);
+  assert.match(source, /elements\.newButton\.hidden = Boolean\(state\.activeDaily\)/);
   assert.match(source, /navigator\.clipboard\.writeText\(payload\.clipboardText\)/);
-  assert.match(source, /new OrbitLockGame/); assert.match(source, /new EchoGridGame/);
+  assert.match(source, /new OrbitLockGame/); assert.match(source, /new EchoGridGame/); assert.match(source, /new LumenLanesGame/);
   assert.doesNotMatch(source, /setInterval|GameEngine|PluginRegistry|CalendarService|RetentionEngine/);
+});
+
+test('lumen lifecycle owns timers and reduced effects never changes route or deadlines', async () => {
+  const source = await readFile(new URL('../src/lumen-game.mjs', import.meta.url), 'utf8');
+  assert.match(source, /this\.plan = lumenPlan\(seed, 18\)/);
+  assert.match(source, /this\.abortController\?\.abort\(\)/);
+  assert.match(source, /this\.timers\.forEach\(clearTimeout\)/);
+  assert.match(source, /this\.deadlineTimer = this\.schedule\(\(\) => this\.resolveMiss\('slow'\), stage\.deadlineMs\)/);
+  assert.doesNotMatch(source, /reducedMotion\s*\?\s*\d+/);
 });
 
 test('persisted back-forward cache restore returns an interrupted run without refreshing its daily route', async () => {

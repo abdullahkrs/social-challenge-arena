@@ -1,4 +1,4 @@
-import { ECHO_GRID_ID, ORBIT_LOCK_ID } from './core.mjs';
+import { ECHO_GRID_ID, LUMEN_LANES_ID, ORBIT_LOCK_ID } from './core.mjs';
 
 export const catalog = Object.freeze([
   Object.freeze({
@@ -26,6 +26,19 @@ export const catalog = Object.freeze([
     howToKey: 'echoHowTo',
     arenaLabelKey: 'echoArenaLabel',
     controlsHintKey: 'echoControlsHint'
+  }),
+  Object.freeze({
+    id: LUMEN_LANES_ID,
+    dimension: '2d',
+    skill: 'reaction',
+    durationSeconds: 25,
+    icon: '⇆',
+    gradient: 'lumen',
+    nameKey: 'lumenName',
+    taglineKey: 'lumenTagline',
+    howToKey: 'lumenHowTo',
+    arenaLabelKey: 'lumenArenaLabel',
+    controlsHintKey: 'lumenControlsHint'
   })
 ]);
 
