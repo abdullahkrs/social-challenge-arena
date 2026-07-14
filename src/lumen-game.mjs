@@ -26,6 +26,7 @@ export class LumenLanesGame {
     this.timers = new Set();
     this.running = false;
     this.accepting = false;
+    this.terminalPending = false;
     this.deadlineTimer = null;
     this.exitTimer = null;
     this.exitArmed = false;
@@ -56,6 +57,7 @@ export class LumenLanesGame {
     this.snapshot = this.emptySnapshot();
     this.running = true;
     this.accepting = false;
+    this.terminalPending = false;
     this.startedAt = performance.now();
     this.container.dataset.reduced = String(this.reducedMotion);
     this.installListeners();
@@ -260,6 +262,13 @@ export class LumenLanesGame {
     this.publishSnapshot();
     this.onAnnounce({ key: kind === 'slow' ? 'laneTooSlow' : kind === 'blocked' ? 'lumenBlocked' : 'laneWrong' });
     if (this.snapshot.lives <= 0) {
+      this.terminalPending = true;
+      this.clearTimer(this.exitTimer);
+      this.exitTimer = null;
+      this.exitArmed = false;
+      this.container.removeAttribute('data-exit-armed');
+      this.exitButton.disabled = true;
+      this.emit('exit-disarmed', {});
       this.schedule(() => this.finish('failed'), 440);
       return;
     }
@@ -278,7 +287,7 @@ export class LumenLanesGame {
   }
 
   requestExit() {
-    if (!this.running) return;
+    if (!this.running || this.terminalPending) return;
     if (this.exitArmed) {
       this.finish('ended');
       return;
@@ -299,10 +308,12 @@ export class LumenLanesGame {
     if (!this.running) return;
     this.running = false;
     this.accepting = false;
+    this.terminalPending = true;
     this.clearTimer(this.deadlineTimer);
     this.clearTimer(this.exitTimer);
     this.deadlineTimer = null;
     this.exitTimer = null;
+    this.exitButton.disabled = true;
     this.buttons.forEach((button) => { button.disabled = true; });
     const summary = summarizeLumenRun(this.snapshot);
     const result = {
@@ -319,6 +330,7 @@ export class LumenLanesGame {
   destroy() {
     this.running = false;
     this.accepting = false;
+    this.terminalPending = false;
     this.abortController?.abort();
     this.abortController = null;
     this.timers.forEach(clearTimeout);
