@@ -38,7 +38,7 @@
         <div class="catalog-header">
           <p class="eyebrow" data-i18n="discoveryEyebrow">Pick your skill</p>
           <h1 tabindex="-1" data-i18n="catalogTitle">Choose a challenge</h1>
-          <p class="tagline" data-i18n="catalogHint">Two fast games. One score to beat.</p>
+          <p class="tagline" data-i18n="catalogHint">Three fast games. One score to beat.</p>
           <div id="invited-badge" class="invite-badge" hidden>
             <strong data-i18n="invited">Friend challenge</strong><span id="target-text"></span>
           </div>
@@ -63,6 +63,11 @@
           </button>
           <button class="challenge-card echo-card" type="button" data-challenge-id="echo-grid">
             <span class="card-visual echo-visual" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>
+            <span class="card-copy"><strong data-name></strong><small data-tagline></small></span>
+            <span class="card-meta"><span data-skill></span><span data-duration></span></span>
+          </button>
+          <button class="challenge-card lumen-card" type="button" data-challenge-id="lumen-lanes">
+            <span class="card-visual lumen-visual" aria-hidden="true"><i></i><i></i><i></i><b>→</b></span>
             <span class="card-copy"><strong data-name></strong><small data-tagline></small></span>
             <span class="card-meta"><span data-skill></span><span data-duration></span></span>
           </button>
@@ -97,6 +102,17 @@
             <button type="button" data-cell="0"></button><button type="button" data-cell="1"></button><button type="button" data-cell="2"></button>
             <button type="button" data-cell="3"></button><button type="button" data-cell="4"></button><button type="button" data-cell="5"></button>
             <button type="button" data-cell="6"></button><button type="button" data-cell="7"></button><button type="button" data-cell="8"></button>
+          </div>
+          <div id="lumen-lanes" class="lumen-lanes" role="group" aria-label="Lumen Lanes game arena" hidden>
+            <div class="lumen-stage" aria-hidden="true">
+              <span class="lumen-rail"></span><span class="lumen-rail"></span><span class="lumen-rail"></span>
+              <strong data-lumen-cue>◆</strong>
+            </div>
+            <div class="lumen-controls">
+              <button type="button" data-lane="0" aria-label="Left lane"><span aria-hidden="true">←</span></button>
+              <button type="button" data-lane="1" aria-label="Center lane"><span aria-hidden="true">◆</span></button>
+              <button type="button" data-lane="2" aria-label="Right lane"><span aria-hidden="true">→</span></button>
+            </div>
           </div>
           <p id="game-status" class="game-status" aria-hidden="true">Ready</p>
           <p id="controls-hint" class="controls-hint"></p>
