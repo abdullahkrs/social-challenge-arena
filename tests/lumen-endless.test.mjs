@@ -89,6 +89,7 @@ test('deliberate exit is two-step and the endless result exposes mastery detail'
   assert.match(source, /this\.exitTimer = this\.schedule[\s\S]*3000/);
   assert.match(source, /emit\('finish'/);
   assert.match(integration, /lumenResultDetail/);
+  assert.match(integration, /MutationObserver\(updateCatalogDuration\)/);
   assert.match(html, /data-lumen-exit/);
   assert.match(html, /id="result-detail"/);
   assert.equal((html.match(/data-lane=/g) || []).length, 3);
