@@ -112,7 +112,8 @@ export function scoreEchoRound({ length, combo, round }) {
 
 export function scoreLumenRound({ elapsedMs, deadlineMs, combo, round }) {
   const safeDeadline = clamp(Math.round(Number(deadlineMs) || 1000), 600, 2500);
-  const safeElapsed = clamp(Math.round(Number(elapsedMs) || safeDeadline), 0, safeDeadline);
+  const elapsed = Number(elapsedMs);
+  const safeElapsed = clamp(Math.round(Number.isFinite(elapsed) ? elapsed : safeDeadline), 0, safeDeadline);
   const speed = clamp(1 - safeElapsed / safeDeadline, 0, 1);
   const base = 120 + Math.round(speed * 220);
   const comboBonus = Math.min(120, Math.max(0, combo - 1) * 12);
