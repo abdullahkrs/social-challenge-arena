@@ -1,98 +1,159 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
-import { mirrorPlan, reflectPattern, scoreMirrorRound } from '../src/core.mjs';
+import { catalog } from '../src/catalog.mjs';
 import {
-  describeMirrorPattern,
-  MIRROR_CELL_COUNT,
-  MIRROR_COLUMNS,
-  MIRROR_ROWS
-} from '../src/mirror-game.mjs';
-import { supportedLanguages, translate } from '../src/i18n.mjs';
+  composeMirrorStage, evaluateMirrorBoard, generateMirrorChunk, MIRROR_BOARD_SIZE, MIRROR_CHUNK_SIZE,
+  MIRROR_MECHANICS, MIRROR_PHASES, MIRROR_RULES, MIRROR_ZONES, mirrorWindow, scoreMirrorStage,
+  transformCell, transformPattern
+} from '../src/mirror-model.mjs';
+import { messages, supportedLanguages, translate } from '../src/i18n.mjs';
+import '../src/mirror-copy.mjs';
+import '../src/mirror-integration.mjs';
 
-test('zero-millisecond Mirror Fuse response is preserved as the fastest valid input', () => {
-  const route = { deadlineMs: 3000, combo: 1, round: 0 };
-  const zero = scoreMirrorRound({ ...route, elapsedMs: 0 });
-  const one = scoreMirrorRound({ ...route, elapsedMs: 1 });
+function connected(pattern) {
+  const cells = new Set(pattern);
+  const seen = new Set([pattern[0]]);
+  const queue = [pattern[0]];
+  while (queue.length) {
+    const cell = queue.shift();
+    const row = Math.floor(cell / MIRROR_BOARD_SIZE);
+    const column = cell % MIRROR_BOARD_SIZE;
+    const candidates = [];
+    if (row > 0) candidates.push(cell - MIRROR_BOARD_SIZE);
+    if (row < MIRROR_BOARD_SIZE - 1) candidates.push(cell + MIRROR_BOARD_SIZE);
+    if (column > 0) candidates.push(cell - 1);
+    if (column < MIRROR_BOARD_SIZE - 1) candidates.push(cell + 1);
+    for (const candidate of candidates) {
+      if (cells.has(candidate) && !seen.has(candidate)) { seen.add(candidate); queue.push(candidate); }
+    }
+  }
+  return seen.size === cells.size;
+}
 
-  assert.deepEqual(zero, { response: 0, points: 480 });
-  assert.ok(zero.points >= one.points);
-  assert.equal(scoreMirrorRound({ ...route, elapsedMs: Number.NaN }).response, 3000);
-  assert.equal(scoreMirrorRound({ ...route }).response, 3000);
+test('Mirror transformations preserve exact deterministic geometry', () => {
+  assert.equal(transformCell(6, 'horizontal'), 8);
+  assert.equal(transformCell(6, 'vertical'), 16);
+  assert.equal(transformCell(6, 'rotate180'), 18);
+  assert.equal(transformCell(6, 'rotateRight'), 8);
+  assert.deepEqual(transformPattern([6, 7, 12], 'horizontal'), [8, 7, 12]);
+  assert.throws(() => transformCell(25, 'horizontal'), RangeError);
+  assert.throws(() => transformPattern([6, 6], 'vertical'), RangeError);
 });
 
-test('sender and friend receive the same Mirror Fuse route and score calculation', () => {
-  const sender = mirrorPlan(0x1234abcd, 10);
-  const friend = mirrorPlan(0x1234abcd, 10);
+test('same seed reproduces the endless journey and different seeds change mechanics and boards', () => {
+  const sender = mirrorWindow(0x1234abcd, 0, 72);
+  const friend = mirrorWindow(0x1234abcd, 0, 72);
+  const other = mirrorWindow(0x1234abce, 0, 72);
   assert.deepEqual(sender, friend);
-
-  const input = { elapsedMs: 740, deadlineMs: sender[0].deadlineMs, combo: 3, round: 0 };
-  assert.deepEqual(scoreMirrorRound(input), scoreMirrorRound(input));
+  assert.notDeepEqual(
+    sender.map(({ rule, mechanic, sourcePattern, initialOn, cursorStart }) => ({ rule, mechanic, sourcePattern, initialOn, cursorStart })),
+    other.map(({ rule, mechanic, sourcePattern, initialOn, cursorStart }) => ({ rule, mechanic, sourcePattern, initialOn, cursorStart }))
+  );
 });
 
-test('Mirror Fuse owns timers and listeners and reduced effects do not alter decisions or deadlines', async () => {
-  const source = await readFile(new URL('../src/mirror-game.mjs', import.meta.url), 'utf8');
-  assert.match(source, /this\.plan = mirrorPlan\(seed, 10\)/);
-  assert.match(source, /this\.abortController\?\.abort\(\)/);
-  assert.match(source, /this\.timers\.forEach\(clearTimeout\)/);
-  assert.match(source, /this\.deadlineTimer = this\.schedule\(\(\) => this\.resolveMiss\('slow'\), stage\.deadlineMs\)/);
-  assert.match(source, /this\.marks\[index\]\.textContent = '✓'/);
-  assert.match(source, /this\.marks\[index\]\.textContent = '×'/);
-  assert.doesNotMatch(source, /reducedMotion\s*\?\s*\d+/);
-  assert.doesNotMatch(source, /setInterval|requestAnimationFrame/);
-});
-
-test('Mirror Fuse exposes localized source and option patterns to assistive technology', async () => {
-  const html = await readFile(new URL('../index.html', import.meta.url), 'utf8');
-  const source = await readFile(new URL('../src/mirror-game.mjs', import.meta.url), 'utf8');
-
-  assert.match(html, /id="mirror-source-description" class="sr-only" data-mirror-source-description/);
-  assert.equal((html.match(/aria-describedby="mirror-source-description"/g) || []).length, 3);
-  assert.match(source, /this\.sourceDescription\.textContent = this\.t\('mirrorSourcePattern'/);
-  assert.match(source, /button\.setAttribute\('aria-label', this\.t\('mirrorOptionPattern'/);
-  assert.match(source, /extraKey: 'mirrorSourcePattern'/);
-  assert.match(source, /this\.languageObserver\?\.disconnect\(\)/);
-
-  for (const language of supportedLanguages) {
-    const row = translate(language, 'mirrorPatternRow', { row: 1, cells: `${translate(language, 'mirrorCellOn')}, ${translate(language, 'mirrorCellOff')}` });
-    const sourceLabel = translate(language, 'mirrorSourcePattern', { pattern: row });
-    const optionLabel = translate(language, 'mirrorOptionPattern', { value: 2, pattern: row });
-    assert.ok(sourceLabel.includes(row));
-    assert.ok(optionLabel.includes(row));
-    assert.ok(optionLabel.includes('2'));
+test('bounded chunks are safe, solvable, distinct, and never imply a fixed ending', () => {
+  for (const seed of [0, 1, 0x92f00d, 0xffffffff]) {
+    for (let chunkIndex = 0; chunkIndex < 5; chunkIndex += 1) {
+      const chunk = generateMirrorChunk(seed, chunkIndex);
+      assert.equal(chunk.length, MIRROR_CHUNK_SIZE);
+      chunk.forEach((stage, offset) => {
+        assert.equal(stage.index, chunkIndex * MIRROR_CHUNK_SIZE + offset);
+        assert.ok(stage.sourcePattern.length >= 4 && stage.sourcePattern.length <= 9);
+        assert.equal(new Set(stage.sourcePattern).size, stage.sourcePattern.length);
+        assert.equal(new Set(stage.targetPattern).size, stage.targetPattern.length);
+        assert.ok(connected(stage.sourcePattern));
+        assert.deepEqual(stage.targetPattern, transformPattern(stage.sourcePattern, stage.rule));
+        assert.ok(stage.initialOn.every((cell) => cell >= 0 && cell < 25));
+        assert.ok(stage.locked.every((cell) => stage.targetPattern.includes(cell) && stage.initialOn.includes(cell)));
+        assert.ok(stage.cursorStart >= 0 && stage.cursorStart < 25);
+        assert.ok(stage.moveBudget > stage.targetPattern.length);
+        assert.ok(stage.deadlineMs >= 11000 && stage.deadlineMs <= 26000);
+        const solved = evaluateMirrorBoard(stage, new Set(stage.targetPattern), stage.targetPattern.length);
+        assert.equal(solved.correct, true);
+        assert.equal(solved.missing.length, 0);
+        assert.equal(solved.extra.length, 0);
+      });
+    }
   }
 });
 
-test('Mirror Fuse uses one 4-by-3 geometry contract for rendering, reflection, and spoken rows', async () => {
-  const source = [1, 0, 1, 0, 1, 0, 1, 1, 0, 0, 0, 1];
-  const expectedRows = [
-    [1, 0, 1],
-    [0, 1, 0],
-    [1, 1, 0],
-    [0, 0, 1]
+test('realistic play windows expose staged layers, multiple decisions, zones, and tension rhythm', () => {
+  const stages = mirrorWindow(0x51f15e5d, 0, 96);
+  assert.deepEqual(new Set(stages.map((stage) => stage.rule)), new Set(MIRROR_RULES));
+  assert.deepEqual(new Set(stages.map((stage) => stage.mechanic)), new Set(MIRROR_MECHANICS));
+  assert.deepEqual(new Set(stages.map((stage) => stage.zone)), new Set(MIRROR_ZONES));
+  assert.deepEqual(new Set(stages.map((stage) => stage.phase)), new Set(MIRROR_PHASES));
+  assert.deepEqual(new Set(stages.map((stage) => stage.layer)), new Set(['understanding', 'application', 'combination', 'deception', 'pressure', 'mastery']));
+  assert.ok(new Set(stages.slice(0, 12).map((stage) => stage.mechanic)).size >= 4);
+  assert.ok(stages.some((stage) => stage.restoresChance));
+  assert.ok(stages.some((stage) => stage.special));
+  assert.ok(stages.some((stage) => stage.milestone));
+});
+
+test('scoring rewards mastery, efficiency, focus, rules, and special phases within bounds', () => {
+  const simple = composeMirrorStage(9876, 0);
+  const mastery = composeMirrorStage(9876, 83);
+  const clean = scoreMirrorStage({ stage: mastery, moves: 8, elapsedMs: 3000, combo: 6, wrongActions: 0 });
+  const sloppy = scoreMirrorStage({ stage: mastery, moves: mastery.moveBudget * 2, elapsedMs: mastery.deadlineMs, combo: 1, wrongActions: 4 });
+  const opening = scoreMirrorStage({ stage: simple, moves: simple.moveBudget, elapsedMs: simple.deadlineMs, combo: 1, wrongActions: 1 });
+  assert.ok(clean.points > sloppy.points);
+  assert.ok(clean.points > opening.points);
+  for (const result of [clean, sloppy, opening]) {
+    assert.ok(result.points >= 0 && result.points <= 220);
+    assert.ok(result.efficiency >= 0 && result.efficiency <= 100);
+    assert.ok(result.focus >= 0 && result.focus <= 100);
+  }
+});
+
+test('Mirror Fuse is endless in the catalog and its runtime owns lifecycle, exit, sound, and first-input timing', async () => {
+  const mirror = catalog.find((challenge) => challenge.id === 'mirror-fuse');
+  assert.equal(mirror?.endless, true);
+  assert.equal(mirror?.durationSeconds, 0);
+  const source = await readFile(new URL('../src/mirror-game.mjs', import.meta.url), 'utf8');
+  assert.match(source, /generateMirrorChunk\(this\.seed, this\.chunkIndex\)/);
+  assert.match(source, /this\.stageIndex \+= 1/);
+  assert.doesNotMatch(source, /finish\('complete'\)|rounds:\s*10|mirrorPlan\(/);
+  assert.match(source, /this\.stageStartedAt = null/);
+  assert.match(source, /this\.deadlineTimer = this\.schedule\(\(\) => this\.resolveMiss\('timeout'\), this\.stage\.deadlineMs\)/);
+  assert.match(source, /this\.exitTimer = this\.schedule\(\(\) => this\.disarmExit\(\), 3000\)/);
+  assert.match(source, /this\.abortController\?\.abort\(\)/);
+  assert.match(source, /this\.languageObserver\?\.disconnect\(\)/);
+  assert.match(source, /this\.timers\.forEach\(clearTimeout\)/);
+  assert.match(source, /platformAudio\.play\('move'/);
+  assert.match(source, /platformAudio\.play\('correct'/);
+  assert.match(source, /platformAudio\.play\('wrong'/);
+  assert.match(source, /platformAudio\.play\('zone'/);
+  assert.doesNotMatch(source, /setInterval|requestAnimationFrame|fetch\(|WebSocket|Audio\(/);
+});
+
+test('Arabic, English, and Turkish provide complete endless Mirror copy and non-audio equivalents', () => {
+  const keys = [
+    'mirrorTagline', 'mirrorHowTo', 'mirrorControlsHint', 'mirrorArenaLabel', 'mirrorPattern', 'mirrorSource', 'mirrorTarget',
+    'mirrorCheckPattern', 'mirrorEndRun', 'mirrorExitNow', 'mirrorResultDetail', 'mirrorRuleHorizontal', 'mirrorRuleVertical',
+    'mirrorRuleRotate180', 'mirrorRuleRotateRight', 'mirrorMechanicRebuild', 'mirrorMechanicAnchor', 'mirrorMechanicRepair',
+    'mirrorMechanicSequence', 'mirrorSourceDescription', 'mirrorTargetCellLabel', 'mirrorDirectionUp', 'mirrorDirectionRight',
+    'mirrorDirectionDown', 'mirrorDirectionLeft'
   ];
-  const spoken = describeMirrorPattern(source, (key, values = {}) => {
-    if (key === 'mirrorCellOn') return '1';
-    if (key === 'mirrorCellOff') return '0';
-    return `row ${values.row}: ${values.cells}`;
-  });
+  assert.deepEqual([...supportedLanguages].sort(), ['ar', 'en', 'tr']);
+  for (const language of supportedLanguages) {
+    for (const key of keys) assert.equal(typeof messages[language][key], 'string', `${language}.${key}`);
+    assert.ok(translate(language, 'mirrorStageReady', { value: 7, rule: 'R', mechanic: 'M' }).includes('7'));
+    assert.ok(translate(language, 'mirrorSourceDescription', { cells: '1', rule: 'R', mechanic: 'M' }).includes('1'));
+  }
+});
 
-  assert.equal(MIRROR_ROWS, 4);
-  assert.equal(MIRROR_COLUMNS, 3);
-  assert.equal(MIRROR_CELL_COUNT, 12);
-  assert.equal(spoken, 'row 1: 1, 0, 1. row 2: 0, 1, 0. row 3: 1, 1, 0. row 4: 0, 0, 1');
-
-  const reflected = reflectPattern(source, MIRROR_COLUMNS);
-  assert.deepEqual(reflected, expectedRows.flatMap((row) => [...row].reverse()));
-
-  const stage = mirrorPlan(0x92f00d, 1)[0];
-  assert.equal(stage.source.length, MIRROR_CELL_COUNT);
-  assert.deepEqual(stage.options[stage.correctIndex], reflectPattern(stage.source, MIRROR_COLUMNS));
-
-  const implementation = await readFile(new URL('../src/mirror-game.mjs', import.meta.url), 'utf8');
-  assert.match(implementation, /grid\.style\.gridTemplateColumns = `repeat\(\$\{MIRROR_COLUMNS\}, 1fr\)`/);
-  assert.match(implementation, /grid\.style\.gridTemplateRows = `repeat\(\$\{MIRROR_ROWS\}, 1fr\)`/);
-  assert.match(implementation, /reflectPattern\(stage\.source, MIRROR_COLUMNS\)/);
-  assert.match(implementation, /Array\.from\(\{ length: MIRROR_ROWS \}/);
-  assert.match(implementation, /slice\(row \* MIRROR_COLUMNS, \(row \+ 1\) \* MIRROR_COLUMNS\)/);
+test('responsive UI preserves explicit spatial LTR geometry, focus, non-color cues, and reduced effects', async () => {
+  const css = await readFile(new URL('../mirror.css', import.meta.url), 'utf8');
+  const source = await readFile(new URL('../src/mirror-game.mjs', import.meta.url), 'utf8');
+  assert.match(css, /\.mirror-circuit\s*\{[^}]*direction:\s*ltr/s);
+  assert.match(css, /@media \(max-width: 390px\)/);
+  assert.match(css, /data-current="true"/);
+  assert.match(css, /data-locked/);
+  assert.match(css, /data-extra/);
+  assert.match(css, /data-reduced/);
+  assert.match(source, /role="gridcell"/);
+  assert.match(source, /aria-current/);
+  assert.match(source, /mirrorSourceDescription/);
+  assert.match(source, /event\.code === 'Space' \|\| event\.code === 'Enter'/);
 });
