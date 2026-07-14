@@ -18,11 +18,12 @@
 
 ## Mobile, RTL, and accessibility
 
-- At 320–430 CSS px, the language control remains labeled and visible, the reduced-effects control becomes one 48 px labeled toggle target, daily play remains full-width where needed, and challenge cards reduce to compact horizontal choices.
+- At 320–430 CSS px, the language control remains labeled and visible, the reduced-effects control remains one visible keyboard-focusable 48 px checkbox target, daily play remains full-width where needed, and challenge cards reduce to compact horizontal choices.
 - Arabic RTL mirrors only the directional back icon. Universal play, share, trophy, accessibility, and language icons are not mirrored.
 - Existing Arabic, English, and Turkish localization remains the single source of user-facing text; no new user-facing translation key was required.
 - Existing visible focus, live announcements, native buttons, 48 px practical targets, non-color gameplay feedback, text zoom behavior, keyboard controls, and reduced-effects semantics remain intact.
 - Gameplay HUD values are presented in one compact shared surface without hiding score, round, chances, or streak and without changing any game state.
+- Result DOM and visual order now agree: the primary friend-share/rematch action is first, followed by replay and the two navigation alternatives.
 
 ## Reliability, privacy, and security
 
@@ -46,5 +47,5 @@
 
 - `tests/ui-consistency.test.mjs` verifies local selective Font Awesome integration, absence of remote providers and custom SVG platform controls, production inclusion, accessible icon treatment, dynamic localized actions, and RTL back behavior.
 - The unchanged existing suite continues to cover deterministic mechanics and scoring, strict invitations, sender/friend equivalence, daily selection and storage, direct entry, rematch, localization parity, keyboard isolation, reduced-effects equivalence, teardown, page-hide, bfcache recovery, and all three challenge regressions.
-- Production build keeps the existing 184,320-byte uncompressed budget and now requires `ui.css` and the third-party notice in the synchronized preview.
-- Final test count, measured build size, syntax checks, and hosted preview status are recorded in the PR after the exact head completes CI.
+- GitHub Actions CI run **#70** passed `npm ci --ignore-scripts`, all **31/31 tests**, the production build, and deployable preview upload on head `aeca0d8`.
+- The synchronized static preview contains 12 files totaling **106,285 bytes**, within the unchanged **184,320-byte** uncompressed budget. The uploaded ZIP is 33,037 bytes.
