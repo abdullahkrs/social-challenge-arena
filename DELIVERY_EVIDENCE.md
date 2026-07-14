@@ -1,45 +1,50 @@
-# Third Challenge and Three-Choice Discovery Evidence
+# Platform UI and UX Consistency Evidence
 
-## Product
+## Product outcome
 
-- **Constraint addressed:** the complete social loop had only timing and memory choices, leaving the catalog too narrow.
-- **New challenge:** Lumen Lanes is an original 2D rapid spatial-decision game. Eighteen seeded left, center, or right signals create a comparable 20–30 second route; the player uses one thumb or native keyboard buttons.
-- **Distinct input rhythm:** every round asks for a directional choice before a bounded deadline. It is not a precision stop, moving gate, tile replay, or sequence-memory variation.
-- **Visible journey:** three concise cards → one-sentence instruction → deterministic run → bounded score → replay/new route → strict share → direct friend attempt → comparison → rematch share.
-- **Platform proof:** the existing registry, host boundary, daily route, result, invitation, comparison, and rematch flow now serve all three challenge IDs without a generic engine or speculative framework.
-- **Compatibility:** Orbit Lock and Echo Grid mechanics are unchanged. The version-1 query shape, checksum salt, numeric bounds, direct-entry precedence, and tamper rejection remain stable.
+- **Constraint addressed:** three complete challenge journeys existed, but platform controls, mobile hierarchy, gameplay chrome, result actions, and shared symbols did not yet read as one product.
+- **Bounded correction:** the challenge mechanics, scoring, deterministic routes, invitation format, daily behavior, and lifecycle code are unchanged. The delivery changes only connected platform presentation, action iconography, responsive hierarchy, and supporting verification.
+- **Discovery:** the large heading and card hierarchy are reduced at mobile widths; the daily route remains prominent, while all three cards are more compact and consistently structured.
+- **Connected surfaces:** top controls, friend badge, instructions, back navigation, gameplay HUD, result identity, replay, share, new-route, and catalog-return actions now share one icon, spacing, radius, focus, pressed, and alignment language.
+
+## Font Awesome Free
+
+- Font Awesome Free 6.7.2 Solid is used for platform-interface icons.
+- A generated WOFF2 subset contains only the glyphs referenced by the live interface: gamepad, globe, universal access, play, arrow-left, rotate-right, share-nodes, shuffle, list, trophy, and user-group.
+- The subset is embedded locally in `ui.css`; there is no CDN, remote font, remote script, network request, package runtime, or full unused Font Awesome bundle.
+- No custom SVG platform icon was added. Gameplay-owned arrows, diamond, target, grid, and route cues remain part of their existing mechanics.
+- Decorative icons are hidden from assistive technology. The back control remains icon-only with its existing localized accessible name; dynamic localized button text is preserved because icons are CSS-generated.
+- `THIRD_PARTY_NOTICES.md` records Font Awesome attribution and licensing and is included in the production output.
+
+## Mobile, RTL, and accessibility
+
+- At 320–430 CSS px, the language control remains labeled and visible, the reduced-effects control becomes one 48 px labeled toggle target, daily play remains full-width where needed, and challenge cards reduce to compact horizontal choices.
+- Arabic RTL mirrors only the directional back icon. Universal play, share, trophy, accessibility, and language icons are not mirrored.
+- Existing Arabic, English, and Turkish localization remains the single source of user-facing text; no new user-facing translation key was required.
+- Existing visible focus, live announcements, native buttons, 48 px practical targets, non-color gameplay feedback, text zoom behavior, keyboard controls, and reduced-effects semantics remain intact.
+- Gameplay HUD values are presented in one compact shared surface without hiding score, round, chances, or streak and without changing any game state.
+
+## Reliability, privacy, and security
+
+- No runtime JavaScript, challenge class, scoring function, route generator, share codec, allowlist, checksum, storage record, page-hide handler, bfcache recovery, timer, listener, or focus transition was changed.
+- The existing strict version-1 invitation, score bounds, direct-entry precedence, daily validation, private local best, teardown, replay, challenge switching, and language switching behavior remain unchanged.
+- Content Security Policy remains no-network and is expanded only to permit the locally embedded `data:` WOFF2 font. `connect-src 'none'` remains unchanged.
+- No account, backend, analytics, cookie, contact access, tracking, external image, external font, API, UI framework, or new runtime dependency was added.
 
 ## Islamic content policy — PASS
 
-- Theme: abstract neutral light-and-lane skill practice.
+- Theme: abstract neutral social skill arcade presentation.
 - Characters/clothing: none.
-- Symbols: neutral arrows, diamond, lanes, numbers, checks, and crosses.
+- Symbols: neutral interface icons, existing geometric challenge cues, numbers, arrows, checks, and comparison marks.
 - Audio: none.
-- Rewards: bounded non-monetary score and optional private device best only; no wagering, chance reward, loot box, collectible, purchase, or monetary incentive.
-- Social pressure: optional private invitation and rematch; no public ranking, humiliation, shame, countdown campaign, missed-day message, urgency, or fear of missing out.
-- Safety: no physical imitation, motion sensor, dangerous instruction, contact access, personal-data request, or harmful challenge.
+- Rewards: bounded non-monetary scores and private local best only; no wagering, chance reward, purchase, collectible economy, or monetary incentive.
+- Social pressure: optional private challenge and rematch only; no humiliation, public ranking, urgency, streak pressure, missed-day message, or fear of missing out.
+- Safety: no physical imitation, dangerous instruction, contact access, personal-data request, or harmful challenge.
 - Final decision: **PASS**.
-
-## Accessibility and localization
-
-- Arabic RTL, English, and Turkish use one key-complete localization system for the third card, instruction, lane labels, prompts, feedback, result, sharing, comparison, and daily state.
-- Three lane buttons are native controls with pointer, touch, Space, and Enter behavior; each is at least 48 CSS px and has a localized accessible name.
-- The visual signal uses arrow/diamond shape and position. Correct, wrong, and timeout feedback includes symbols, text announcements, and HUD changes, not color alone.
-- The catalog collapses to one compact card per row at mobile widths, while the daily action remains visually primary and the three choices remain scannable.
-- Reduced effects removes decorative transitions only; seed, lane order, deadlines, scoring, results, and comparison stay identical.
-- Page hide, replay, switching, and bfcache recovery destroy game-owned timers and listeners before another host starts.
-
-## Privacy, security, reliability, and performance
-
-- No account, cookie, analytics, fingerprint, backend, contact permission, personal data, third-party runtime asset, or network API was added.
-- Strict invitations allow exactly the three known challenge IDs and reject unknown IDs, extra fields, unsupported versions, malformed values, checksum mismatches, and out-of-range scores.
-- Daily local state remains exactly `dateKey`, `challengeId`, `seed`, and bounded `best`; stale or mismatched records are discarded safely.
-- Lumen Lanes owns one abort controller and a bounded timer set. Destroy clears all timers, listeners, button state, and transient DOM attributes.
-- Zero runtime dependencies remain. The local production build is 94,810 bytes against the enforced 184,320-byte budget.
 
 ## Verification
 
-- `node --check src/core.mjs`, `src/catalog.mjs`, `src/i18n.mjs`, `src/lumen-game.mjs`, and `src/app.mjs` — pass.
-- `npm test` — 26/26 pass, covering all three deterministic plans/scoring models, strict invitations, sender/friend route equivalence, injected daily dates for all three IDs, safe local best, direct entry, rematch, localization parity, accessible markup, keyboard isolation, reduced-effects equivalence, teardown, and existing challenge regressions.
-- `npm run build` — 94,810 / 184,320 bytes.
-- CI uploads the deployable static preview artifact for the pull request; `main` publishes the same output through GitHub Pages.
+- `tests/ui-consistency.test.mjs` verifies local selective Font Awesome integration, absence of remote providers and custom SVG platform controls, production inclusion, accessible icon treatment, dynamic localized actions, and RTL back behavior.
+- The unchanged existing suite continues to cover deterministic mechanics and scoring, strict invitations, sender/friend equivalence, daily selection and storage, direct entry, rematch, localization parity, keyboard isolation, reduced-effects equivalence, teardown, page-hide, bfcache recovery, and all three challenge regressions.
+- Production build keeps the existing 184,320-byte uncompressed budget and now requires `ui.css` and the third-party notice in the synchronized preview.
+- Final test count, measured build size, syntax checks, and hosted preview status are recorded in the PR after the exact head completes CI.
