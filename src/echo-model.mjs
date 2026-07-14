@@ -13,6 +13,7 @@ export function rotateClockwise(direction) { return (Number(direction) + 1) % 4;
 export function rotateCounterClockwise(direction) { return (Number(direction) + 3) % 4; }
 
 export function moveCell(cell, direction, size = ECHO_BOARD_SIZE) {
+  if (!Number.isInteger(cell) || cell < 0 || cell >= size * size || !Number.isInteger(direction) || direction < 0 || direction > 3) return -1;
   const row = Math.floor(cell / size);
   const column = cell % size;
   const [dr, dc] = DELTAS[direction] || [0, 0];
@@ -114,10 +115,21 @@ function buildStage(seed, index, rng) {
     displayStart = pick(rng, starts);
   } else if (mechanic === 'echo') {
     expectedMoves = expectedPath.moves;
-    echoFlags = expectedMoves.map((_, moveIndex) => moveIndex > 0 && rng() > (index < 18 ? 0.74 : 0.6));
-    if (!echoFlags.some(Boolean)) echoFlags[Math.min(expectedMoves.length - 1, 1 + Math.floor(rng() * Math.max(1, expectedMoves.length - 1)))] = true;
-    displayMoves = expectedMoves.map((direction, moveIndex) => echoFlags[moveIndex] ? inverseDirection(direction) : direction);
-    const starts = validStarts(displayMoves);
+    let starts = [];
+    for (let attempt = 0; attempt < 18 && !starts.length; attempt += 1) {
+      echoFlags = expectedMoves.map((_, moveIndex) => moveIndex > 0 && rng() > (index < 18 ? 0.74 : 0.6));
+      if (!echoFlags.some(Boolean)) echoFlags[Math.min(expectedMoves.length - 1, 1 + Math.floor(rng() * Math.max(1, expectedMoves.length - 1)))] = true;
+      displayMoves = expectedMoves.map((direction, moveIndex) => echoFlags[moveIndex] ? inverseDirection(direction) : direction);
+      starts = validStarts(displayMoves);
+    }
+    if (!starts.length) {
+      for (let moveIndex = 0; moveIndex < expectedMoves.length && !starts.length; moveIndex += 1) {
+        echoFlags = expectedMoves.map((_, candidate) => candidate === moveIndex);
+        displayMoves = expectedMoves.map((direction, candidate) => echoFlags[candidate] ? inverseDirection(direction) : direction);
+        starts = validStarts(displayMoves);
+      }
+    }
+    if (!starts.length) throw new Error('Echo generator could not place an opposed cue path');
     displayStart = pick(rng, starts);
   }
 
