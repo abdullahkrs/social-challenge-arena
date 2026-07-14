@@ -10,6 +10,7 @@ const distanceValue = lumen?.querySelector('[data-lumen-distance]');
 const ruleValues = lumen ? [...lumen.querySelectorAll('[data-lumen-rule]')] : [];
 const exitButton = lumen?.querySelector('[data-lumen-exit]');
 const laneButtons = lumen ? [...lumen.querySelectorAll('[data-lane]')] : [];
+const accessibleSequence = lumen?.querySelector('[data-lumen-accessible-sequence]');
 const resultDetail = document.querySelector('#result-detail');
 const resultSummary = document.querySelector('#result-summary');
 const durationValue = document.querySelector('[data-challenge-id="lumen-lanes"] [data-duration]');
@@ -58,6 +59,16 @@ function updateLaneLabels(stage = activeStage) {
   });
 }
 
+function updateAccessibleSequence(stage = activeStage) {
+  if (!accessibleSequence) return;
+  if (stage?.mechanic !== 'memory' || !Array.isArray(stage.sequence)) {
+    accessibleSequence.textContent = '';
+    return;
+  }
+  const watchKey = stage.memoryRule === 'first' ? 'lumenMemoryWatchFirst' : 'lumenMemoryWatchLast';
+  accessibleSequence.textContent = `${t(watchKey, { count: stage.sequence.length })}. ${stage.sequence.map(laneName).join(', ')}.`;
+}
+
 function updateStage(stage = activeStage, snapshot = activeSnapshot) {
   if (!stage || !lumen) return;
   gameScreen?.setAttribute('data-lumen-active', 'true');
@@ -68,6 +79,7 @@ function updateStage(stage = activeStage, snapshot = activeSnapshot) {
   ruleValues.forEach((element) => { element.textContent = t(ruleKeys[stage.mechanic] || 'lumenRuleDirect'); });
   if (exitButton) exitButton.textContent = t(exitArmed ? 'lumenExitNow' : 'lumenEndRun');
   updateLaneLabels(stage);
+  updateAccessibleSequence(stage);
 }
 
 function updateResult(result = lastResult) {
@@ -89,6 +101,7 @@ function resetSharedHud() {
   activeSnapshot = null;
   exitArmed = false;
   updateLaneLabels(null);
+  updateAccessibleSequence(null);
 }
 
 if (lumen) {
@@ -97,6 +110,7 @@ if (lumen) {
     resultDetail?.setAttribute('hidden', '');
     activeSnapshot = event.detail.snapshot;
     exitArmed = false;
+    updateAccessibleSequence(null);
     gameScreen?.setAttribute('data-lumen-active', 'true');
     if (roundLabel) roundLabel.textContent = t('lumenDistance');
     if (roundValue) roundValue.textContent = '1';
@@ -126,6 +140,7 @@ if (lumen) {
 
   lumen.addEventListener('lumen:finish', (event) => {
     lastResult = event.detail.result;
+    updateAccessibleSequence(null);
     queueMicrotask(() => updateResult());
   });
 
