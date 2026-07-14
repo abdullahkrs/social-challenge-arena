@@ -19,6 +19,7 @@ let activeStage = null;
 let activeSnapshot = null;
 let lastResult = null;
 let exitArmed = false;
+let memoryAnnouncement = 'none';
 
 function language() {
   return normalizeLanguage(document.documentElement.lang);
@@ -50,6 +51,13 @@ function laneName(index) {
   return t(['laneLeft', 'laneCenter', 'laneRight'][index]);
 }
 
+function memoryKeys(stage = activeStage) {
+  return {
+    watchKey: stage?.memoryRule === 'first' ? 'lumenMemoryWatchFirst' : 'lumenMemoryWatchLast',
+    chooseKey: stage?.memoryRule === 'first' ? 'lumenMemoryChooseFirst' : 'lumenMemoryChooseLast'
+  };
+}
+
 function updateLaneLabels(stage = activeStage) {
   laneButtons.forEach((button, index) => {
     const notes = [];
@@ -59,14 +67,33 @@ function updateLaneLabels(stage = activeStage) {
   });
 }
 
+function updateMemoryActions(stage = activeStage) {
+  const repeatButton = lumen?.querySelector('[data-lumen-memory-repeat]');
+  const readyButton = lumen?.querySelector('[data-lumen-memory-ready]');
+  if (stage?.mechanic !== 'memory' || !Array.isArray(stage.sequence)) return;
+  const { watchKey, chooseKey } = memoryKeys(stage);
+  if (repeatButton) {
+    repeatButton.textContent = t('replay');
+    repeatButton.setAttribute('aria-label', `${t('replay')}: ${t(watchKey, { count: stage.sequence.length })}`);
+  }
+  if (readyButton) {
+    readyButton.textContent = t('ready');
+    readyButton.setAttribute('aria-label', `${t('ready')}: ${t(chooseKey)}`);
+  }
+}
+
 function updateAccessibleSequence(stage = activeStage) {
   if (!accessibleSequence) return;
-  if (stage?.mechanic !== 'memory' || !Array.isArray(stage.sequence)) {
+  if (stage?.mechanic !== 'memory' || !Array.isArray(stage.sequence) || memoryAnnouncement === 'none') {
     accessibleSequence.textContent = '';
     return;
   }
-  const watchKey = stage.memoryRule === 'first' ? 'lumenMemoryWatchFirst' : 'lumenMemoryWatchLast';
-  accessibleSequence.textContent = `${t(watchKey, { count: stage.sequence.length })}. ${stage.sequence.map(laneName).join(', ')}.`;
+  const { watchKey, chooseKey } = memoryKeys(stage);
+  if (memoryAnnouncement === 'choose') {
+    accessibleSequence.textContent = `${t(chooseKey)}.`;
+    return;
+  }
+  accessibleSequence.textContent = `${t(watchKey, { count: stage.sequence.length })}. ${stage.sequence.map(laneName).join(', ')}. ${t(chooseKey)}. ${t('ready')}.`;
 }
 
 function updateStage(stage = activeStage, snapshot = activeSnapshot) {
@@ -79,7 +106,7 @@ function updateStage(stage = activeStage, snapshot = activeSnapshot) {
   ruleValues.forEach((element) => { element.textContent = t(ruleKeys[stage.mechanic] || 'lumenRuleDirect'); });
   if (exitButton) exitButton.textContent = t(exitArmed ? 'lumenExitNow' : 'lumenEndRun');
   updateLaneLabels(stage);
-  updateAccessibleSequence(stage);
+  updateMemoryActions(stage);
 }
 
 function updateResult(result = lastResult) {
@@ -101,6 +128,7 @@ function resetSharedHud() {
   activeSnapshot = null;
   lastResult = null;
   exitArmed = false;
+  memoryAnnouncement = 'none';
   updateLaneLabels(null);
   updateAccessibleSequence(null);
 }
@@ -111,6 +139,7 @@ if (lumen) {
     resultDetail?.setAttribute('hidden', '');
     activeSnapshot = event.detail.snapshot;
     exitArmed = false;
+    memoryAnnouncement = 'none';
     updateAccessibleSequence(null);
     gameScreen?.setAttribute('data-lumen-active', 'true');
     if (roundLabel) roundLabel.textContent = t('lumenDistance');
@@ -118,10 +147,30 @@ if (lumen) {
     if (exitButton) exitButton.textContent = t('lumenEndRun');
   });
 
+  lumen.addEventListener('lumen:memory-clear', () => {
+    memoryAnnouncement = 'none';
+    updateAccessibleSequence(null);
+  });
+
   lumen.addEventListener('lumen:stage', (event) => {
     activeStage = event.detail.stage;
     activeSnapshot = event.detail.snapshot;
+    memoryAnnouncement = 'none';
     updateStage();
+    updateAccessibleSequence();
+  });
+
+  lumen.addEventListener('lumen:memory-ready', (event) => {
+    activeStage = event.detail.stage;
+    memoryAnnouncement = 'sequence';
+    updateMemoryActions();
+    updateAccessibleSequence();
+  });
+
+  lumen.addEventListener('lumen:memory-response', (event) => {
+    activeStage = event.detail.stage;
+    memoryAnnouncement = 'choose';
+    updateAccessibleSequence();
   });
 
   lumen.addEventListener('lumen:snapshot', (event) => {
@@ -141,6 +190,7 @@ if (lumen) {
 
   lumen.addEventListener('lumen:finish', (event) => {
     lastResult = event.detail.result;
+    memoryAnnouncement = 'none';
     updateAccessibleSequence(null);
     queueMicrotask(() => updateResult());
   });
@@ -155,6 +205,7 @@ new MutationObserver(() => {
   if (activeStage) updateStage();
   if (lastResult) updateResult();
   if (!activeStage) updateLaneLabels(null);
+  updateAccessibleSequence();
 }).observe(document.documentElement, { attributes: true, attributeFilter: ['lang', 'dir'] });
 
 if (durationValue) {
