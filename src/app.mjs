@@ -1,12 +1,13 @@
 import {
   buildInviteUrl, buildResultSharePayload, CHALLENGE_ID, compareScores, comparisonSymbol,
-  createSeed, dailyChallengeFor, ECHO_GRID_ID, initialScreenForInvite, parseInvite,
+  createSeed, dailyChallengeFor, ECHO_GRID_ID, initialScreenForInvite, LUMEN_LANES_ID, parseInvite,
   readDailyBest, screenAfterPageShow, shouldRefreshDaily, shouldRefreshDailyOnPageShow, updateDailyBest, writeDailyBest
 } from './core.mjs';
 import { catalog, getChallenge } from './catalog.mjs';
 import { isRtl, normalizeLanguage, supportedLanguages, translate } from './i18n.mjs';
 import { OrbitLockGame } from './game.mjs';
 import { EchoGridGame } from './echo-game.mjs';
+import { LumenLanesGame } from './lumen-game.mjs';
 
 function browserStorage() { try { return window.localStorage; } catch { return null; } }
 function readPreference(key) { try { return browserStorage()?.getItem(key) ?? null; } catch { return null; } }
@@ -30,7 +31,8 @@ const elements = {
   dailyEntry: document.querySelector('#daily-entry'), dailyIcon: document.querySelector('#daily-icon'), dailyDate: document.querySelector('#daily-date'),
   dailyChallengeName: document.querySelector('#daily-challenge-name'), dailyTagline: document.querySelector('#daily-tagline'), dailyBest: document.querySelector('#daily-best'),
   dailyStartButton: document.querySelector('#daily-start-button'), gameHeading: document.querySelector('#game-heading'), canvas: document.querySelector('#game-canvas'),
-  echoGrid: document.querySelector('#echo-grid'), controlsHint: document.querySelector('#controls-hint'), gameStatus: document.querySelector('#game-status'),
+  echoGrid: document.querySelector('#echo-grid'), lumenLanes: document.querySelector('#lumen-lanes'),
+  controlsHint: document.querySelector('#controls-hint'), gameStatus: document.querySelector('#game-status'),
   score: document.querySelector('#score-value'), round: document.querySelector('#round-value'), lives: document.querySelector('#lives-value'), combo: document.querySelector('#combo-value'),
   resultScore: document.querySelector('#result-score'), resultHeading: document.querySelector('#result-heading'), resultSummary: document.querySelector('#result-summary'),
   resultChallenge: document.querySelector('#result-challenge'), dailyResult: document.querySelector('#daily-result'), comparison: document.querySelector('#comparison'),
@@ -49,13 +51,14 @@ function challengeName() { const challenge = currentChallenge(); return challeng
 function announce(message) { elements.liveRegion.textContent = ''; requestAnimationFrame(() => { elements.liveRegion.textContent = message; }); }
 
 function renderCatalog() {
+  const skillKeys = { timing: 'skillTiming', memory: 'skillMemory', reaction: 'skillReaction' };
   elements.cards.forEach((card) => {
     const challenge = getChallenge(card.dataset.challengeId);
     if (!challenge) return;
     const name = t(challenge.nameKey);
     card.querySelector('[data-name]').textContent = name;
     card.querySelector('[data-tagline]').textContent = t(challenge.taglineKey);
-    card.querySelector('[data-skill]').textContent = t(challenge.skill === 'timing' ? 'skillTiming' : 'skillMemory');
+    card.querySelector('[data-skill]').textContent = t(skillKeys[challenge.skill] || 'play');
     card.querySelector('[data-duration]').textContent = t('seconds', { value: challenge.durationSeconds });
     card.setAttribute('aria-label', t('challengeCard', { name }));
     card.setAttribute('aria-current', challenge.id === state.challengeId ? 'true' : 'false');
@@ -70,9 +73,12 @@ function renderChallengeText() {
   elements.instructionCopy.textContent = t(challenge.howToKey);
   elements.gameHeading.textContent = t(challenge.nameKey);
   elements.controlsHint.textContent = t(challenge.controlsHintKey);
-  elements.canvas.setAttribute('aria-label', t(challenge.arenaLabelKey));
-  elements.echoGrid.setAttribute('aria-label', t(challenge.arenaLabelKey));
+  elements.canvas.setAttribute('aria-label', t('orbitArenaLabel'));
+  elements.echoGrid.setAttribute('aria-label', t('echoArenaLabel'));
+  elements.lumenLanes.setAttribute('aria-label', t('lumenArenaLabel'));
   [...elements.echoGrid.querySelectorAll('[data-cell]')].forEach((button, index) => button.setAttribute('aria-label', t('tileLabel', { value: index + 1 })));
+  const laneKeys = ['laneLeft', 'laneCenter', 'laneRight'];
+  [...elements.lumenLanes.querySelectorAll('[data-lane]')].forEach((button, index) => button.setAttribute('aria-label', t(laneKeys[index])));
   elements.resultChallenge.textContent = t(challenge.nameKey);
 }
 
@@ -246,15 +252,22 @@ function beginRun() {
       renderResult(); setScreen('result'); announce(resultAnnouncement());
     }
   };
+
+  elements.canvas.hidden = true;
+  elements.echoGrid.hidden = true;
+  elements.lumenLanes.hidden = true;
   if (state.challengeId === ECHO_GRID_ID) {
-    elements.canvas.hidden = true; elements.echoGrid.hidden = false;
+    elements.echoGrid.hidden = false;
     game = new EchoGridGame({ container: elements.echoGrid, ...callbacks });
+  } else if (state.challengeId === LUMEN_LANES_ID) {
+    elements.lumenLanes.hidden = false;
+    game = new LumenLanesGame({ container: elements.lumenLanes, ...callbacks });
   } else {
-    elements.canvas.hidden = false; elements.echoGrid.hidden = true;
+    elements.canvas.hidden = false;
     game = new OrbitLockGame({ canvas: elements.canvas, ...callbacks });
   }
   game.start(state.seed);
-  if (state.challengeId !== ECHO_GRID_ID) elements.canvas.focus();
+  if (state.challengeId === CHALLENGE_ID) elements.canvas.focus();
   track('run_started', { challenge: state.challengeId, seed: state.seed, invited: Boolean(state.invite), daily: Boolean(state.activeDaily) });
 }
 
