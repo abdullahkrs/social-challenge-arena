@@ -43,6 +43,18 @@
             <strong data-i18n="invited">Friend challenge</strong><span id="target-text"></span>
           </div>
         </div>
+
+        <section id="daily-entry" class="daily-entry" aria-labelledby="daily-title">
+          <span id="daily-icon" class="daily-icon" aria-hidden="true">◎</span>
+          <div class="daily-copy">
+            <p id="daily-date" class="daily-date"></p>
+            <h2 id="daily-title" data-i18n="dailyTitle">Today's challenge</h2>
+            <p class="daily-meta"><strong id="daily-challenge-name"></strong><span id="daily-tagline"></span></p>
+            <p id="daily-best" class="daily-best"></p>
+          </div>
+          <button id="daily-start-button" class="primary daily-start" type="button" data-i18n="dailyPlay">Play daily</button>
+        </section>
+
         <div id="catalog" class="catalog" aria-label="Choose a challenge" data-i18n-aria="catalogTitle">
           <button class="challenge-card orbit-card" type="button" data-challenge-id="orbit-lock">
             <span class="card-visual orbit-visual" aria-hidden="true"><i></i></span>
@@ -97,6 +109,7 @@
           <h2 id="result-heading" tabindex="-1">Your result</h2>
           <p id="result-challenge" class="result-challenge"></p>
           <div id="result-score" class="result-score">0</div>
+          <p id="daily-result" class="daily-result" hidden></p>
           <div id="comparison" class="comparison" role="group" aria-labelledby="comparison-title" hidden>
             <span id="comparison-title" class="sr-only" data-i18n="compareTitle">Head-to-head</span>
             <div class="duel-score"><span data-i18n="challenger">Challenger</span><strong id="challenger-score">0</strong></div>

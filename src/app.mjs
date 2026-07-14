@@ -1,20 +1,23 @@
 import {
   buildInviteUrl, buildResultSharePayload, CHALLENGE_ID, compareScores, comparisonSymbol,
-  createSeed, ECHO_GRID_ID, initialScreenForInvite, parseInvite, screenAfterPageShow
+  createSeed, dailyChallengeFor, ECHO_GRID_ID, initialScreenForInvite, parseInvite,
+  readDailyBest, screenAfterPageShow, shouldRefreshDaily, shouldRefreshDailyOnPageShow, updateDailyBest, writeDailyBest
 } from './core.mjs';
 import { catalog, getChallenge } from './catalog.mjs';
 import { isRtl, normalizeLanguage, supportedLanguages, translate } from './i18n.mjs';
 import { OrbitLockGame } from './game.mjs';
 import { EchoGridGame } from './echo-game.mjs';
 
-function readPreference(key) { try { return localStorage.getItem(key); } catch { return null; } }
-function writePreference(key, value) { try { localStorage.setItem(key, value); } catch { /* session-only */ } }
+function browserStorage() { try { return window.localStorage; } catch { return null; } }
+function readPreference(key) { try { return browserStorage()?.getItem(key) ?? null; } catch { return null; } }
+function writePreference(key, value) { try { browserStorage()?.setItem(key, value); } catch { /* session-only */ } }
 
 const systemReducedMotion = typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches;
 const state = {
   language: normalizeLanguage(readPreference('sca-language') || navigator.language),
   reducedMotion: readPreference('sca-reduced-motion') === 'true' || systemReducedMotion,
-  screen: 'discovery', challengeId: CHALLENGE_ID, seed: createSeed(), invite: null, result: null, invalidInvite: false, events: []
+  screen: 'discovery', challengeId: CHALLENGE_ID, seed: createSeed(), invite: null, result: null, invalidInvite: false, events: [],
+  daily: null, activeDaily: null, dailyBest: null, dailyStorageAvailable: true
 };
 
 const elements = {
@@ -24,14 +27,17 @@ const elements = {
   instructionEyebrow: document.querySelector('#instruction-eyebrow'), instructionIcon: document.querySelector('#instruction-icon'),
   instructionTitle: document.querySelector('#instruction-title'), instructionCopy: document.querySelector('#instruction-copy'), instructionTarget: document.querySelector('#instruction-target'),
   startButton: document.querySelector('#start-button'), backButtons: [...document.querySelectorAll('[data-action="back"]')], inviteCatalogButton: document.querySelector('#invite-catalog-button'),
-  gameHeading: document.querySelector('#game-heading'), canvas: document.querySelector('#game-canvas'), echoGrid: document.querySelector('#echo-grid'), controlsHint: document.querySelector('#controls-hint'),
-  gameStatus: document.querySelector('#game-status'), score: document.querySelector('#score-value'), round: document.querySelector('#round-value'),
-  lives: document.querySelector('#lives-value'), combo: document.querySelector('#combo-value'), resultScore: document.querySelector('#result-score'),
-  resultHeading: document.querySelector('#result-heading'), resultSummary: document.querySelector('#result-summary'), resultChallenge: document.querySelector('#result-challenge'),
-  comparison: document.querySelector('#comparison'), comparisonText: document.querySelector('#comparison-text'), comparisonSymbol: document.querySelector('#comparison-symbol'),
-  challengerScore: document.querySelector('#challenger-score'), playerScore: document.querySelector('#player-score'), differenceText: document.querySelector('#difference-text'),
-  replayButton: document.querySelector('#replay-button'), newButton: document.querySelector('#new-button'), catalogButton: document.querySelector('#catalog-button'),
-  shareButton: document.querySelector('#share-button'), liveRegion: document.querySelector('#live-region')
+  dailyEntry: document.querySelector('#daily-entry'), dailyIcon: document.querySelector('#daily-icon'), dailyDate: document.querySelector('#daily-date'),
+  dailyChallengeName: document.querySelector('#daily-challenge-name'), dailyTagline: document.querySelector('#daily-tagline'), dailyBest: document.querySelector('#daily-best'),
+  dailyStartButton: document.querySelector('#daily-start-button'), gameHeading: document.querySelector('#game-heading'), canvas: document.querySelector('#game-canvas'),
+  echoGrid: document.querySelector('#echo-grid'), controlsHint: document.querySelector('#controls-hint'), gameStatus: document.querySelector('#game-status'),
+  score: document.querySelector('#score-value'), round: document.querySelector('#round-value'), lives: document.querySelector('#lives-value'), combo: document.querySelector('#combo-value'),
+  resultScore: document.querySelector('#result-score'), resultHeading: document.querySelector('#result-heading'), resultSummary: document.querySelector('#result-summary'),
+  resultChallenge: document.querySelector('#result-challenge'), dailyResult: document.querySelector('#daily-result'), comparison: document.querySelector('#comparison'),
+  comparisonText: document.querySelector('#comparison-text'), comparisonSymbol: document.querySelector('#comparison-symbol'), challengerScore: document.querySelector('#challenger-score'),
+  playerScore: document.querySelector('#player-score'), differenceText: document.querySelector('#difference-text'), replayButton: document.querySelector('#replay-button'),
+  newButton: document.querySelector('#new-button'), catalogButton: document.querySelector('#catalog-button'), shareButton: document.querySelector('#share-button'),
+  liveRegion: document.querySelector('#live-region')
 };
 
 let game = null;
@@ -70,6 +76,48 @@ function renderChallengeText() {
   elements.resultChallenge.textContent = t(challenge.nameKey);
 }
 
+function formatDailyDate(dateKey) {
+  try {
+    return new Intl.DateTimeFormat(state.language, { day: 'numeric', month: 'short', timeZone: 'UTC' }).format(new Date(`${dateKey}T12:00:00Z`));
+  } catch {
+    return dateKey;
+  }
+}
+
+function dailyBestText(record = state.dailyBest) {
+  const parts = [record ? t('dailyBest', { score: record.best }) : t('dailyNoBest')];
+  if (!state.dailyStorageAvailable) parts.push(t('dailySessionOnly'));
+  return parts.join(' · ');
+}
+
+function renderDailyEntry() {
+  if (!state.daily) return;
+  const challenge = getChallenge(state.daily.challengeId);
+  if (!challenge) return;
+  const name = t(challenge.nameKey);
+  elements.dailyEntry.dataset.challenge = challenge.id;
+  elements.dailyIcon.textContent = challenge.icon;
+  elements.dailyDate.textContent = formatDailyDate(state.daily.dateKey);
+  elements.dailyChallengeName.textContent = name;
+  elements.dailyTagline.textContent = t(challenge.taglineKey);
+  elements.dailyBest.textContent = dailyBestText();
+  elements.dailyStartButton.textContent = t('dailyPlay');
+  elements.dailyStartButton.setAttribute('aria-label', t('dailyPlayLabel', { name }));
+}
+
+function refreshDailyChallenge(input = new Date()) {
+  if (!shouldRefreshDaily(state.daily, input, state.screen)) {
+    renderDailyEntry();
+    return;
+  }
+  state.daily = dailyChallengeFor(input);
+  const stored = readDailyBest(browserStorage(), state.daily);
+  state.dailyBest = stored.record;
+  state.dailyStorageAvailable = stored.available;
+  renderDailyEntry();
+  track('daily_refreshed', { dateKey: state.daily.dateKey, challenge: state.daily.challengeId });
+}
+
 function applyLanguage() {
   document.documentElement.lang = state.language;
   document.documentElement.dir = isRtl(state.language) ? 'rtl' : 'ltr';
@@ -77,7 +125,7 @@ function applyLanguage() {
   elements.language.value = state.language;
   document.querySelectorAll('[data-i18n]').forEach((element) => { element.textContent = t(element.dataset.i18n); });
   document.querySelectorAll('[data-i18n-aria]').forEach((element) => { element.setAttribute('aria-label', t(element.dataset.i18nAria)); });
-  renderCatalog(); renderChallengeText(); updateInviteUI(); renderResult();
+  renderCatalog(); renderChallengeText(); renderDailyEntry(); updateEntryUI(); renderResult();
   if (state.invalidInvite) elements.errorBanner.textContent = t('invalidLink');
 }
 
@@ -90,25 +138,32 @@ function focusScreen(screen) {
 
 function setScreen(screen) {
   state.screen = screen;
+  if (screen === 'discovery') {
+    state.activeDaily = null;
+    refreshDailyChallenge(new Date());
+  }
   document.querySelectorAll('[data-screen]').forEach((section) => { section.hidden = section.dataset.screen !== screen; });
   if (screen !== 'game') destroyGame();
+  updateEntryUI();
   focusScreen(screen);
   track('screen_view', { screen, challenge: state.challengeId });
 }
 
-function updateInviteUI() {
+function updateEntryUI() {
   const invited = Boolean(state.invite);
+  const dailyRecovery = Boolean(state.activeDaily && !invited);
   const name = challengeName();
-  document.documentElement.dataset.invited = String(invited);
+  document.documentElement.dataset.entry = invited ? 'invite' : dailyRecovery ? 'daily' : 'normal';
   elements.invitedBadge.hidden = !invited;
   elements.targetText.textContent = invited ? `${name} · ${t('beatScore', { score: state.invite.target })}` : '';
   elements.instructionCard.classList.toggle('is-invite', invited);
-  elements.instructionEyebrow.hidden = !invited;
-  elements.instructionEyebrow.textContent = invited ? t('invited') : '';
+  elements.instructionCard.classList.toggle('is-daily', dailyRecovery);
+  elements.instructionEyebrow.hidden = !invited && !dailyRecovery;
+  elements.instructionEyebrow.textContent = invited ? t('invited') : dailyRecovery ? t('dailyTitle') : '';
   elements.backButtons.forEach((button) => { button.hidden = invited; });
   elements.inviteCatalogButton.hidden = !invited;
-  elements.startButton.textContent = invited ? t('acceptChallenge', { name }) : t('start');
-  elements.instructionTarget.textContent = invited ? t('challengerTarget', { score: state.invite.target }) : t('sameRun');
+  elements.startButton.textContent = invited ? t('acceptChallenge', { name }) : dailyRecovery ? t('dailyPlay') : t('start');
+  elements.instructionTarget.textContent = invited ? t('challengerTarget', { score: state.invite.target }) : dailyRecovery ? t('dailySameRoute') : t('sameRun');
 }
 
 function parseLocationInvite() {
@@ -118,7 +173,7 @@ function parseLocationInvite() {
     history.replaceState({}, '', `${location.pathname}${location.hash}`); track('invite_invalid', { reason: parsed.reason }); return;
   }
   if (parsed.invite) {
-    state.invite = parsed.invite; state.seed = parsed.invite.seed; state.challengeId = parsed.invite.challengeId;
+    state.invite = parsed.invite; state.activeDaily = null; state.seed = parsed.invite.seed; state.challengeId = parsed.invite.challengeId;
     track('invite_opened', { challenge: parsed.invite.challengeId, target: parsed.invite.target });
   }
 }
@@ -126,10 +181,11 @@ function parseLocationInvite() {
 function selectChallenge(id, openInstructions = true) {
   const challenge = getChallenge(id);
   if (!challenge) return;
+  state.activeDaily = null;
   if (state.invite && state.invite.challengeId !== id) {
     state.invite = null; state.seed = createSeed(); history.replaceState({}, '', location.pathname);
   }
-  state.challengeId = id; state.result = null; renderCatalog(); renderChallengeText(); updateInviteUI();
+  state.challengeId = id; state.result = null; renderCatalog(); renderChallengeText(); updateEntryUI();
   track('challenge_selected', { challenge: id });
   if (openInstructions) setScreen('instructions');
 }
@@ -140,16 +196,29 @@ function handleGameAnnouncement(event) {
   elements.gameStatus.textContent = message; announce(message);
 }
 
+function dailyResultText(dailyResult) {
+  if (!dailyResult) return '';
+  const parts = [t(dailyResult.isNewBest ? 'dailyNewBest' : 'dailyBest', { score: dailyResult.best })];
+  if (!dailyResult.storageAvailable) parts.push(t('dailySessionOnly'));
+  return parts.join(' · ');
+}
+
 function resultAnnouncement() {
   if (!state.result) return '';
-  if (!state.invite) return t('finalScore', { score: state.result.score });
-  const comparison = compareScores(state.result.score, state.invite.target);
-  return t('comparisonAnnouncement', {
-    outcome: t(comparison.outcome, { difference: comparison.difference }),
-    target: state.invite.target,
-    score: state.result.score,
-    difference: comparison.difference
-  });
+  let message;
+  if (!state.invite) {
+    message = t('finalScore', { score: state.result.score });
+  } else {
+    const comparison = compareScores(state.result.score, state.invite.target);
+    message = t('comparisonAnnouncement', {
+      outcome: t(comparison.outcome, { difference: comparison.difference }),
+      target: state.invite.target,
+      score: state.result.score,
+      difference: comparison.difference
+    });
+  }
+  const dailyText = dailyResultText(state.result.dailyBest);
+  return dailyText ? `${message}. ${dailyText}.` : message;
 }
 
 function beginRun() {
@@ -165,7 +234,15 @@ function beginRun() {
     },
     onAnnounce: handleGameAnnouncement,
     onFinish: (result) => {
-      state.result = result; track('run_finished', { challenge: state.challengeId, score: result.score, reason: result.reason, round: result.round });
+      const finished = { ...result };
+      if (state.activeDaily) {
+        const outcome = updateDailyBest(state.dailyBest, state.activeDaily, result.score);
+        state.dailyBest = outcome.record;
+        state.dailyStorageAvailable = writeDailyBest(browserStorage(), outcome.record, state.activeDaily);
+        finished.dailyBest = { best: outcome.record.best, isNewBest: outcome.isNewBest, storageAvailable: state.dailyStorageAvailable };
+      }
+      state.result = finished;
+      track('run_finished', { challenge: state.challengeId, score: result.score, reason: result.reason, round: result.round, daily: Boolean(state.activeDaily) });
       renderResult(); setScreen('result'); announce(resultAnnouncement());
     }
   };
@@ -178,7 +255,20 @@ function beginRun() {
   }
   game.start(state.seed);
   if (state.challengeId !== ECHO_GRID_ID) elements.canvas.focus();
-  track('run_started', { challenge: state.challengeId, seed: state.seed, invited: Boolean(state.invite) });
+  track('run_started', { challenge: state.challengeId, seed: state.seed, invited: Boolean(state.invite), daily: Boolean(state.activeDaily) });
+}
+
+function beginDailyRun() {
+  refreshDailyChallenge(new Date());
+  if (!state.daily) return;
+  state.activeDaily = { ...state.daily };
+  state.invite = null;
+  state.challengeId = state.activeDaily.challengeId;
+  state.seed = state.activeDaily.seed;
+  state.result = null;
+  history.replaceState({}, '', location.pathname);
+  renderCatalog(); renderChallengeText(); updateEntryUI();
+  safeBeginRun();
 }
 
 function renderResult() {
@@ -186,6 +276,9 @@ function renderResult() {
   elements.resultScore.textContent = state.result.score; elements.resultHeading.textContent = t('resultTitle');
   elements.resultSummary.textContent = t(state.result.reason === 'complete' ? 'complete' : 'failed');
   elements.resultChallenge.textContent = challengeName();
+  elements.dailyResult.hidden = !state.result.dailyBest;
+  elements.dailyResult.textContent = dailyResultText(state.result.dailyBest);
+  elements.newButton.hidden = Boolean(state.activeDaily);
   if (state.invite) {
     const comparison = compareScores(state.result.score, state.invite.target);
     const outcomeText = t(comparison.outcome, { difference: comparison.difference });
@@ -232,9 +325,12 @@ function handleRunError(error) {
 }
 function safeBeginRun() { try { beginRun(); } catch (error) { handleRunError(error); } }
 
-function handlePageShow(event) {
+function handlePageShow(event, input = new Date()) {
   const nextScreen = screenAfterPageShow(event, state.screen);
-  if (nextScreen === state.screen) return;
+  if (nextScreen === state.screen) {
+    if (shouldRefreshDailyOnPageShow(event, state.daily, input, state.screen)) refreshDailyChallenge(input);
+    return;
+  }
   state.result = null; setScreen(nextScreen); announce(t('ready')); track('bfcache_restored', { screen: nextScreen });
 }
 
@@ -250,15 +346,16 @@ function bindEvents() {
     track('reduced_motion_changed', { enabled: state.reducedMotion });
   });
   elements.cards.forEach((card) => card.addEventListener('click', () => selectChallenge(card.dataset.challengeId)));
+  elements.dailyStartButton.addEventListener('click', beginDailyRun);
   elements.startButton.addEventListener('click', safeBeginRun);
   elements.backButtons.forEach((button) => button.addEventListener('click', () => setScreen('discovery')));
   elements.inviteCatalogButton.addEventListener('click', () => setScreen('discovery'));
   elements.replayButton.addEventListener('click', safeBeginRun);
   elements.newButton.addEventListener('click', () => {
-    state.seed = createSeed(); state.invite = null; history.replaceState({}, '', location.pathname); updateInviteUI(); setScreen('instructions');
+    state.activeDaily = null; state.seed = createSeed(); state.invite = null; history.replaceState({}, '', location.pathname); updateEntryUI(); setScreen('instructions');
   });
   elements.catalogButton.addEventListener('click', () => {
-    state.seed = createSeed(); state.invite = null; history.replaceState({}, '', location.pathname); updateInviteUI(); setScreen('discovery');
+    state.activeDaily = null; state.seed = createSeed(); state.invite = null; history.replaceState({}, '', location.pathname); updateEntryUI(); setScreen('discovery');
   });
   elements.shareButton.addEventListener('click', shareResult);
   window.addEventListener('pagehide', destroyGame);
@@ -269,7 +366,7 @@ function boot() {
   try {
     parseLocationInvite(); bindEvents(); applyLanguage(); document.documentElement.dataset.reducedMotion = String(state.reducedMotion);
     elements.loading.hidden = true; elements.app.hidden = false; setScreen(initialScreenForInvite(state.invite));
-    track('app_ready', { language: state.language, challenges: catalog.length, invited: Boolean(state.invite) });
+    track('app_ready', { language: state.language, challenges: catalog.length, invited: Boolean(state.invite), daily: state.daily?.dateKey || null });
   } catch (error) {
     console.error(error); elements.loading.textContent = t('loadError'); elements.loading.setAttribute('role', 'alert');
   }

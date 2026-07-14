@@ -1,6 +1,6 @@
 # Social Challenge Arena
 
-A mobile-first multilingual social arcade platform with two complete original skill challenges.
+A mobile-first multilingual social arcade platform with two complete original skill challenges and one optional private daily route.
 
 ## Playable catalog
 
@@ -12,6 +12,12 @@ Both use the complete journey:
 `discover → choose → play → result → localized share → direct friend attempt → head-to-head comparison → rematch share`
 
 Valid invitation links open the selected challenge and target score directly, while normal catalog discovery remains available.
+
+## Daily challenge
+
+The discovery surface selects one existing challenge and deterministic route from the canonical UTC date. Everyone receives the same route for that date. The device may remember only the current route identity and its best bounded score; corrupt, stale, or blocked storage never prevents play.
+
+The daily route is optional and has unlimited replay. It has no account, streak, countdown, missed-day message, public ranking, urgency, or expiring link. Sharing uses the existing strict version-1 invitation, so a friend can play the same route and compare after the date changes.
 
 ## Languages and access
 
