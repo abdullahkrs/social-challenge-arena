@@ -152,6 +152,10 @@ export function shouldRefreshDaily(currentDaily, input = new Date(), screen = 'd
   return !currentDaily || currentDaily.dateKey !== utcDateKey(input);
 }
 
+export function shouldRefreshDailyOnPageShow(event, currentDaily, input = new Date(), screen = 'discovery') {
+  return Boolean(event?.persisted) && shouldRefreshDaily(currentDaily, input, screen);
+}
+
 function hasExactKeys(value, expected) {
   return Object.keys(value).sort().join('|') === [...expected].sort().join('|');
 }
