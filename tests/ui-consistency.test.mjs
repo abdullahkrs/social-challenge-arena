@@ -10,21 +10,27 @@ const [html, css, accessibilityCss, notices, build] = await Promise.all([
   readFile(new URL('../scripts/build.mjs', import.meta.url), 'utf8')
 ]);
 
+const retainedIcons = [
+  'fa-gamepad', 'fa-globe', 'fa-universal-access', 'fa-arrow-left', 'fa-trophy', 'fa-user-group'
+];
+
 test('Font Awesome is local, selective, licensed, and included in the production build', () => {
   assert.match(css, /Font Awesome Free 6\.7\.2/);
   assert.match(css, /data:font\/woff2;base64,/);
   assert.doesNotMatch(html, /fontawesome\.com|cdnjs|jsdelivr|unpkg/i);
   assert.doesNotMatch(html, /<svg\b/i);
+  assert.doesNotMatch(css, /\.action-icon::before/);
   assert.match(notices, /Fonts: SIL Open Font License 1\.1 \(SIL OFL 1\.1\)/);
   assert.ok(build.includes("'ui.css'"));
   assert.ok(build.includes("'THIRD_PARTY_NOTICES.md'"));
+  assert.deepEqual(
+    [...css.matchAll(/\.(fa-[\w-]+)::before/g)].map((match) => match[1]),
+    retainedIcons
+  );
 });
 
 test('retained platform icons use explicit accessible Font Awesome treatments', () => {
-  const icons = [
-    'fa-gamepad', 'fa-globe', 'fa-universal-access', 'fa-arrow-left', 'fa-trophy', 'fa-user-group'
-  ];
-  for (const className of icons) {
+  for (const className of retainedIcons) {
     assert.ok(html.includes(className), `${className} should be used by a real platform surface`);
     assert.ok(css.includes(`.${className}::before`), `${className} should map to the local subset`);
   }
