@@ -1,25 +1,29 @@
 import { clamp, mirrorPlan, scoreMirrorRound } from './core.mjs';
+import { normalizeLanguage, translate } from './i18n.mjs';
 
 export class MirrorFuseGame {
   constructor({ container, onUpdate, onFinish, onAnnounce, reducedMotion = false }) {
     if (!(container instanceof HTMLElement)) throw new TypeError('container is required');
     this.container = container;
     this.sourceGrid = container.querySelector('[data-mirror-source]');
+    this.sourceDescription = container.querySelector('[data-mirror-source-description]');
     this.buttons = [...container.querySelectorAll('[data-mirror-option]')];
     this.optionGrids = this.buttons.map((button) => button.querySelector('[data-mirror-grid]'));
     this.marks = this.buttons.map((button) => button.querySelector('[data-mirror-mark]'));
-    if (!this.sourceGrid || this.buttons.length !== 3 || this.optionGrids.some((grid) => !grid) || this.marks.some((mark) => !mark)) {
-      throw new Error('Mirror Fuse requires one source grid and three complete options');
+    if (!this.sourceGrid || !this.sourceDescription || this.buttons.length !== 3 || this.optionGrids.some((grid) => !grid) || this.marks.some((mark) => !mark)) {
+      throw new Error('Mirror Fuse requires one source grid, one source description, and three complete options');
     }
     this.onUpdate = onUpdate;
     this.onFinish = onFinish;
     this.onAnnounce = onAnnounce;
     this.reducedMotion = Boolean(reducedMotion);
     this.abortController = null;
+    this.languageObserver = null;
     this.timers = new Set();
     this.deadlineTimer = null;
     this.running = false;
     this.accepting = false;
+    this.visibleStage = null;
     this.ensureCells(this.sourceGrid);
     this.optionGrids.forEach((grid) => this.ensureCells(grid));
   }
@@ -37,6 +41,36 @@ export class MirrorFuseGame {
     return { score: 0, round: 0, rounds: 10, lives: 3, combo: 0, precision: 0 };
   }
 
+  language() {
+    return normalizeLanguage(this.container.ownerDocument.documentElement.lang);
+  }
+
+  t(key, values = {}) {
+    return translate(this.language(), key, values);
+  }
+
+  describePattern(pattern) {
+    return Array.from({ length: 3 }, (_, row) => {
+      const cells = pattern
+        .slice(row * 4, row * 4 + 4)
+        .map((cell) => this.t(cell === 1 ? 'mirrorCellOn' : 'mirrorCellOff'))
+        .join(', ');
+      return this.t('mirrorPatternRow', { row: row + 1, cells });
+    }).join('. ');
+  }
+
+  refreshAccessibility(stage = this.visibleStage) {
+    if (!stage) return;
+    const sourcePattern = this.describePattern(stage.source);
+    this.sourceDescription.textContent = this.t('mirrorSourcePattern', { pattern: sourcePattern });
+    this.buttons.forEach((button, index) => {
+      button.setAttribute('aria-label', this.t('mirrorOptionPattern', {
+        value: index + 1,
+        pattern: this.describePattern(stage.options[index])
+      }));
+    });
+  }
+
   start(seed) {
     this.destroy();
     this.abortController = new AbortController();
@@ -47,6 +81,7 @@ export class MirrorFuseGame {
     this.startedAt = performance.now();
     this.container.dataset.reduced = String(this.reducedMotion);
     this.installListeners();
+    this.installLanguageObserver();
     this.resetVisuals();
     this.onUpdate({ ...this.snapshot });
     this.schedule(() => this.showRound(), 320);
@@ -57,6 +92,12 @@ export class MirrorFuseGame {
     this.buttons.forEach((button, index) => {
       button.addEventListener('click', () => this.activate(index), { signal });
     });
+  }
+
+  installLanguageObserver() {
+    if (typeof MutationObserver !== 'function') return;
+    this.languageObserver = new MutationObserver(() => this.refreshAccessibility());
+    this.languageObserver.observe(this.container.ownerDocument.documentElement, { attributes: true, attributeFilter: ['lang'] });
   }
 
   schedule(callback, delay) {
@@ -89,6 +130,8 @@ export class MirrorFuseGame {
 
   resetVisuals() {
     this.container.removeAttribute('data-feedback');
+    this.visibleStage = null;
+    this.sourceDescription.textContent = '';
     this.sourceGrid.querySelectorAll('span').forEach((cell) => {
       cell.removeAttribute('data-on');
       cell.textContent = '·';
@@ -96,6 +139,7 @@ export class MirrorFuseGame {
     this.buttons.forEach((button, index) => {
       button.disabled = true;
       button.classList.remove('is-correct', 'is-wrong');
+      button.setAttribute('aria-label', this.t('mirrorOptionLabel', { value: index + 1 }));
       this.marks[index].textContent = '';
       this.optionGrids[index].querySelectorAll('span').forEach((cell) => {
         cell.removeAttribute('data-on');
@@ -111,6 +155,7 @@ export class MirrorFuseGame {
       return;
     }
     const stage = this.plan[this.snapshot.round];
+    this.visibleStage = stage;
     this.accepting = true;
     this.container.removeAttribute('data-feedback');
     this.renderPattern(this.sourceGrid, stage.source);
@@ -120,9 +165,14 @@ export class MirrorFuseGame {
       this.marks[index].textContent = '';
       this.renderPattern(this.optionGrids[index], stage.options[index]);
     });
+    this.refreshAccessibility(stage);
     this.roundStartedAt = performance.now();
     if (!this.container.contains(this.container.ownerDocument.activeElement)) this.buttons[0].focus({ preventScroll: true });
-    this.onAnnounce({ key: 'mirrorPrompt' });
+    this.onAnnounce({
+      key: 'mirrorPrompt',
+      extraKey: 'mirrorSourcePattern',
+      extraValues: { pattern: this.describePattern(stage.source) }
+    });
     this.deadlineTimer = this.schedule(() => this.resolveMiss('slow'), stage.deadlineMs);
   }
 
@@ -209,9 +259,11 @@ export class MirrorFuseGame {
     this.accepting = false;
     this.abortController?.abort();
     this.abortController = null;
+    this.languageObserver?.disconnect();
+    this.languageObserver = null;
     this.timers.forEach(clearTimeout);
     this.timers.clear();
     this.deadlineTimer = null;
-    if (this.container && this.sourceGrid && this.buttons) this.resetVisuals();
+    if (this.container && this.sourceGrid && this.sourceDescription && this.buttons) this.resetVisuals();
   }
 }
