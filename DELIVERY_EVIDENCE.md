@@ -28,13 +28,15 @@
 
 - Arabic RTL, English, and Turkish use the existing key-parity localization system for name, tagline, instruction, prompt, feedback, controls, arena, option labels, card metadata, sharing, and comparison.
 - The three answers are native buttons with localized accessible names, visible focus, touch/pointer/keyboard operation, and practical targets above 48 CSS px.
+- Every round now exposes the source as localized row-and-cell text, includes each candidate pattern in its button name, and announces the source through the existing live region so the puzzle is solvable without sight.
+- Mid-round language changes refresh the active pattern descriptions; the owned language observer is disconnected in `destroy()`.
 - Source and candidate cells use shape and text glyphs in addition to color. Correct, wrong, and timeout outcomes include `✓` or `×`, localized live announcements, and score/chance changes.
 - Option order and challenge geometry are not mirrored merely because the interface language is Arabic.
 - Reduced effects changes transition duration only; source patterns, candidates, answer index, deadlines, scoring, route, and result remain identical.
 
 ## Reliability, privacy, security, and performance
 
-- Mirror Fuse owns one abort controller, one tracked timeout set, the active deadline timer, transient classes, feedback marks, disabled state, and focus transition; `destroy()` clears and resets all of them.
+- Mirror Fuse owns one abort controller, one tracked timeout set, the active deadline timer, the language observer, transient classes, feedback marks, disabled state, and focus transition; `destroy()` clears and resets all of them.
 - Replay, challenge switching, page hide, and bfcache recovery use the existing shared destruction path before another host starts.
 - Strict version-1 invitations keep the same fields, checksum salt, bounds, and tamper rejection while adding only the known `mirror-fuse` ID to the allowlist.
 - No account, backend, analytics, cookie, contact access, tracking, remote font, remote image, API, UI framework, runtime dependency, or network permission was added.
@@ -53,8 +55,10 @@
 
 ## Verification
 
-- GitHub Actions CI run **#83** passed `npm ci --ignore-scripts`, the complete `npm test` suite, production `npm run build`, and preview upload on the implementation head.
-- Tests cover deterministic reflection plans, unique distractors, exact scoring bounds, zero-millisecond input, sender/friend equivalence, all four strict invitations, comparison/rematch, localization parity, native controls, lifecycle teardown, reduced-effects equivalence, exact legacy daily fixtures, and future four-ID selection.
-- The production preview contains **14 files totaling 125,304 bytes**, within the unchanged **184,320-byte** uncompressed budget.
-- The uploaded preview ZIP is **37,294 bytes** with SHA-256 digest `611be031da86eda22a86fd2624c96e3fe2967df129766abcc138f79feaad5c62`.
+- Final correction head: `e2e1c95b42f5738fd64e6785697531ac9d83a1a2`.
+- GitHub Actions CI run **#88** passed `npm ci --ignore-scripts`, the complete `npm test` suite, production `npm run build`, and preview upload.
+- Focused accessibility coverage verifies the referenced source description, three described option buttons, localized row/cell wording in Arabic, English, and Turkish, live source announcement, and language-observer teardown.
+- Existing tests continue to cover deterministic reflection plans, unique distractors, exact scoring bounds, zero-millisecond input, sender/friend equivalence, all four strict invitations, comparison/rematch, localization parity, native controls, lifecycle teardown, reduced-effects equivalence, exact legacy daily fixtures, and future four-ID selection.
+- The production preview contains **14 files totaling 128,210 bytes**, within the unchanged **184,320-byte** uncompressed budget.
+- The uploaded preview ZIP is **37,965 bytes** with SHA-256 digest `578085ec1bd3ba2954a8bc3fec2a94efc7c42fc716d7ad066a711aa5b1639daa`.
 - Static preview inspection confirmed the expected entry point, four catalog cards, all four hosts, local styles, localization module, no remote asset, and complete deployable file set.
