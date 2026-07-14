@@ -12,8 +12,10 @@ test('echo chunks are deterministic, bounded, and mechanically varied', () => {
   assert.deepEqual(first, repeat);
   assert.notDeepEqual(first, next);
   for (const stage of [...first, ...next]) {
-    assert.ok(applyMoves(stage.displayStart, stage.displayMoves));
-    assert.ok(applyMoves(stage.responseStart, stage.expectedMoves));
+    const displayPath = applyMoves(stage.displayStart, stage.displayMoves);
+    const responsePath = applyMoves(stage.responseStart, stage.expectedMoves);
+    assert.ok(displayPath?.cells.every(Number.isInteger));
+    assert.ok(responsePath?.cells.every(Number.isInteger));
     assert.equal(stage.displayMoves.length, stage.expectedMoves.length);
     assert.ok(stage.length >= 3 && stage.length <= 8);
   }
