@@ -88,7 +88,7 @@ function fakeCanvasDocument(blob = new Blob(['png'], { type: 'image/png' })) {
   const context = new Proxy({
     createLinearGradient: () => gradient,
     createRadialGradient: () => gradient,
-    save() {}, restore() {}, translate() {}, rotate() {}, beginPath() {}, moveTo() {}, arcTo() {}, closePath() {},
+    save() {}, restore() {}, translate() {}, scale() {}, rotate() {}, beginPath() {}, moveTo() {}, arcTo() {}, closePath() {},
     fill() {}, stroke() {}, arc() {}, fillRect() {}, fillText() {}, lineTo() {}
   }, { set(target, key, value) { target[key] = value; return true; } });
   const canvas = {
