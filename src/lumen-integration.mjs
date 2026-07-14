@@ -12,6 +12,7 @@ const exitButton = lumen?.querySelector('[data-lumen-exit]');
 const laneButtons = lumen ? [...lumen.querySelectorAll('[data-lane]')] : [];
 const resultDetail = document.querySelector('#result-detail');
 const resultSummary = document.querySelector('#result-summary');
+const durationValue = document.querySelector('[data-challenge-id="lumen-lanes"] [data-duration]');
 
 let activeStage = null;
 let activeSnapshot = null;
@@ -41,8 +42,7 @@ const ruleKeys = {
 };
 
 function updateCatalogDuration() {
-  const duration = document.querySelector('[data-challenge-id="lumen-lanes"] [data-duration]');
-  if (duration) duration.textContent = t('endless');
+  if (durationValue && durationValue.textContent !== t('endless')) durationValue.textContent = t('endless');
 }
 
 function laneName(index) {
@@ -141,6 +141,10 @@ new MutationObserver(() => {
   if (!activeStage) updateLaneLabels(null);
 }).observe(document.documentElement, { attributes: true, attributeFilter: ['lang', 'dir'] });
 
+if (durationValue) {
+  new MutationObserver(updateCatalogDuration).observe(durationValue, { childList: true, characterData: true, subtree: true });
+}
+queueMicrotask(updateCatalogDuration);
 updateCatalogDuration();
 updateLaneLabels(null);
 if (exitButton) exitButton.textContent = t('lumenEndRun');
