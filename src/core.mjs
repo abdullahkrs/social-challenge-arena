@@ -5,7 +5,10 @@ export const CHALLENGE_ID = ORBIT_LOCK_ID;
 export const CHALLENGE_IDS = Object.freeze([ORBIT_LOCK_ID, ECHO_GRID_ID]);
 export const SCORE_MAX = 9999;
 export const SEED_MAX = 0xffffffff;
+export const DAILY_STORAGE_KEY = 'sca-daily-best';
 const ALLOWED_KEYS = ['c', 'ck', 's', 't', 'v'];
+const DAILY_KEYS = ['best', 'challengeId', 'dateKey', 'seed'];
+const DATE_KEY_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
 // Kept stable so every previously generated Orbit Lock and Echo Grid v1 link remains valid.
 const CHECKSUM_SALT = 'sca-orbit-lock-v1';
 
@@ -109,13 +112,100 @@ export function buildResultSharePayload({ title, text, url }) {
   };
 }
 
-function fnv1a(value) {
+function fnv1aNumber(value) {
   let hash = 0x811c9dc5;
   for (let index = 0; index < value.length; index += 1) {
     hash ^= value.charCodeAt(index);
     hash = Math.imul(hash, 0x01000193);
   }
-  return (hash >>> 0).toString(36).padStart(7, '0');
+  return hash >>> 0;
+}
+
+function fnv1a(value) {
+  return fnv1aNumber(value).toString(36).padStart(7, '0');
+}
+
+function validDate(input) {
+  const date = input instanceof Date ? new Date(input.getTime()) : new Date(input);
+  if (!Number.isFinite(date.getTime())) throw new RangeError('Invalid date');
+  return date;
+}
+
+export function utcDateKey(input = new Date()) {
+  const date = validDate(input);
+  const year = String(date.getUTCFullYear()).padStart(4, '0');
+  const month = String(date.getUTCMonth() + 1).padStart(2, '0');
+  const day = String(date.getUTCDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
+export function dailyChallengeFor(input = new Date()) {
+  const dateKey = utcDateKey(input);
+  const challengeHash = fnv1aNumber(`daily|${dateKey}`);
+  const challengeId = CHALLENGE_IDS[challengeHash % CHALLENGE_IDS.length];
+  const seed = fnv1aNumber(`route|${dateKey}|${challengeId}`);
+  return { dateKey, challengeId, seed };
+}
+
+export function shouldRefreshDaily(currentDaily, input = new Date(), screen = 'discovery') {
+  if (screen !== 'discovery') return false;
+  return !currentDaily || currentDaily.dateKey !== utcDateKey(input);
+}
+
+function hasExactKeys(value, expected) {
+  return Object.keys(value).sort().join('|') === [...expected].sort().join('|');
+}
+
+export function parseDailyBest(input, daily) {
+  if (!daily || !DATE_KEY_PATTERN.test(String(daily.dateKey || '')) || !CHALLENGE_IDS.includes(daily.challengeId)) return null;
+  if (!Number.isInteger(daily.seed) || daily.seed < 0 || daily.seed > SEED_MAX) return null;
+  let value = input;
+  try {
+    if (typeof value === 'string') value = JSON.parse(value);
+  } catch {
+    return null;
+  }
+  if (!value || typeof value !== 'object' || Array.isArray(value) || !hasExactKeys(value, DAILY_KEYS)) return null;
+  if (value.dateKey !== daily.dateKey || value.challengeId !== daily.challengeId || value.seed !== daily.seed) return null;
+  if (!Number.isInteger(value.best) || value.best < 0 || value.best > SCORE_MAX) return null;
+  return { dateKey: value.dateKey, challengeId: value.challengeId, seed: value.seed, best: value.best };
+}
+
+export function updateDailyBest(input, daily, score) {
+  const previous = parseDailyBest(input, daily);
+  const safeScore = clamp(Math.trunc(Number(score) || 0), 0, SCORE_MAX);
+  const previousBest = previous?.best ?? null;
+  const best = previousBest === null ? safeScore : Math.max(previousBest, safeScore);
+  return {
+    record: { dateKey: daily.dateKey, challengeId: daily.challengeId, seed: daily.seed, best },
+    previousBest,
+    isNewBest: previousBest === null || safeScore > previousBest
+  };
+}
+
+export function readDailyBest(storage, daily) {
+  if (!storage || typeof storage.getItem !== 'function') return { record: null, available: false, discarded: false };
+  try {
+    const raw = storage.getItem(DAILY_STORAGE_KEY);
+    if (raw === null) return { record: null, available: true, discarded: false };
+    const record = parseDailyBest(raw, daily);
+    if (record) return { record, available: true, discarded: false };
+    if (typeof storage.removeItem === 'function') storage.removeItem(DAILY_STORAGE_KEY);
+    return { record: null, available: true, discarded: true };
+  } catch {
+    return { record: null, available: false, discarded: false };
+  }
+}
+
+export function writeDailyBest(storage, record, daily) {
+  const validated = parseDailyBest(record, daily);
+  if (!validated || !storage || typeof storage.setItem !== 'function') return false;
+  try {
+    storage.setItem(DAILY_STORAGE_KEY, JSON.stringify(validated));
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 function payload({ challengeId, seed, target }) {
