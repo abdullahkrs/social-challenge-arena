@@ -26,3 +26,23 @@ test('a terminal miss cannot be reclassified as a voluntary exit', async () => {
   assert.match(requestExit, /if \(!this\.running \|\| this\.terminalPending\) return;/);
   assert.match(source, /this\.terminalPending = false;/);
 });
+
+test('memory stages use one ordered announcement path and start the unchanged deadline only after Ready', async () => {
+  const [gameSource, integrationSource] = await Promise.all([
+    readFile(gameUrl, 'utf8'),
+    readFile(integrationUrl, 'utf8')
+  ]);
+  const memoryPlayback = gameSource.match(/playMemorySequence\(stage\) \{([\s\S]*?)\n  \}\n\n  presentMemoryDecision/)?.[1] ?? '';
+  const responseStart = gameSource.match(/startMemoryResponse\(\) \{([\s\S]*?)\n  \}/)?.[1] ?? '';
+
+  assert.doesNotMatch(memoryPlayback, /this\.onAnnounce/);
+  assert.match(gameSource, /data-lumen-memory-repeat/);
+  assert.match(gameSource, /data-lumen-memory-ready/);
+  assert.match(gameSource, /this\.emit\('memory-ready', \{ stage \}\)/);
+  assert.match(gameSource, /replayMemorySequence\(\)/);
+  assert.match(responseStart, /this\.roundStartedAt = performance\.now\(\);/);
+  assert.match(responseStart, /this\.deadlineTimer = this\.schedule\(\(\) => this\.resolveMiss\('slow'\), stage\.deadlineMs\)/);
+  assert.match(integrationSource, /memoryAnnouncement = 'sequence'/);
+  assert.match(integrationSource, /stage\.sequence\.map\(laneName\)\.join\(', '\)/);
+  assert.match(integrationSource, /memoryAnnouncement = 'choose'/);
+});
