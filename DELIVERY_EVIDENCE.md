@@ -1,41 +1,43 @@
-# Direct Duel Social Loop Evidence
+# Private Daily Challenge Loop Evidence
 
 ## Product
 
-- **Constraint addressed:** social-loop friction after sharing.
-- **Invite entry:** valid Orbit Lock and Echo Grid v1 links now open the selected challenge directly on a concise target surface. The primary action starts the same challenge and deterministic route; a quieter secondary action opens the catalog.
-- **Share:** native sharing uses localized challenge name, score, friendly call to compete, and strict URL. Clipboard and manual fallback include the useful invitation text plus the full URL.
-- **Comparison and rematch:** invited results show challenger score, player score, numeric difference, localized win/loss/tie text, and a non-color arrow/equality symbol. Rematch sharing keeps the challenge and route while making the player’s new score the target.
-- **Platform proof:** one shared invite-entry, result comparison, and rematch flow serves both existing challenges without changing either mechanic or adding a generic sharing framework.
-- **Compatibility:** the version-1 shape, allowlist, checksum salt, challenge IDs, score bounds, and deterministic tamper rejection remain unchanged.
+- **Constraint addressed:** ordinary visits had no fresh return reason and completed scores disappeared after the session.
+- **Daily route:** a canonical UTC date deterministically selects Orbit Lock or Echo Grid and one seed. Independent devices receive the same challenge and route for that date.
+- **Visible journey:** compact discovery entry → one primary daily action → play → result and private best/new-best state → same-route replay → strict share → friend attempt → comparison → rematch share.
+- **Safe rollover:** the date is checked only when discovery is entered. An active game, result, replay, or restored interrupted run keeps its original route.
+- **Compatibility:** valid invitations still take precedence at boot. Daily sharing uses the unchanged strict version-1 challenge, seed, score, checksum, and allowlist format, so links remain playable after the date changes.
+- **Scope:** both existing challenges prove one shared daily flow. No third challenge, calendar service, retention engine, account, backend, notification, or speculative framework was added.
 
 ## Islamic content policy — PASS
 
-- Theme: abstract friendly skill competition in precision timing and visual memory.
+- Theme: optional abstract daily precision or visual-memory skill practice.
 - Characters/clothing: none.
-- Symbols: neutral circles, tiles, numbers, arrows, equality, checks, and crosses.
+- Symbols: neutral circles, tiles, numbers, checks, crosses, arrows, and date text.
 - Audio: none.
-- Rewards: bounded non-monetary score only; no wagering, chance reward, loot box, purchase, or monetization.
-- Social pressure: optional private invitation and rematch; no countdown pressure, public ranking, humiliation, shaming, or manipulative urgency.
-- Safety: no physical imitation, dangerous instruction, personal-data request, or contact access.
+- Rewards: bounded non-monetary score and private on-device best only; no wagering, chance reward, collectible, purchase, or monetary incentive.
+- Social pressure: unlimited optional replay with no streak, countdown, missed-day message, shame, fear of missing out, public ranking, or manipulative urgency.
+- Safety: no physical imitation, dangerous instruction, contact access, personal-data request, or harmful challenge.
 
 ## Accessibility and localization
 
-- Arabic RTL, English, and Turkish use one key-complete localization system for invite entry, share copy, fallback copy, comparison, rematch, errors, and announcements.
-- Invite boot moves focus to the primary play action. Result focus remains on the result heading, and comparison is announced once with both scores, outcome, and difference.
-- All primary invite and result actions keep at least 48 CSS px. The comparison is understandable without color.
-- The 320px invite card uses a compact layout; the three-part comparison remains readable through 360–430px and desktop widths.
-- Reduced effects changes only presentation. Touch, pointer, keyboard, replay, catalog navigation, language changes, page hide, and back/forward-cache recovery retain the same decisions and state.
+- Arabic RTL, English, and Turkish share one key-complete localization system for the daily title, date, challenge identity, action, best/new-best, storage fallback, result, sharing, and announcements.
+- The daily entry has one clearly labelled primary action at least 48 CSS px high; layouts wrap at 320px and adapt through 360–430px and desktop widths.
+- Daily best and new-best are explicit text, not color-only signals, and are appended once to the existing result announcement.
+- Logical focus remains discovery → daily action → game → result → replay/share/catalog. An interrupted bfcache run returns to the instructions surface without changing its route.
+- Reduced-effects mode changes presentation only; challenge choice, seed, score, best decision, sharing, comparison, and lifecycle remain identical.
 
-## Privacy, security, performance, and lifecycle
+## Privacy, security, reliability, and performance
 
-- No account, contacts, cookies, analytics, remote assets, external API, notification permission, or social-platform dependency.
-- Invalid, extra, unknown, malformed, out-of-range, wrong-version, and checksum-mismatched links are removed before normal discovery.
-- Existing game-owned listeners, timers, animation frames, observers, and DOM hosts continue to be torn down on navigation, replay, finish, page hide, and back/forward-cache restoration.
-- Zero runtime dependencies and the existing 180 KiB uncompressed static budget remain enforced by the build.
+- Local daily state is limited to exactly `dateKey`, `challengeId`, `seed`, and bounded `best`. No identifier, account, cookie, analytics, fingerprint, cloud sync, or personal data is stored.
+- Malformed, extra-field, stale, unsupported, mismatched-route, or out-of-range data is ignored and removed. Blocked storage degrades to a localized session-only best while the complete journey remains usable.
+- Invite shape, version, challenge allowlist, numeric bounds, and deterministic tamper rejection remain unchanged.
+- No date polling, interval, observer, extra canvas, or duplicated host was added. Existing game listeners, timers, animation frames, observers, page-hide teardown, and bfcache recovery remain in place.
+- Zero runtime dependencies remain. The deployable static build is 77,286 bytes against the enforced 184,320-byte budget.
 
 ## Verification
 
-- `npm test` — focused coverage includes direct invite boot, invalid recovery, legacy links, localized native/clipboard payloads, same-route rematches, comparison outcomes/symbols, localization parity, real entry markup, keyboard isolation, and lifecycle behavior.
-- `npm run build` — generates `dist/` and enforces the static budget.
-- CI uploads the deployable static preview artifact for the PR; `main` deploys the same output through GitHub Pages.
+- `node --check src/app.mjs` and `node --check src/core.mjs` — pass.
+- `npm test` — 24 focused tests pass, covering UTC keys, deterministic selection of both challenge IDs, invite precedence, safe rollover, exact local-state validation, monotonic best updates, corrupt/blocked storage, same-route replay/share, localization, accessibility markup, lifecycle teardown, and existing social-loop behavior.
+- `npm run build` — produces `dist/` at 77,286 bytes within the 180 KiB static budget.
+- CI uploads the deployable static preview artifact for the pull request; `main` deploys the same output through GitHub Pages.
