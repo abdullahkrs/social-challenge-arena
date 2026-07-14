@@ -13,10 +13,25 @@ export class LumenLanesGame {
     this.cue = container.querySelector('[data-lumen-cue]');
     this.sequence = container.querySelector('[data-lumen-sequence]');
     this.player = container.querySelector('[data-lumen-player]');
+    this.controls = container.querySelector('.lumen-controls');
     this.buttons = [...container.querySelectorAll('[data-lane]')];
     this.exitButton = container.querySelector('[data-lumen-exit]');
-    if (!this.cue || !this.sequence || !this.player || this.buttons.length !== 3 || !this.exitButton) {
-      throw new Error('Lumen Lanes requires a cue, sequence, player, three lanes, and deliberate exit');
+    this.memoryActions = container.querySelector('[data-lumen-memory-actions]');
+    if (!this.memoryActions) {
+      this.memoryActions = document.createElement('div');
+      this.memoryActions.className = 'result-actions lumen-memory-actions';
+      this.memoryActions.dataset.lumenMemoryActions = '';
+      this.memoryActions.hidden = true;
+      this.memoryActions.innerHTML = [
+        '<button class="ghost" type="button" data-lumen-memory-repeat>Replay</button>',
+        '<button class="secondary" type="button" data-lumen-memory-ready>Ready</button>'
+      ].join('');
+      this.controls?.before(this.memoryActions);
+    }
+    this.memoryRepeatButton = this.memoryActions.querySelector('[data-lumen-memory-repeat]');
+    this.memoryReadyButton = this.memoryActions.querySelector('[data-lumen-memory-ready]');
+    if (!this.cue || !this.sequence || !this.player || !this.controls || this.buttons.length !== 3 || !this.exitButton || !this.memoryRepeatButton || !this.memoryReadyButton) {
+      throw new Error('Lumen Lanes requires a cue, sequence, player, lane controls, memory controls, and deliberate exit');
     }
     this.onUpdate = onUpdate;
     this.onFinish = onFinish;
@@ -24,6 +39,7 @@ export class LumenLanesGame {
     this.reducedMotion = Boolean(reducedMotion);
     this.abortController = null;
     this.timers = new Set();
+    this.memoryTimers = new Set();
     this.running = false;
     this.accepting = false;
     this.terminalPending = false;
@@ -79,27 +95,42 @@ export class LumenLanesGame {
       event.preventDefault();
       this.activate(lane);
     }, { signal });
+    this.memoryRepeatButton.addEventListener('click', () => this.replayMemorySequence(), { signal });
+    this.memoryReadyButton.addEventListener('click', () => this.startMemoryResponse(), { signal });
     this.exitButton.addEventListener('click', () => this.requestExit(), { signal });
   }
 
-  schedule(callback, delay) {
+  schedule(callback, delay, collection = this.timers) {
     const timer = setTimeout(() => {
-      this.timers.delete(timer);
+      collection.delete(timer);
       callback();
     }, Math.max(0, delay));
-    this.timers.add(timer);
+    collection.add(timer);
     return timer;
   }
 
-  clearTimer(timer) {
+  clearTimer(timer, collection = this.timers) {
     if (!timer) return;
     clearTimeout(timer);
-    this.timers.delete(timer);
+    collection.delete(timer);
+  }
+
+  clearMemoryTimers() {
+    this.memoryTimers.forEach(clearTimeout);
+    this.memoryTimers.clear();
   }
 
   setReducedMotion(value) {
     this.reducedMotion = Boolean(value);
     this.container.dataset.reduced = String(this.reducedMotion);
+  }
+
+  resetMemoryControls() {
+    this.clearMemoryTimers();
+    this.memoryActions.hidden = true;
+    this.controls.hidden = false;
+    this.memoryRepeatButton.disabled = true;
+    this.memoryReadyButton.disabled = true;
   }
 
   resetVisuals() {
@@ -118,6 +149,7 @@ export class LumenLanesGame {
       button.classList.remove('is-correct', 'is-wrong', 'is-blocked', 'is-risk');
       button.removeAttribute('data-marker');
     });
+    this.resetMemoryControls();
     this.exitButton.disabled = false;
     this.exitArmed = false;
   }
@@ -132,6 +164,8 @@ export class LumenLanesGame {
   }
 
   prepareStage(stage) {
+    this.resetMemoryControls();
+    this.emit('memory-clear', {});
     this.currentStage = stage;
     this.accepting = false;
     this.container.removeAttribute('data-feedback');
@@ -180,11 +214,17 @@ export class LumenLanesGame {
   }
 
   playMemorySequence(stage) {
+    if (!this.running || this.currentStage !== stage) return;
+    this.clearMemoryTimers();
+    this.accepting = false;
+    this.controls.hidden = true;
+    this.memoryActions.hidden = true;
+    this.memoryRepeatButton.disabled = true;
+    this.memoryReadyButton.disabled = true;
     this.sequence.hidden = false;
     this.sequence.textContent = '';
     this.cue.textContent = '•';
-    const watchKey = stage.memoryRule === 'first' ? 'lumenMemoryWatchFirst' : 'lumenMemoryWatchLast';
-    this.onAnnounce({ key: watchKey, values: { count: stage.sequence.length } });
+    this.emit('memory-clear', {});
     const stepMs = Math.max(220, Math.round(stage.previewMs / stage.sequence.length));
 
     stage.sequence.forEach((lane, index) => {
@@ -192,19 +232,46 @@ export class LumenLanesGame {
         if (!this.running || this.currentStage !== stage) return;
         this.cue.textContent = CUES[lane];
         this.sequence.textContent = stage.sequence.slice(0, index + 1).map((value) => CUES[value]).join(' ');
-      }, index * stepMs);
+      }, index * stepMs, this.memoryTimers);
     });
 
-    this.schedule(() => {
-      if (!this.running || this.currentStage !== stage) return;
-      this.cue.textContent = '?';
-      this.sequence.textContent = stage.sequence.map(() => '•').join(' ');
-      this.accepting = true;
-      this.roundStartedAt = performance.now();
-      const chooseKey = stage.memoryRule === 'first' ? 'lumenMemoryChooseFirst' : 'lumenMemoryChooseLast';
-      this.onAnnounce({ key: chooseKey });
-      this.deadlineTimer = this.schedule(() => this.resolveMiss('slow'), stage.deadlineMs);
-    }, stage.previewMs + 140);
+    this.schedule(() => this.presentMemoryDecision(stage), stage.previewMs + 140, this.memoryTimers);
+  }
+
+  presentMemoryDecision(stage) {
+    if (!this.running || this.currentStage !== stage) return;
+    this.clearMemoryTimers();
+    this.cue.textContent = '?';
+    this.sequence.textContent = stage.sequence.map(() => '•').join(' ');
+    this.memoryActions.hidden = false;
+    this.controls.hidden = true;
+    this.memoryRepeatButton.disabled = false;
+    this.memoryReadyButton.disabled = false;
+    this.emit('memory-ready', { stage });
+    this.memoryReadyButton.focus({ preventScroll: true });
+  }
+
+  replayMemorySequence() {
+    const stage = this.currentStage;
+    if (!this.running || stage?.mechanic !== 'memory' || this.accepting) return;
+    this.playMemorySequence(stage);
+  }
+
+  startMemoryResponse() {
+    const stage = this.currentStage;
+    if (!this.running || stage?.mechanic !== 'memory' || this.accepting) return;
+    this.clearMemoryTimers();
+    this.memoryActions.hidden = true;
+    this.controls.hidden = false;
+    this.memoryRepeatButton.disabled = true;
+    this.memoryReadyButton.disabled = true;
+    this.cue.textContent = '?';
+    this.sequence.textContent = stage.sequence.map(() => '•').join(' ');
+    this.accepting = true;
+    this.roundStartedAt = performance.now();
+    this.emit('memory-response', { stage });
+    this.buttons[1].focus({ preventScroll: true });
+    this.deadlineTimer = this.schedule(() => this.resolveMiss('slow'), stage.deadlineMs);
   }
 
   activate(index) {
@@ -311,8 +378,11 @@ export class LumenLanesGame {
     this.terminalPending = true;
     this.clearTimer(this.deadlineTimer);
     this.clearTimer(this.exitTimer);
+    this.clearMemoryTimers();
     this.deadlineTimer = null;
     this.exitTimer = null;
+    this.memoryActions.hidden = true;
+    this.controls.hidden = false;
     this.exitButton.disabled = true;
     this.buttons.forEach((button) => { button.disabled = true; });
     const summary = summarizeLumenRun(this.snapshot);
@@ -335,6 +405,7 @@ export class LumenLanesGame {
     this.abortController = null;
     this.timers.forEach(clearTimeout);
     this.timers.clear();
+    this.clearMemoryTimers();
     this.deadlineTimer = null;
     this.exitTimer = null;
     this.currentStage = null;
