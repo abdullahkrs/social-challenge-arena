@@ -1,43 +1,42 @@
-# Private Daily Challenge Loop Evidence
+# Three-Challenge Catalog and Lane Spark Evidence
 
 ## Product
 
-- **Constraint addressed:** ordinary visits had no fresh return reason and completed scores disappeared after the session.
-- **Daily route:** a canonical UTC date deterministically selects Orbit Lock or Echo Grid and one seed. Independent devices receive the same challenge and route for that date.
-- **Visible journey:** compact discovery entry → one primary daily action → play → result and private best/new-best state → same-route replay → strict share → friend attempt → comparison → rematch share.
-- **Safe rollover:** the date is checked only when discovery is entered. An active game, result, replay, or restored interrupted run keeps its original route.
-- **Compatibility:** valid invitations still take precedence at boot. Daily sharing uses the unchanged strict version-1 challenge, seed, score, checksum, and allowlist format, so links remain playable after the date changes.
-- **Scope:** both existing challenges prove one shared daily flow. No third challenge, calendar service, retention engine, account, backend, notification, or speculative framework was added.
+- **Constraint addressed:** the live catalog covered precision timing and visual memory only.
+- **New challenge:** Lane Spark is a materially different one-thumb directional-reaction game. Twelve deterministic signals ask for left, middle, or right selection inside a bounded response window.
+- **Visible journey:** discovery → concise instruction → short play → bounded score → replay/new route → strict invitation → same-route friend attempt → score comparison → rematch share.
+- **Platform proof:** the existing catalog, daily selector, host boundary, result, replay, invitation allowlist, comparison, rematch, localization, and lifecycle now serve three real challenges without a generic game engine.
+- **Compatibility:** Orbit Lock and Echo Grid IDs, version-1 invitation shape, checksum salt, numeric bounds, direct-invite precedence, daily local state, UTC rollover, and bfcache recovery remain intact.
 
 ## Islamic content policy — PASS
 
-- Theme: optional abstract daily precision or visual-memory skill practice.
+- Theme: abstract neutral direction-and-reaction skill practice.
 - Characters/clothing: none.
-- Symbols: neutral circles, tiles, numbers, checks, crosses, arrows, and date text.
+- Symbols: neutral arrows, a circle, lanes, numbers, checks, crosses, and score text.
 - Audio: none.
-- Rewards: bounded non-monetary score and private on-device best only; no wagering, chance reward, collectible, purchase, or monetary incentive.
-- Social pressure: unlimited optional replay with no streak, countdown, missed-day message, shame, fear of missing out, public ranking, or manipulative urgency.
-- Safety: no physical imitation, dangerous instruction, contact access, personal-data request, or harmful challenge.
+- Rewards: bounded non-monetary score only; no wagering, chance reward, purchase, collectible, or monetization.
+- Social pressure: optional private invitation and rematch only; no public ranking, humiliation, urgency, streak, or missed-day pressure.
+- Safety: seated/touch interaction only; no physical imitation, dangerous instruction, contact access, or personal-data request.
 
 ## Accessibility and localization
 
-- Arabic RTL, English, and Turkish share one key-complete localization system for the daily title, date, challenge identity, action, best/new-best, storage fallback, result, sharing, and announcements.
-- The daily entry has one clearly labelled primary action at least 48 CSS px high; layouts wrap at 320px and adapt through 360–430px and desktop widths.
-- Daily best and new-best are explicit text, not color-only signals, and are appended once to the existing result announcement.
-- Logical focus remains discovery → daily action → game → result → replay/share/catalog. An interrupted bfcache run returns to the instructions surface without changing its route.
-- Reduced-effects mode changes presentation only; challenge choice, seed, score, best decision, sharing, comparison, and lifecycle remain identical.
+- Arabic RTL, English, and Turkish use one key-complete localization system for catalog identity, instruction, lane labels, feedback, result, share, comparison, and daily states.
+- Lane placement is physically stable left-to-right even in RTL; localized labels remain readable and the arrow/circle cue does not rely on color.
+- Three primary lane targets remain at least 48 CSS px, support pointer/touch and native keyboard activation, and expose 1–3 shortcuts.
+- The response-time bar is functional feedback updated directly rather than decorative animation; reduced effects preserves the same route, window, score, decisions, and teardown.
+- The three-card discovery surface collapses into compact horizontal cards at phone widths without carousel controls, onboarding slides, or added explanatory paragraphs.
 
 ## Privacy, security, reliability, and performance
 
-- Local daily state is limited to exactly `dateKey`, `challengeId`, `seed`, and bounded `best`. No identifier, account, cookie, analytics, fingerprint, cloud sync, or personal data is stored.
-- Malformed, extra-field, stale, unsupported, mismatched-route, or out-of-range data is ignored and removed. Blocked storage degrades to a localized session-only best while the complete journey remains usable.
-- Invite shape, version, challenge allowlist, numeric bounds, and deterministic tamper rejection remain unchanged.
-- No date polling, interval, observer, extra canvas, or duplicated host was added. Existing game listeners, timers, animation frames, observers, page-hide teardown, and bfcache recovery remain in place.
-- Zero runtime dependencies remain. The deployable static build is 77,286 bytes against the enforced 184,320-byte budget.
+- No account, cookie, analytics, fingerprinting, contacts, third-party runtime asset, backend, or network API.
+- Lane Spark owns one abort controller, bounded timeout set, and one animation frame; finish, navigation, page hide, replay, challenge switching, and bfcache recovery cancel all owned work.
+- Invalid IDs, malformed values, extra fields, unsupported versions, checksum mismatch, and out-of-range scores still fail safely into normal discovery.
+- Daily storage remains limited to exactly `dateKey`, `challengeId`, `seed`, and bounded `best`.
+- Zero runtime dependencies and the existing 180 KiB uncompressed static budget remain enforced.
 
 ## Verification
 
-- `node --check src/app.mjs` and `node --check src/core.mjs` — pass.
-- `npm test` — 24 focused tests pass, covering UTC keys, deterministic selection of both challenge IDs, invite precedence, safe rollover, exact local-state validation, monotonic best updates, corrupt/blocked storage, same-route replay/share, localization, accessibility markup, lifecycle teardown, and existing social-loop behavior.
-- `npm run build` — produces `dist/` at 77,286 bytes within the 180 KiB static budget.
-- CI uploads the deployable static preview artifact for the pull request; `main` deploys the same output through GitHub Pages.
+- `node --check src/core.mjs`, `node --check src/app.mjs`, and `node --check src/lane-game.mjs` — pass.
+- `npm test` — 27 focused tests pass for deterministic routes/scoring, all-three daily selection, strict invitations, legacy compatibility, same-route rematches, localization parity, real entry markup, keyboard isolation, lifecycle teardown, and existing journeys.
+- `npm run build` — passes the enforced 180 KiB static budget.
+- CI publishes the deployable static preview artifact for the pull request; `main` deploys the same output through GitHub Pages.
