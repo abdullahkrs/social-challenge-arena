@@ -4,7 +4,7 @@
 
 ### Delivered outcome
 
-The existing result action now generates one local, privacy-safe 900 × 1125 PNG result card for all four live challenges before sharing. The visual artifact uses the established platform palette and challenge-owned geometry, includes the localized challenge identity and bounded score, and adds challenger/player scores plus a non-color win/loss/tie symbol for invited results.
+The existing result action now generates one local, privacy-safe 720 × 900 PNG result card for all four live challenges before sharing. The renderer preserves the established 900 × 1125 composition in a scaled 4:5 output, reducing real-browser PNG size without changing card content. The visual artifact uses the established platform palette and challenge-owned geometry, includes the localized challenge identity and bounded score, and adds challenger/player scores plus a non-color win/loss/tie symbol for invited results.
 
 The complete journey remains:
 
@@ -33,7 +33,7 @@ The complete journey remains:
 - Temporary canvas memory is released after success, cancellation, error, repeated share, replay/navigation, language change, page hide, and bfcache recovery.
 - Oversized or empty blobs are rejected before file sharing.
 - Generated filenames contain only the challenge ID and bounded score; the image contains no URL, personal data, device data, or hidden identifier.
-- Reduced effects do not change card data, score, comparison, URL, or fallback behavior.
+- Reduced effects do not change card data, score, comparison, URL, image content, or fallback behavior.
 
 ### Privacy and security
 
@@ -52,13 +52,14 @@ No account, backend, analytics, cookies, fingerprinting, contacts, storage permi
 
 ### Verification
 
-- Reviewed implementation head: `36fff7a71e6414da25032c04b702b5f4d96330c7`.
-- GitHub Actions CI **#95** passed dependency installation, the complete repository test suite, production build, and preview upload.
-- Focused result-card coverage: **9/9 passing** for deterministic models across all four challenge IDs, solo/invited win-loss-tie content, Arabic RTL metadata, score bounds, explicit file support, native text fallback support, payload construction, cancellation, blob limits, PNG file generation, and canvas cleanup.
-- Production static preview: **15 files / 144,821 bytes**, within the unchanged **184,320-byte** budget.
-- Uploaded preview ZIP: **42,607 bytes**.
+- Reviewed implementation head: `db10cb23ce3e487ffc423b19c3d740634b387bb9`.
+- GitHub Actions CI **#99** passed dependency installation, the complete repository test suite, production build, and preview upload.
+- Focused unit coverage remains **9/9 passing** for deterministic models across all four challenge IDs, solo/invited win-loss-tie content, Arabic RTL metadata, score bounds, explicit file support, native text fallback support, payload construction, cancellation, blob limits, PNG file generation, and canvas cleanup.
+- A dependency-free real Chromium regression renders **48 cards**: all four challenges × Arabic/English/Turkish × solo/win/loss/tie. Every generated PNG stays inside the unchanged **665,600-byte** file bound at the production 720 × 900 output size.
+- Production static preview: **15 files / 144,980 bytes**, within the unchanged **184,320-byte** budget.
+- Uploaded preview ZIP: **42,649 bytes**.
 - Existing regression coverage remains current for all four mechanics, daily selection and persistence, strict links and checksum behavior, sender/friend equivalence, result comparison/rematch, localization parity, accessibility entry points, keyboard/touch controls, lifecycle teardown, and bfcache recovery.
 
 ### Scope review
 
-Changed runtime surfaces are limited to the share orchestrator, localized share/card copy, and the new card renderer. Challenge mechanics, scoring, daily rotation, result truth, invitation compatibility, CSP, existing interface layout, and runtime dependencies are unchanged.
+Changed runtime surfaces remain limited to the share orchestrator, localized share/card copy, and card renderer. The QA correction only scales the existing composition to a smaller 4:5 PNG and adds a real-browser size regression. Challenge mechanics, scoring, daily rotation, result truth, invitation compatibility, CSP, existing interface layout, and runtime dependencies are unchanged.
