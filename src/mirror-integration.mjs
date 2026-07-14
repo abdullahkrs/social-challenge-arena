@@ -86,6 +86,18 @@ if (typeof document !== 'undefined') {
       activeStage = event.detail.stage;
       activeSnapshot = event.detail.snapshot;
       updateHud();
+
+      // The shared live region owns stage announcements. Keeping the hidden
+      // spatial description non-live prevents overlapping duplicate speech.
+      const sourceDescription = mirror.querySelector('[data-mirror-source-description]');
+      sourceDescription?.removeAttribute('aria-live');
+      sourceDescription?.removeAttribute('aria-atomic');
+
+      // Return keyboard focus to the generated board after every transition,
+      // including stages completed from the separate Check pattern control.
+      queueMicrotask(() => {
+        mirror.querySelector('[data-mirror-target-cell][data-current="true"]')?.focus({ preventScroll: true });
+      });
     });
     mirror.addEventListener('mirror:snapshot', (event) => {
       activeSnapshot = event.detail.snapshot;
