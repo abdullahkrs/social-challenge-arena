@@ -2,15 +2,18 @@ export const SHARE_VERSION = 1;
 export const ORBIT_LOCK_ID = 'orbit-lock';
 export const ECHO_GRID_ID = 'echo-grid';
 export const LUMEN_LANES_ID = 'lumen-lanes';
+export const MIRROR_FUSE_ID = 'mirror-fuse';
 export const CHALLENGE_ID = ORBIT_LOCK_ID;
-export const CHALLENGE_IDS = Object.freeze([ORBIT_LOCK_ID, ECHO_GRID_ID, LUMEN_LANES_ID]);
+export const LEGACY_DAILY_CHALLENGE_IDS = Object.freeze([ORBIT_LOCK_ID, ECHO_GRID_ID, LUMEN_LANES_ID]);
+export const CHALLENGE_IDS = Object.freeze([...LEGACY_DAILY_CHALLENGE_IDS, MIRROR_FUSE_ID]);
+export const DAILY_EXPANSION_DATE_KEY = '2026-08-01';
 export const SCORE_MAX = 9999;
 export const SEED_MAX = 0xffffffff;
 export const DAILY_STORAGE_KEY = 'sca-daily-best';
 const ALLOWED_KEYS = ['c', 'ck', 's', 't', 'v'];
 const DAILY_KEYS = ['best', 'challengeId', 'dateKey', 'seed'];
 const DATE_KEY_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
-// Kept stable so every previously generated Orbit Lock and Echo Grid v1 link remains valid.
+// Kept stable so every previously generated v1 invitation remains valid.
 const CHECKSUM_SALT = 'sca-orbit-lock-v1';
 
 export function clamp(value, min, max) {
@@ -75,6 +78,52 @@ export function lumenPlan(seed, rounds = 18) {
   return plan;
 }
 
+export function reflectPattern(pattern, columns = 3) {
+  if (!Array.isArray(pattern) || pattern.length === 0 || !Number.isInteger(columns) || columns < 1 || pattern.length % columns !== 0) {
+    throw new RangeError('Invalid reflection pattern');
+  }
+  const reflected = [];
+  for (let index = 0; index < pattern.length; index += columns) {
+    reflected.push(...pattern.slice(index, index + columns).reverse());
+  }
+  return reflected;
+}
+
+export function mirrorPlan(seed, rounds = 10) {
+  const rng = makeRng(seed ^ 0x7f4a7c15);
+  return Array.from({ length: rounds }, (_, round) => {
+    let source;
+    do {
+      source = Array.from({ length: 12 }, () => (rng() > 0.48 ? 1 : 0));
+    } while (source.reduce((sum, value) => sum + value, 0) < 4 || source.reduce((sum, value) => sum + value, 0) > 8);
+
+    const correct = reflectPattern(source, 3);
+    const variants = [];
+    const seen = new Set([correct.join('')]);
+    while (variants.length < 2) {
+      const candidate = [...correct];
+      const flips = round < 4 ? 1 : 2;
+      const flipped = new Set();
+      while (flipped.size < flips) flipped.add(Math.floor(rng() * candidate.length));
+      flipped.forEach((index) => { candidate[index] = candidate[index] ? 0 : 1; });
+      const key = candidate.join('');
+      if (!seen.has(key)) {
+        seen.add(key);
+        variants.push(candidate);
+      }
+    }
+    const correctIndex = Math.floor(rng() * 3);
+    const options = [...variants];
+    options.splice(correctIndex, 0, correct);
+    return {
+      source,
+      options,
+      correctIndex,
+      deadlineMs: Math.round(Math.max(2200, 3600 - round * 120 + rng() * 160))
+    };
+  });
+}
+
 export function angularDistance(a, b) {
   const full = Math.PI * 2;
   return Math.abs(((a - b + Math.PI) % full + full) % full - Math.PI);
@@ -119,6 +168,17 @@ export function scoreLumenRound({ elapsedMs, deadlineMs, combo, round }) {
   const comboBonus = Math.min(120, Math.max(0, combo - 1) * 12);
   const roundBonus = Math.min(40, Math.max(0, round) * 3);
   return { reaction: safeElapsed, points: clamp(base + comboBonus + roundBonus, 0, 500) };
+}
+
+export function scoreMirrorRound({ elapsedMs, deadlineMs, combo, round }) {
+  const safeDeadline = clamp(Math.round(Number(deadlineMs) || 3000), 1600, 5000);
+  const elapsed = Number(elapsedMs);
+  const safeElapsed = clamp(Math.round(Number.isFinite(elapsed) ? elapsed : safeDeadline), 0, safeDeadline);
+  const speed = clamp(1 - safeElapsed / safeDeadline, 0, 1);
+  const base = 180 + Math.round(speed * 300);
+  const comboBonus = Math.min(140, Math.max(0, combo - 1) * 28);
+  const roundBonus = Math.min(50, Math.max(0, round) * 5);
+  return { response: safeElapsed, points: clamp(base + comboBonus + roundBonus, 0, 650) };
 }
 
 export function compareScores(score, target) {
@@ -173,7 +233,8 @@ export function utcDateKey(input = new Date()) {
 export function dailyChallengeFor(input = new Date()) {
   const dateKey = utcDateKey(input);
   const challengeHash = fnv1aNumber(`daily|${dateKey}`);
-  const challengeId = CHALLENGE_IDS[challengeHash % CHALLENGE_IDS.length];
+  const pool = dateKey < DAILY_EXPANSION_DATE_KEY ? LEGACY_DAILY_CHALLENGE_IDS : CHALLENGE_IDS;
+  const challengeId = pool[challengeHash % pool.length];
   const seed = fnv1aNumber(`route|${dateKey}|${challengeId}`);
   return { dateKey, challengeId, seed };
 }

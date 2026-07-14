@@ -1,51 +1,64 @@
-# Platform UI and UX Consistency Evidence
+# Mirror Fuse and Stable Daily Expansion Evidence
 
 ## Product outcome
 
-- **Constraint addressed:** three complete challenge journeys existed, but platform controls, mobile hierarchy, gameplay chrome, result actions, and shared symbols did not yet read as one product.
-- **Bounded correction:** the challenge mechanics, scoring, deterministic routes, invitation format, daily behavior, and lifecycle code are unchanged. The delivery changes only connected platform presentation, retained platform iconography, responsive hierarchy, and supporting verification.
-- **Discovery:** the large heading and card hierarchy are reduced at mobile widths; the daily route remains prominent, while all three cards are more compact and consistently structured.
-- **Connected surfaces:** top controls, friend context, back navigation, gameplay HUD, result identity, button hierarchy, spacing, radius, focus, pressed behavior, and alignment now follow one platform language.
+- **Constraint addressed:** the coherent platform had only three abstract skills. Mirror Fuse adds a materially different spatial-reflection decision without rebuilding the shared platform.
+- **Challenge:** each seeded round presents a 4×3 source pattern and three candidate answers. The player chooses the exact horizontal reflection across ten rounds with three chances.
+- **Complete journey:** catalog discovery → concise instruction → play → result → replay/new route → localized strict share → direct friend attempt → comparison → rematch share → catalog return.
+- **Bounded delivery:** existing Orbit Lock, Echo Grid, Lumen Lanes, result, comparison, sharing, and platform controls retain their established behavior and visual language.
 
-## Font Awesome Free
+## Stable daily expansion
 
-- Font Awesome Free 6.7.2 Solid is used for retained platform-interface icons.
-- A generated WOFF2 subset containing exactly six retained glyphs is embedded locally in `ui.css`; live icons are represented by explicit decorative DOM children with `aria-hidden="true"`, including gamepad, language, accessibility, back, trophy, and friend context.
-- Text-bearing localized actions intentionally render without pseudo-element Font Awesome glyphs, preventing private-use glyphs from entering accessible names while preserving the established action hierarchy.
-- There is no CDN, remote font, remote script, runtime network request, package runtime, full Font Awesome bundle, or custom SVG platform icon.
-- Gameplay-owned arrows, diamond, target, grid, and route cues remain part of their existing mechanics.
-- `THIRD_PARTY_NOTICES.md` records the Font Awesome icon, font, and code licenses, including **SIL OFL 1.1** for the embedded WOFF2 subset, and is included in the production output.
+- The rollout boundary is **2026-08-01 UTC**.
+- Dates through **2026-07-31** continue to use the original ordered pool `[orbit-lock, echo-grid, lumen-lanes]` and therefore preserve the exact challenge and seed produced by the previous selector.
+- Dates from **2026-08-01** use the ordered four-challenge pool and can deterministically select Mirror Fuse.
+- Focused fixtures preserve exact legacy assignments and prove all four IDs occur after the boundary.
+- Daily storage remains only `dateKey`, `challengeId`, `seed`, and bounded `best`; stale, corrupt, or unavailable storage never prevents play.
+- The route remains optional with unlimited replay and no streak, countdown, missed-day pressure, expiry, urgency, or public ranking.
 
-## Mobile, RTL, and accessibility
+## UI and UX consistency
 
-- At 320–430 CSS px, the language control remains labeled and visible, and the reduced-effects control retains a native focusable checkbox plus a recognizable Font Awesome accessibility indicator inside its 48 px target.
-- Arabic RTL mirrors only the directional back icon. Universal trophy, accessibility, language, gamepad, and friend-context icons are not mirrored.
-- Existing Arabic, English, and Turkish localization remains the single source of user-facing text; no new user-facing translation key was required.
-- Existing visible focus, live announcements, native buttons, 48 px practical targets, non-color gameplay feedback, text zoom behavior, keyboard controls, and reduced-effects semantics remain intact.
-- Gameplay HUD values are presented in one compact shared surface without hiding score, round, chances, or streak and without changing any game state.
-- Result DOM and visual order agree: the primary friend-share/rematch action is first, followed by replay and the two navigation alternatives.
+- Mirror Fuse reuses the existing compact challenge card, instruction card, four-value HUD, result hierarchy, comparison surface, and action order.
+- Platform controls continue to use the existing locally bundled Font Awesome subset; gameplay patterns, mirror axis, diamonds, checks, and crosses are mechanic-owned CSS or semantic text.
+- The fourth card extends the established catalog to four columns on wide screens, a balanced two-column layout at tablet widths, and one compact card per row on phones.
+- The arena is explicitly left-to-right because reflection geometry is language-independent; Arabic RTL still applies to surrounding platform text and navigation.
+- Responsive rules cover 320–430 CSS px without introducing a parallel component system or unrelated redesign.
 
-## Reliability, privacy, and security
+## Localization and accessibility
 
-- No runtime JavaScript, challenge class, scoring function, route generator, share codec, allowlist, checksum, storage record, page-hide handler, bfcache recovery, timer, listener, or focus transition was changed.
-- The existing strict version-1 invitation, score bounds, direct-entry precedence, daily validation, private local best, teardown, replay, challenge switching, and language switching behavior remain unchanged.
-- Content Security Policy remains no-network and is expanded only to permit the locally embedded `data:` WOFF2 font. `connect-src 'none'` remains unchanged.
-- No account, backend, analytics, cookie, contact access, tracking, external image, external font, API, UI framework, or new runtime dependency was added.
+- Arabic RTL, English, and Turkish use the existing key-parity localization system for name, tagline, instruction, prompt, feedback, controls, arena, option labels, card metadata, sharing, and comparison.
+- The three answers are native buttons with localized accessible names, visible focus, touch/pointer/keyboard operation, and practical targets above 48 CSS px.
+- Every round now exposes the source as localized row-and-cell text, includes each candidate pattern in its button name, and announces the source through the existing live region so the puzzle is solvable without sight.
+- Mid-round language changes refresh the active pattern descriptions; the owned language observer is disconnected in `destroy()`.
+- Source and candidate cells use shape and text glyphs in addition to color. Correct, wrong, and timeout outcomes include `✓` or `×`, localized live announcements, and score/chance changes.
+- Option order and challenge geometry are not mirrored merely because the interface language is Arabic.
+- Reduced effects changes transition duration only; source patterns, candidates, answer index, deadlines, scoring, route, and result remain identical.
+
+## Reliability, privacy, security, and performance
+
+- Mirror Fuse owns one abort controller, one tracked timeout set, the active deadline timer, the language observer, transient classes, feedback marks, disabled state, and focus transition; `destroy()` clears and resets all of them.
+- Replay, challenge switching, page hide, and bfcache recovery use the existing shared destruction path before another host starts.
+- Strict version-1 invitations keep the same fields, checksum salt, bounds, and tamper rejection while adding only the known `mirror-fuse` ID to the allowlist.
+- No account, backend, analytics, cookie, contact access, tracking, remote font, remote image, API, UI framework, runtime dependency, or network permission was added.
+- Content Security Policy remains no-network with `connect-src 'none'`.
 
 ## Islamic content policy — PASS
 
-- Theme: abstract neutral social skill arcade presentation.
+- Theme: neutral abstract pattern reflection and spatial reasoning.
 - Characters/clothing: none.
-- Symbols: neutral interface icons, existing geometric challenge cues, numbers, arrows, checks, and comparison marks.
+- Symbols: geometric cells, a mirror divider, question mark, numbers, checks, and crosses; no devotional or questionable symbolism.
 - Audio: none.
-- Rewards: bounded non-monetary scores and private local best only; no wagering, chance reward, purchase, collectible economy, or monetary incentive.
-- Social pressure: optional private challenge and rematch only; no humiliation, public ranking, urgency, streak pressure, missed-day message, or fear of missing out.
-- Safety: no physical imitation, dangerous instruction, contact access, personal-data request, or harmful challenge.
+- Rewards: bounded non-monetary score and optional private daily best only; no wagering, chance reward, loot box, purchase, or monetary incentive.
+- Social pressure: optional private invitation and rematch only; no humiliation, public ranking, urgency, streak pressure, missed-day message, or fear of missing out.
+- Safety risks: no physical imitation, dangerous instruction, sensor access, contact access, or personal-data request.
 - Final decision: **PASS**.
 
 ## Verification
 
-- `tests/ui-consistency.test.mjs` verifies local selective Font Awesome integration, complete icon/font/code licensing notice, absence of remote providers and custom SVG platform controls, production inclusion, the visible mobile reduced-effects indicator, explicit hidden decorative icons, plain localized text actions, and RTL back behavior.
-- The unchanged existing suite continues to cover deterministic mechanics and scoring, strict invitations, sender/friend equivalence, daily selection and storage, direct entry, rematch, localization parity, keyboard isolation, reduced-effects equivalence, teardown, page-hide, bfcache recovery, and all three challenge regressions.
-- The CI workflow runs `npm ci --ignore-scripts`, all **32/32 tests**, the production build, and deployable preview upload.
-- The synchronized static preview contains 12 files totaling **104,451 bytes**, within the unchanged **184,320-byte** uncompressed budget.
+- Accessibility implementation head: `e2e1c95b42f5738fd64e6785697531ac9d83a1a2`.
+- GitHub Actions CI run **#88** passed `npm ci --ignore-scripts`, the complete `npm test` suite, production `npm run build`, and preview upload.
+- Focused accessibility coverage verifies the referenced source description, three described option buttons, localized row/cell wording in Arabic, English, and Turkish, live source announcement, and language-observer teardown.
+- Existing tests continue to cover deterministic reflection plans, unique distractors, exact scoring bounds, zero-millisecond input, sender/friend equivalence, all four strict invitations, comparison/rematch, localization parity, native controls, lifecycle teardown, reduced-effects equivalence, exact legacy daily fixtures, and future four-ID selection.
+- The production preview contains **14 files totaling 128,210 bytes**, within the unchanged **184,320-byte** uncompressed budget.
+- The uploaded preview ZIP is **37,965 bytes** with SHA-256 digest `578085ec1bd3ba2954a8bc3fec2a94efc7c42fc716d7ad066a711aa5b1639daa`.
+- Static preview inspection confirmed the expected entry point, four catalog cards, all four hosts, local styles, localization module, no remote asset, and complete deployable file set.
