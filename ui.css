@@ -1,0 +1,152 @@
+/* Font Awesome Free 6.7.2 — selected solid glyph subset; see THIRD_PARTY_NOTICES.md. */
+@font-face {
+  font-family: "Font Awesome 6 Free";
+  font-style: normal;
+  font-weight: 900;
+  font-display: block;
+  src: url("data:font/woff2;base64,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") format("woff2");
+}
+
+:root {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --ui-radius-sm: 14px;
+  --ui-radius: 20px;
+  --ui-transition: 160ms ease;
+}
+
+.fa-icon,
+.action-icon::before {
+  font-family: "Font Awesome 6 Free";
+  font-style: normal;
+  font-weight: 900;
+  line-height: 1;
+  text-rendering: auto;
+}
+.fa-gamepad::before { content: "\f11b"; }
+.fa-globe::before { content: "\f0ac"; }
+.fa-universal-access::before { content: "\f29a"; }
+.fa-play::before { content: "\f04b"; }
+.fa-arrow-left::before { content: "\f060"; }
+.fa-rotate-right::before { content: "\f2f9"; }
+.fa-share-nodes::before { content: "\f1e0"; }
+.fa-shuffle::before { content: "\f074"; }
+.fa-list::before { content: "\f03a"; }
+.fa-trophy::before { content: "\f091"; }
+.fa-user-group::before { content: "\f500"; }
+
+.action-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: .65rem;
+}
+.action-icon::before { flex: 0 0 auto; font-size: .92em; }
+
+.topbar { padding-bottom: 8px; }
+.brand-mark { font-size: 1.05rem; }
+.controls { min-width: 0; }
+.select-wrap { position: relative; display: inline-flex; align-items: center; min-width: 0; }
+.select-wrap .control-icon { position: absolute; inset-inline-start: 14px; z-index: 1; color: var(--accent); pointer-events: none; }
+.select-wrap select { min-width: 126px; max-width: 150px; padding-inline: 38px 30px; text-overflow: ellipsis; }
+.motion-control { transition: border-color var(--ui-transition), background var(--ui-transition); }
+.motion-control:hover { border-color: rgba(124, 246, 212, .4); background: rgba(22, 32, 69, .9); }
+.motion-control .fa-icon { color: var(--accent); }
+
+.discovery { align-content: start; gap: 16px; padding-top: clamp(16px, 4vw, 32px); }
+.catalog-header { max-width: 660px; }
+.catalog-header h1 { font-size: clamp(2.2rem, 7vw, 4.7rem); }
+.catalog-header .tagline { margin-top: 10px; }
+.invite-badge { gap: 9px; }
+.invite-badge > .fa-icon { color: var(--accent); }
+
+.daily-entry { border-radius: var(--ui-radius); padding: 14px 16px; box-shadow: 0 14px 38px rgba(0, 0, 0, .2); }
+.daily-icon { width: 58px; height: 58px; border-radius: 17px; }
+.daily-start { min-width: 136px; }
+
+.challenge-card {
+  min-height: 218px;
+  border-radius: var(--ui-radius);
+  box-shadow: 0 18px 52px rgba(0, 0, 0, .25);
+  transition: transform var(--ui-transition), border-color var(--ui-transition), background var(--ui-transition);
+}
+.challenge-card:active { transform: scale(.99); }
+.card-copy small { line-height: 1.35; }
+.card-meta { padding-top: 2px; border-top: 1px solid rgba(176, 193, 255, .1); }
+
+.primary, .secondary, .ghost, .icon-button { border-radius: var(--ui-radius-sm); transition: transform var(--ui-transition), filter var(--ui-transition), border-color var(--ui-transition), background var(--ui-transition); }
+.primary:active, .secondary:active, .ghost:active, .icon-button:active { transform: scale(.98); }
+.secondary:hover, .ghost:hover, .icon-button:hover { border-color: rgba(124, 246, 212, .38); }
+
+.back-button { transform: none !important; display: grid; place-items: center; }
+.back-button .fa-icon { transition: transform var(--ui-transition); }
+[dir=rtl] .back-button .fa-icon { transform: rotate(180deg); }
+
+.instruction-card, .result-card { border-radius: var(--ui-radius); gap: 16px; }
+.instruction-card h2, .result-card h2 { font-size: clamp(2rem, 7vw, 3.6rem); }
+.instruction-icon { width: 84px; height: 84px; border-radius: 24px; font-size: 2.6rem; }
+
+.game { gap: 10px; }
+.hud { gap: 6px; padding: 5px; border: 1px solid var(--line); border-radius: 18px; background: rgba(8, 13, 34, .42); }
+.hud div { min-height: 52px; border: 0; border-radius: 13px; background: rgba(24, 35, 77, .72); }
+.hud span { font-size: .68rem; }
+.hud strong { font-size: 1.08rem; }
+
+.result-mark { display: grid; place-items: center; width: 52px; height: 52px; border-radius: 16px; color: var(--accent-ink); background: linear-gradient(145deg, #ffd47a, var(--accent)); font-size: 1.25rem; }
+.result-card .eyebrow { margin-bottom: -6px; }
+.result-score { font-size: clamp(4.8rem, 21vw, 8rem); }
+.comparison { border-radius: var(--ui-radius); }
+.result-actions button { min-width: 0; padding-inline: 14px; }
+.result-actions .primary { order: -1; }
+
+@media (max-width: 720px) {
+  .catalog-header { text-align: start; justify-items: start; }
+  .challenge-card {
+    min-height: 148px;
+    grid-template-columns: 94px minmax(0, 1fr);
+    gap: 12px;
+    padding: 14px;
+    border-radius: 18px;
+  }
+  .card-visual { grid-row: 1 / 3; min-height: 90px; }
+  .card-meta { grid-column: 2; }
+  .orbit-visual { width: 76px; height: 76px; border-width: 8px; }
+  .echo-visual { width: 78px; height: 78px; gap: 5px; }
+  .lumen-visual { width: 82px; height: 78px; gap: 5px; }
+  .lumen-visual b { width: 38px; height: 38px; border-radius: 12px; font-size: 1.25rem; }
+  .card-copy strong { font-size: 1.25rem; }
+  .card-copy small { font-size: .86rem; }
+}
+
+@media (max-width: 620px) {
+  .topbar { align-items: center; padding-inline: 12px; }
+  .controls { gap: 7px; }
+  .select-wrap select { min-width: 112px; max-width: 122px; }
+  .motion-control { width: 48px; padding: 0; justify-content: center; }
+  .motion-control input { position: absolute; width: 1px; height: 1px; opacity: 0; }
+  .motion-control .fa-icon { font-size: 1.05rem; }
+  .motion-control:has(input:checked) { color: var(--accent-ink); border-color: var(--accent); background: var(--accent); }
+  .motion-control:has(input:checked) .fa-icon { color: var(--accent-ink); }
+  .screen { min-height: calc(100svh - 70px); }
+  .daily-entry { grid-template-columns: 54px minmax(0, 1fr); padding: 12px; }
+  .daily-icon { width: 50px; height: 50px; border-radius: 15px; }
+  .daily-start { min-height: 48px; }
+  .instruction-card, .result-card { padding: 22px 18px; }
+  .hud { position: sticky; top: 4px; z-index: 2; backdrop-filter: blur(12px); }
+  .result-actions { gap: 8px; }
+  .result-actions .primary { order: -1; }
+}
+
+@media (max-width: 360px) {
+  .brand-mark { width: 38px; height: 38px; }
+  .select-wrap select { min-width: 104px; max-width: 108px; font-size: .88rem; }
+  .catalog-header h1 { font-size: 2.05rem; }
+  .tagline { font-size: .95rem; }
+  .challenge-card { grid-template-columns: 78px minmax(0, 1fr); min-height: 136px; padding: 12px; }
+  .card-visual { min-height: 76px; }
+  .orbit-visual { width: 66px; height: 66px; }
+  .echo-visual, .lumen-visual { width: 68px; height: 68px; }
+  .card-copy strong { font-size: 1.12rem; }
+  .card-meta { font-size: .68rem; }
+  .hud { gap: 3px; padding: 4px; }
+  .hud div { min-height: 48px; }
+}
