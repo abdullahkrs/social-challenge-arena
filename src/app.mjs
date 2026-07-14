@@ -9,6 +9,7 @@ import { OrbitLockGame } from './game.mjs';
 import { EchoGridGame } from './echo-game.mjs';
 import { LumenLanesGame } from './lumen-game.mjs';
 import { MirrorFuseGame } from './mirror-game.mjs';
+import { buildFileShareData, buildResultCardModel, isShareCancellation, renderResultCard, supportsFileShare, supportsTextShare } from './share-card.mjs';
 
 function browserStorage() { try { return window.localStorage; } catch { return null; } }
 function readPreference(key) { try { return browserStorage()?.getItem(key) ?? null; } catch { return null; } }
@@ -44,7 +45,17 @@ const elements = {
 };
 
 let game = null;
+let activeShare = null;
 function destroyGame() { game?.destroy(); game = null; }
+function cancelShare() {
+  if (!activeShare) return;
+  activeShare.controller.abort();
+  activeShare.artifact?.dispose();
+  activeShare = null;
+  elements.shareButton.disabled = false;
+  elements.shareButton.removeAttribute('aria-busy');
+  renderResult();
+}
 function track(name, detail = {}) { state.events.push({ name, detail, at: Date.now() }); if (state.events.length > 50) state.events.shift(); }
 function t(key, values) { return translate(state.language, key, values); }
 function currentChallenge() { return getChallenge(state.challengeId); }
@@ -146,6 +157,7 @@ function focusScreen(screen) {
 }
 
 function setScreen(screen) {
+  if (screen !== 'result') cancelShare();
   state.screen = screen;
   if (screen === 'discovery') {
     state.activeDaily = null;
@@ -320,22 +332,107 @@ function renderResult() {
   }
 }
 
+async function copyOrPrompt(payload, session) {
+  try {
+    await navigator.clipboard.writeText(payload.clipboardText);
+    if (activeShare !== session || session.controller.signal.aborted) return;
+    announce(t('copied'));
+    track('share_completed', { challenge: state.challengeId, method: 'clipboard', score: state.result.score });
+  } catch {
+    if (activeShare !== session || session.controller.signal.aborted) return;
+    const copied = window.prompt(t('shareUnavailable'), payload.clipboardText);
+    if (activeShare !== session || session.controller.signal.aborted) return;
+    elements.shareButton.focus({ preventScroll: true });
+    announce(t('shareFallback'));
+    track('share_fallback', { accepted: copied !== null });
+  }
+}
+
+function resultCardModel() {
+  const comparison = state.invite ? compareScores(state.result.score, state.invite.target) : null;
+  return buildResultCardModel({
+    challengeId: state.challengeId,
+    language: state.language,
+    direction: isRtl(state.language) ? 'rtl' : 'ltr',
+    appName: t('appName'),
+    challengeName: challengeName(),
+    score: state.result.score,
+    challengerScore: state.invite?.target,
+    labels: {
+      score: t('score'), challenger: t('challenger'), you: t('you'), duel: t('shareCardDuel'),
+      outcome: comparison ? t(comparison.outcome, { difference: comparison.difference }) : '',
+      callToAction: t('shareCardCallToAction'), privacy: t('privacy')
+    }
+  });
+}
+
 async function shareResult() {
-  if (!state.result) return;
+  if (!state.result || activeShare) return;
+  const session = { controller: new AbortController(), artifact: null };
+  activeShare = session;
+  elements.shareButton.disabled = true;
+  elements.shareButton.setAttribute('aria-busy', 'true');
+  elements.shareButton.textContent = t('sharePreparing');
+  announce(t('sharePreparing'));
   const url = buildInviteUrl(location.href, { challengeId: state.challengeId, seed: state.seed, target: state.result.score });
   const name = challengeName();
   const text = t(state.invite ? 'rematchShareText' : 'challengeShareText', { name, score: state.result.score });
   const payload = buildResultSharePayload({ title: name, text, url });
+  let artifact = null;
   try {
-    if (navigator.share && (!navigator.canShare || navigator.canShare(payload.shareData))) {
-      await navigator.share(payload.shareData); track('share_completed', { challenge: state.challengeId, method: 'native', score: state.result.score }); return;
+    try {
+      artifact = await renderResultCard(resultCardModel(), { signal: session.controller.signal });
+      if (activeShare !== session || session.controller.signal.aborted) return;
+      session.artifact = artifact;
+      track('share_card_rendered', { challenge: state.challengeId, bytes: artifact.size, invited: Boolean(state.invite) });
+    } catch (error) {
+      if (isShareCancellation(error) || session.controller.signal.aborted) return;
+      track('share_card_failed', { challenge: state.challengeId, reason: error?.name || 'render' });
     }
-    await navigator.clipboard.writeText(payload.clipboardText); announce(t('copied')); elements.shareButton.textContent = t('copied');
-    track('share_completed', { challenge: state.challengeId, method: 'clipboard', score: state.result.score });
-  } catch (error) {
-    if (error?.name === 'AbortError') return;
-    const copied = window.prompt(t('shareUnavailable'), payload.clipboardText); elements.shareButton.focus({ preventScroll: true });
-    track('share_fallback', { accepted: copied !== null });
+
+    if (artifact?.file && supportsFileShare(navigator, artifact.file)) {
+      try {
+        await navigator.share(buildFileShareData(payload.shareData, artifact.file));
+        if (activeShare !== session || session.controller.signal.aborted) return;
+        announce(t('shareComplete'));
+        track('share_completed', { challenge: state.challengeId, method: 'native-file', score: state.result.score });
+        return;
+      } catch (error) {
+        if (activeShare !== session || session.controller.signal.aborted) return;
+        if (isShareCancellation(error)) {
+          announce(t('shareCancelled'));
+          track('share_cancelled', { challenge: state.challengeId, method: 'native-file' });
+          return;
+        }
+        track('native_share_failed', { challenge: state.challengeId, method: 'native-file', reason: error?.name || 'share' });
+      }
+    }
+    if (supportsTextShare(navigator, payload.shareData)) {
+      try {
+        await navigator.share(payload.shareData);
+        if (activeShare !== session || session.controller.signal.aborted) return;
+        announce(t('shareComplete'));
+        track('share_completed', { challenge: state.challengeId, method: 'native-text', score: state.result.score });
+        return;
+      } catch (error) {
+        if (activeShare !== session || session.controller.signal.aborted) return;
+        if (isShareCancellation(error)) {
+          announce(t('shareCancelled'));
+          track('share_cancelled', { challenge: state.challengeId, method: 'native-text' });
+          return;
+        }
+        track('native_share_failed', { challenge: state.challengeId, method: 'native-text', reason: error?.name || 'share' });
+      }
+    }
+    if (activeShare === session && !session.controller.signal.aborted) await copyOrPrompt(payload, session);
+  } finally {
+    artifact?.dispose();
+    if (activeShare === session) {
+      activeShare = null;
+      elements.shareButton.disabled = false;
+      elements.shareButton.removeAttribute('aria-busy');
+      renderResult();
+    }
   }
 }
 
@@ -356,6 +453,7 @@ function handlePageShow(event, input = new Date()) {
 
 function bindEvents() {
   elements.language.addEventListener('change', () => {
+    cancelShare();
     state.language = normalizeLanguage(elements.language.value); writePreference('sca-language', state.language); applyLanguage();
     track('language_changed', { language: state.language });
   });
@@ -378,7 +476,7 @@ function bindEvents() {
     state.activeDaily = null; state.seed = createSeed(); state.invite = null; history.replaceState({}, '', location.pathname); updateEntryUI(); setScreen('discovery');
   });
   elements.shareButton.addEventListener('click', shareResult);
-  window.addEventListener('pagehide', destroyGame);
+  window.addEventListener('pagehide', () => { destroyGame(); cancelShare(); });
   window.addEventListener('pageshow', handlePageShow);
 }
 
