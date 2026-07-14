@@ -63,7 +63,7 @@ test('endless scoring rewards mastery without quickly saturating the strict scor
   const basic = scoreEndlessLumen({ stage: direct, elapsedMs: direct.deadlineMs * 0.5, combo: 1, risk: false });
   const mastered = scoreEndlessLumen({ stage: choice, elapsedMs: 0, combo: 12, risk: true });
   assert.ok(mastered.points > basic.points);
-  assert.ok(mastered.points <= 90);
+  assert.ok(mastered.points <= 78);
   assert.ok(basic.points >= 22);
   assert.ok(120 * mastered.points < 9999);
   assert.deepEqual(summarizeLumenRun({ round: 28, attempts: 30, correct: 24, bestCombo: 9 }), { gates: 28, bestCombo: 9, accuracy: 80 });
@@ -81,7 +81,13 @@ test('the runtime keeps only one bounded chunk and has no fixed completion branc
   assert.equal(LUMEN_CHUNK_SIZE, 18);
 });
 
-test('deliberate exit is two-step and the endless result exposes mastery detail', async () => {
+test('visual movement never reveals the correct lane before the player decides', async () => {
+  const source = await readFile(new URL('../src/lumen-game.mjs', import.meta.url), 'utf8');
+  assert.doesNotMatch(source, /dataset\.target\s*=/);
+  assert.match(source, /this\.player\.style\.setProperty\('--player-lane', String\(index\)\)/);
+});
+
+test('deliberate exit and accessible memory cues support the endless result journey', async () => {
   const source = await readFile(new URL('../src/lumen-game.mjs', import.meta.url), 'utf8');
   const integration = await readFile(new URL('../src/lumen-integration.mjs', import.meta.url), 'utf8');
   const html = await readFile(new URL('../index.html', import.meta.url), 'utf8');
@@ -89,8 +95,10 @@ test('deliberate exit is two-step and the endless result exposes mastery detail'
   assert.match(source, /this\.exitTimer = this\.schedule[\s\S]*3000/);
   assert.match(source, /emit\('finish'/);
   assert.match(integration, /lumenResultDetail/);
+  assert.match(integration, /stage\.sequence\.map\(laneName\)/);
   assert.match(integration, /MutationObserver\(updateCatalogDuration\)/);
   assert.match(html, /data-lumen-exit/);
+  assert.match(html, /data-lumen-accessible-sequence/);
   assert.match(html, /id="result-detail"/);
   assert.equal((html.match(/data-lane=/g) || []).length, 3);
 });
