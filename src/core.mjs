@@ -1,8 +1,9 @@
 export const SHARE_VERSION = 1;
 export const ORBIT_LOCK_ID = 'orbit-lock';
 export const ECHO_GRID_ID = 'echo-grid';
+export const LUMEN_LANES_ID = 'lumen-lanes';
 export const CHALLENGE_ID = ORBIT_LOCK_ID;
-export const CHALLENGE_IDS = Object.freeze([ORBIT_LOCK_ID, ECHO_GRID_ID]);
+export const CHALLENGE_IDS = Object.freeze([ORBIT_LOCK_ID, ECHO_GRID_ID, LUMEN_LANES_ID]);
 export const SCORE_MAX = 9999;
 export const SEED_MAX = 0xffffffff;
 export const DAILY_STORAGE_KEY = 'sca-daily-best';
@@ -55,6 +56,25 @@ export function echoPlan(seed, rounds = 8) {
   });
 }
 
+export function lumenPlan(seed, rounds = 18) {
+  const rng = makeRng(seed ^ 0x51f15e5d);
+  const plan = [];
+  let previous = -1;
+  let repeatCount = 0;
+  for (let round = 0; round < rounds; round += 1) {
+    let lane = Math.floor(rng() * 3);
+    if (lane === previous && repeatCount >= 1) lane = (lane + 1 + Math.floor(rng() * 2)) % 3;
+    repeatCount = lane === previous ? repeatCount + 1 : 0;
+    previous = lane;
+    plan.push({
+      lane,
+      deadlineMs: Math.round(Math.max(920, 1680 - round * 42 + rng() * 100)),
+      drift: rng() > 0.5 ? 1 : -1
+    });
+  }
+  return plan;
+}
+
 export function angularDistance(a, b) {
   const full = Math.PI * 2;
   return Math.abs(((a - b + Math.PI) % full + full) % full - Math.PI);
@@ -88,6 +108,16 @@ export function scoreEchoRound({ length, combo, round }) {
   const comboBonus = Math.min(220, Math.max(0, combo - 1) * 35);
   const roundBonus = Math.min(180, Math.max(0, round) * 20);
   return clamp(base + comboBonus + roundBonus, 0, 900);
+}
+
+export function scoreLumenRound({ elapsedMs, deadlineMs, combo, round }) {
+  const safeDeadline = clamp(Math.round(Number(deadlineMs) || 1000), 600, 2500);
+  const safeElapsed = clamp(Math.round(Number(elapsedMs) || safeDeadline), 0, safeDeadline);
+  const speed = clamp(1 - safeElapsed / safeDeadline, 0, 1);
+  const base = 120 + Math.round(speed * 220);
+  const comboBonus = Math.min(120, Math.max(0, combo - 1) * 12);
+  const roundBonus = Math.min(40, Math.max(0, round) * 3);
+  return { reaction: safeElapsed, points: clamp(base + comboBonus + roundBonus, 0, 500) };
 }
 
 export function compareScores(score, target) {
