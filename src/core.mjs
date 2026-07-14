@@ -1,8 +1,9 @@
 export const SHARE_VERSION = 1;
 export const ORBIT_LOCK_ID = 'orbit-lock';
 export const ECHO_GRID_ID = 'echo-grid';
+export const LANE_SPARK_ID = 'lane-spark';
 export const CHALLENGE_ID = ORBIT_LOCK_ID;
-export const CHALLENGE_IDS = Object.freeze([ORBIT_LOCK_ID, ECHO_GRID_ID]);
+export const CHALLENGE_IDS = Object.freeze([ORBIT_LOCK_ID, ECHO_GRID_ID, LANE_SPARK_ID]);
 export const SCORE_MAX = 9999;
 export const SEED_MAX = 0xffffffff;
 export const DAILY_STORAGE_KEY = 'sca-daily-best';
@@ -55,6 +56,25 @@ export function echoPlan(seed, rounds = 8) {
   });
 }
 
+export function lanePlan(seed, rounds = 12) {
+  const rng = makeRng(seed ^ 0x51f15e5d);
+  const plan = [];
+  let previous = -1;
+  let repeatCount = 0;
+  for (let round = 0; round < rounds; round += 1) {
+    let lane = Math.floor(rng() * 3);
+    if (lane === previous && repeatCount >= 1) lane = (lane + 1 + Math.floor(rng() * 2)) % 3;
+    repeatCount = lane === previous ? repeatCount + 1 : 0;
+    previous = lane;
+    plan.push({
+      lane,
+      windowMs: Math.max(980, Math.round(1780 - round * 55 + rng() * 120)),
+      leadMs: Math.round(260 + rng() * 180)
+    });
+  }
+  return plan;
+}
+
 export function angularDistance(a, b) {
   const full = Math.PI * 2;
   return Math.abs(((a - b + Math.PI) % full + full) % full - Math.PI);
@@ -88,6 +108,17 @@ export function scoreEchoRound({ length, combo, round }) {
   const comboBonus = Math.min(220, Math.max(0, combo - 1) * 35);
   const roundBonus = Math.min(180, Math.max(0, round) * 20);
   return clamp(base + comboBonus + roundBonus, 0, 900);
+}
+
+export function scoreLaneRound({ responseMs, windowMs, combo, round }) {
+  const safeWindow = clamp(Math.trunc(Number(windowMs) || 1000), 500, 5000);
+  const response = Number(responseMs);
+  const safeResponse = clamp(Number.isFinite(response) ? response : safeWindow, 0, safeWindow);
+  const speed = Math.round(clamp(1 - safeResponse / safeWindow, 0, 1) * 100);
+  const base = 190 + Math.round(speed * 3.2);
+  const comboBonus = Math.min(180, Math.max(0, combo - 1) * 30);
+  const roundBonus = Math.min(110, Math.max(0, round) * 10);
+  return { speed, points: clamp(base + comboBonus + roundBonus, 0, 800) };
 }
 
 export function compareScores(score, target) {
