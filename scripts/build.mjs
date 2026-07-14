@@ -13,7 +13,10 @@ for (const file of files) {
 }
 
 const html = await readFile(join(dist, 'index.html'), 'utf8');
-for (const required of ['./styles.css', './ui.css', './ui-accessibility.css', './mirror.css', './src/app.mjs']) {
+for (const required of [
+  './styles.css', './ui.css', './ui-accessibility.css', './mirror.css',
+  './src/lumen.css', './src/app.mjs', './src/lumen-integration.mjs'
+]) {
   if (!html.includes(required)) throw new Error(`Missing runtime reference: ${required}`);
 }
 
