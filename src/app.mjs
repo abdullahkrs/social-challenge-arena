@@ -1,7 +1,7 @@
 import {
   buildInviteUrl, buildResultSharePayload, CHALLENGE_ID, compareScores, comparisonSymbol,
   createSeed, dailyChallengeFor, ECHO_GRID_ID, initialScreenForInvite, parseInvite,
-  readDailyBest, screenAfterPageShow, shouldRefreshDaily, updateDailyBest, writeDailyBest
+  readDailyBest, screenAfterPageShow, shouldRefreshDaily, shouldRefreshDailyOnPageShow, updateDailyBest, writeDailyBest
 } from './core.mjs';
 import { catalog, getChallenge } from './catalog.mjs';
 import { isRtl, normalizeLanguage, supportedLanguages, translate } from './i18n.mjs';
@@ -325,9 +325,12 @@ function handleRunError(error) {
 }
 function safeBeginRun() { try { beginRun(); } catch (error) { handleRunError(error); } }
 
-function handlePageShow(event) {
+function handlePageShow(event, input = new Date()) {
   const nextScreen = screenAfterPageShow(event, state.screen);
-  if (nextScreen === state.screen) return;
+  if (nextScreen === state.screen) {
+    if (shouldRefreshDailyOnPageShow(event, state.daily, input, state.screen)) refreshDailyChallenge(input);
+    return;
+  }
   state.result = null; setScreen(nextScreen); announce(t('ready')); track('bfcache_restored', { screen: nextScreen });
 }
 
