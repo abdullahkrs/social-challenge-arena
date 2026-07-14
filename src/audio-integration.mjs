@@ -1,3 +1,4 @@
+import './echo-copy.mjs';
 import { platformAudio } from './audio.mjs';
 import { normalizeLanguage, translate } from './i18n.mjs';
 
