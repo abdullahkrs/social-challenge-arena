@@ -10,7 +10,7 @@
 ## Font Awesome Free
 
 - Font Awesome Free 6.7.2 Solid is used for retained platform-interface icons.
-- A small generated WOFF2 subset is embedded locally in `ui.css`; live icons are represented by explicit decorative DOM children with `aria-hidden="true"`, including gamepad, language, accessibility, back, trophy, and friend context.
+- A generated WOFF2 subset containing exactly six retained glyphs is embedded locally in `ui.css`; live icons are represented by explicit decorative DOM children with `aria-hidden="true"`, including gamepad, language, accessibility, back, trophy, and friend context.
 - Text-bearing localized actions intentionally render without pseudo-element Font Awesome glyphs, preventing private-use glyphs from entering accessible names while preserving the established action hierarchy.
 - There is no CDN, remote font, remote script, runtime network request, package runtime, full Font Awesome bundle, or custom SVG platform icon.
 - Gameplay-owned arrows, diamond, target, grid, and route cues remain part of their existing mechanics.
@@ -47,5 +47,5 @@
 
 - `tests/ui-consistency.test.mjs` verifies local selective Font Awesome integration, complete icon/font/code licensing notice, absence of remote providers and custom SVG platform controls, production inclusion, the visible mobile reduced-effects indicator, explicit hidden decorative icons, plain localized text actions, and RTL back behavior.
 - The unchanged existing suite continues to cover deterministic mechanics and scoring, strict invitations, sender/friend equivalence, daily selection and storage, direct entry, rematch, localization parity, keyboard isolation, reduced-effects equivalence, teardown, page-hide, bfcache recovery, and all three challenge regressions.
-- Current branch verification runs `npm ci --ignore-scripts`, all **32/32 tests**, the production build, and deployable preview upload.
-- The synchronized static preview contains 12 files totaling **106,259 bytes**, within the unchanged **184,320-byte** uncompressed budget.
+- The CI workflow runs `npm ci --ignore-scripts`, all **32/32 tests**, the production build, and deployable preview upload.
+- The synchronized static preview contains 12 files totaling **104,451 bytes**, within the unchanged **184,320-byte** uncompressed budget.
