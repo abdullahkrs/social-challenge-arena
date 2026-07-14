@@ -4,7 +4,7 @@ import { fileURLToPath } from 'node:url';
 
 const root = fileURLToPath(new URL('..', import.meta.url));
 const dist = join(root, 'dist');
-const files = ['index.html', 'styles.css', 'ui.css', 'THIRD_PARTY_NOTICES.md', 'src'];
+const files = ['index.html', 'styles.css', 'ui.css', 'ui-accessibility.css', 'THIRD_PARTY_NOTICES.md', 'src'];
 
 await rm(dist, { recursive: true, force: true });
 await mkdir(dist, { recursive: true });
@@ -13,7 +13,7 @@ for (const file of files) {
 }
 
 const html = await readFile(join(dist, 'index.html'), 'utf8');
-for (const required of ['./styles.css', './ui.css', './src/app.mjs']) {
+for (const required of ['./styles.css', './ui.css', './ui-accessibility.css', './src/app.mjs']) {
   if (!html.includes(required)) throw new Error(`Missing runtime reference: ${required}`);
 }
 
