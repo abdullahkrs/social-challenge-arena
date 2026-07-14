@@ -1,13 +1,14 @@
 # Social Challenge Arena
 
-A mobile-first multilingual social arcade platform with two complete original skill challenges and one optional private daily route.
+A mobile-first multilingual social arcade platform with three complete original skill challenges and one optional private daily route.
 
 ## Playable catalog
 
 - **Orbit Lock** — a 2D precision-timing challenge: lock a moving pulse inside twelve deterministic gates.
 - **Echo Grid** — a 2D visual-memory challenge: watch a deterministic tile pattern and repeat it in order across eight rounds.
+- **Lane Spark** — a 2D directional-reaction challenge: read twelve deterministic signals and tap the matching left, middle, or right lane before time expires.
 
-Both use the complete journey:
+All three use the complete journey:
 
 `discover → choose → play → result → localized share → direct friend attempt → head-to-head comparison → rematch share`
 
@@ -22,7 +23,8 @@ The daily route is optional and has unlimited replay. It has no account, streak,
 ## Languages and access
 
 - Arabic with full RTL, English, and Turkish
-- Touch and pointer throughout; Space/Enter for Orbit Lock and native keyboard buttons for Echo Grid
+- Touch and pointer throughout
+- Space/Enter for Orbit Lock, native keyboard buttons for Echo Grid, and lane buttons plus 1–3 shortcuts for Lane Spark
 - Reduced-effects mode, visible focus, non-color-only feedback, and live announcements
 - No account, external analytics, third-party assets, or network API
 
