@@ -3,10 +3,22 @@ import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import {
   angularDistance, buildInviteUrl, buildResultSharePayload, challengePlan, compareScores, comparisonSymbol,
-  echoPlan, encodeInvite, initialScreenForInvite, isGameAttemptKey, parseInvite, scoreAttempt, scoreEchoRound, screenAfterPageShow
+  dailyChallengeFor, DAILY_STORAGE_KEY, echoPlan, encodeInvite, initialScreenForInvite, isGameAttemptKey,
+  parseDailyBest, parseInvite, readDailyBest, scoreAttempt, scoreEchoRound, screenAfterPageShow,
+  shouldRefreshDaily, updateDailyBest, utcDateKey, writeDailyBest
 } from '../src/core.mjs';
 import { catalog, getChallenge } from '../src/catalog.mjs';
 import { missingTranslations, supportedLanguages, translate } from '../src/i18n.mjs';
+
+function memoryStorage(initial = {}) {
+  const values = new Map(Object.entries(initial));
+  return {
+    getItem(key) { return values.has(key) ? values.get(key) : null; },
+    setItem(key, value) { values.set(key, String(value)); },
+    removeItem(key) { values.delete(key); },
+    value(key) { return values.get(key); }
+  };
+}
 
 test('orbit plan is deterministic and bounded', () => {
   const first = challengePlan(12345); const second = challengePlan(12345);
@@ -30,6 +42,75 @@ test('catalog exposes two materially different live challenges', () => {
   assert.equal(getChallenge('unknown'), null);
 });
 
+test('UTC date keys are canonical and independent of local offsets', () => {
+  assert.equal(utcDateKey(new Date('2026-07-14T00:00:00.000Z')), '2026-07-14');
+  assert.equal(utcDateKey('2026-07-13T21:30:00-03:00'), '2026-07-14');
+  assert.equal(utcDateKey('2026-12-31T23:59:59.999Z'), '2026-12-31');
+  assert.throws(() => utcDateKey('not-a-date'), /Invalid date/);
+});
+
+test('daily route is deterministic and injected dates prove both challenges', () => {
+  const orbit = dailyChallengeFor('2026-07-01T12:00:00Z');
+  const echo = dailyChallengeFor('2026-07-02T12:00:00Z');
+  assert.deepEqual(orbit, dailyChallengeFor('2026-07-01T23:59:59Z'));
+  assert.equal(orbit.challengeId, 'orbit-lock');
+  assert.equal(echo.challengeId, 'echo-grid');
+  assert.notEqual(orbit.seed, echo.seed);
+  assert.ok(Number.isInteger(orbit.seed) && orbit.seed >= 0 && orbit.seed <= 0xffffffff);
+});
+
+test('daily rollover refreshes only on a safe discovery return', () => {
+  const current = dailyChallengeFor('2026-07-14T10:00:00Z');
+  assert.equal(shouldRefreshDaily(current, '2026-07-14T23:59:59Z', 'discovery'), false);
+  assert.equal(shouldRefreshDaily(current, '2026-07-15T00:00:01Z', 'game'), false);
+  assert.equal(shouldRefreshDaily(current, '2026-07-15T00:00:01Z', 'result'), false);
+  assert.equal(shouldRefreshDaily(current, '2026-07-15T00:00:01Z', 'discovery'), true);
+});
+
+test('daily best accepts only the exact current route and bounded score', () => {
+  const daily = dailyChallengeFor('2026-07-14T12:00:00Z');
+  const valid = { ...daily, best: 3210 };
+  assert.deepEqual(parseDailyBest(JSON.stringify(valid), daily), valid);
+  assert.equal(parseDailyBest('{broken', daily), null);
+  assert.equal(parseDailyBest({ ...valid, extra: true }, daily), null);
+  assert.equal(parseDailyBest({ ...valid, dateKey: '2026-07-13' }, daily), null);
+  assert.equal(parseDailyBest({ ...valid, challengeId: 'unknown' }, daily), null);
+  assert.equal(parseDailyBest({ ...valid, seed: daily.seed + 1 }, daily), null);
+  assert.equal(parseDailyBest({ ...valid, best: 10000 }, daily), null);
+});
+
+test('daily best updates only upward and keeps the exact route', () => {
+  const daily = dailyChallengeFor('2026-07-14T12:00:00Z');
+  const first = updateDailyBest(null, daily, 600);
+  assert.equal(first.isNewBest, true); assert.equal(first.previousBest, null); assert.equal(first.record.best, 600);
+  const lower = updateDailyBest(first.record, daily, 500);
+  assert.equal(lower.isNewBest, false); assert.equal(lower.previousBest, 600); assert.equal(lower.record.best, 600);
+  const higher = updateDailyBest(lower.record, daily, 900);
+  assert.equal(higher.isNewBest, true); assert.equal(higher.record.best, 900);
+  assert.deepEqual({ dateKey: higher.record.dateKey, challengeId: higher.record.challengeId, seed: higher.record.seed }, daily);
+});
+
+test('corrupt or stale local best is discarded and storage failure stays playable', () => {
+  const daily = dailyChallengeFor('2026-07-14T12:00:00Z');
+  const corrupt = memoryStorage({ [DAILY_STORAGE_KEY]: JSON.stringify({ ...daily, best: 120, extra: 'x' }) });
+  assert.deepEqual(readDailyBest(corrupt, daily), { record: null, available: true, discarded: true });
+  assert.equal(corrupt.value(DAILY_STORAGE_KEY), undefined);
+  const blocked = { getItem() { throw new Error('blocked'); }, setItem() { throw new Error('blocked'); } };
+  assert.deepEqual(readDailyBest(blocked, daily), { record: null, available: false, discarded: false });
+  const session = updateDailyBest(null, daily, 77).record;
+  assert.equal(writeDailyBest(blocked, session, daily), false);
+  assert.equal(session.best, 77);
+});
+
+test('daily best persistence stores only date, challenge, seed, and best', () => {
+  const daily = dailyChallengeFor('2026-07-14T12:00:00Z');
+  const storage = memoryStorage();
+  const record = updateDailyBest(null, daily, 456).record;
+  assert.equal(writeDailyBest(storage, record, daily), true);
+  assert.deepEqual(Object.keys(JSON.parse(storage.value(DAILY_STORAGE_KEY))).sort(), ['best', 'challengeId', 'dateKey', 'seed']);
+  assert.deepEqual(readDailyBest(storage, daily).record, record);
+});
+
 test('strict invite round-trips both challenges and keeps legacy v1 shape', () => {
   const orbit = encodeInvite({ seed: 4294967295, target: 4321 });
   assert.deepEqual(parseInvite(orbit), { ok: true, invite: { challengeId: 'orbit-lock', seed: 4294967295, target: 4321 } });
@@ -47,7 +128,7 @@ test('strict invite rejects extras, unknown challenges, malformed values, and ou
   assert.throws(() => encodeInvite({ challengeId: 'unknown', seed: 1, target: 1 }), /Unknown challenge/);
 });
 
-test('valid invitations boot to the direct invite surface and invalid ones recover to discovery', () => {
+test('valid invitations take precedence at boot and invalid ones recover to discovery', () => {
   const valid = parseInvite(encodeInvite({ challengeId: 'echo-grid', seed: 18, target: 750 }));
   assert.equal(initialScreenForInvite(valid.invite), 'instructions');
   const invalid = parseInvite('v=1&c=echo-grid&s=i&t=751&ck=wrong');
@@ -59,6 +140,14 @@ test('invite URL is language-independent and clears fragments', () => {
   const url = buildInviteUrl('https://example.com/play?lang=ar#result', { challengeId: 'echo-grid', seed: 8, target: 250 });
   const parsed = new URL(url); assert.equal(parsed.hash, ''); assert.equal(parsed.searchParams.has('lang'), false);
   assert.equal(parseInvite(parsed.search).invite.challengeId, 'echo-grid');
+});
+
+test('daily score shares as a strict non-expiring same-route invitation', () => {
+  const daily = dailyChallengeFor('2026-07-14T12:00:00Z');
+  const url = buildInviteUrl('https://example.com/', { challengeId: daily.challengeId, seed: daily.seed, target: 812 });
+  assert.deepEqual(parseInvite(new URL(url).search).invite, { challengeId: daily.challengeId, seed: daily.seed, target: 812 });
+  assert.deepEqual(dailyChallengeFor('2026-07-20T12:00:00Z').dateKey, '2026-07-20');
+  assert.deepEqual(parseInvite(new URL(url).search).invite.seed, daily.seed);
 });
 
 test('localized native and clipboard invitation payloads include challenge, score, CTA, and strict URL', () => {
@@ -93,19 +182,26 @@ test('both scoring models remain bounded', () => {
   assert.equal(scoreEchoRound({ length: 99, combo: 99, round: 99 }), 900);
 });
 
-test('all required languages have the same message keys and localized social copy', () => {
+test('all required languages have matching keys and localized daily states', () => {
   assert.deepEqual(supportedLanguages, ['ar', 'en', 'tr']); assert.deepEqual(missingTranslations(), []);
   for (const language of supportedLanguages) {
     assert.ok(translate(language, 'echoName').length > 2);
     assert.ok(translate(language, 'challengeCard', { name: 'X' }).includes('X'));
     assert.ok(translate(language, 'rematchShareText', { name: 'X', score: 10 }).includes('10'));
     assert.ok(translate(language, 'comparisonAnnouncement', { outcome: 'O', target: 1, score: 2, difference: 1 }).includes('2'));
+    assert.ok(translate(language, 'dailyPlayLabel', { name: 'X' }).includes('X'));
+    assert.ok(translate(language, 'dailyBest', { score: 55 }).includes('55'));
+    assert.ok(translate(language, 'dailyNewBest', { score: 66 }).includes('66'));
+    assert.ok(translate(language, 'dailySessionOnly').length > 5);
   }
 });
 
-test('direct invite entry and compact settings remain accessible in the real entry point', async () => {
+test('daily entry and compact settings are accessible in the real entry point', async () => {
   const html = await readFile(new URL('../index.html', import.meta.url), 'utf8');
   assert.match(html, /<input id="motion-toggle" type="checkbox" aria-label="Reduce effects" data-i18n-aria="reduceMotion">/);
+  assert.match(html, /id="daily-entry"[^>]*aria-labelledby="daily-title"/);
+  assert.match(html, /id="daily-start-button" class="primary daily-start"/);
+  assert.match(html, /id="daily-result" class="daily-result" hidden/);
   assert.match(html, /id="invite-catalog-button"/);
   assert.match(html, /id="challenger-score"/); assert.match(html, /id="player-score"/); assert.match(html, /id="difference-text"/);
   assert.equal((html.match(/data-challenge-id=/g) || []).length, 2);
@@ -121,21 +217,25 @@ test('game keyboard attempts are consumed only from the focused canvas target', 
   assert.equal(isGameAttemptKey({ code: 'KeyA', target: canvas }, canvas), false);
 });
 
-test('app routes invites directly, copies full invitation content, and hosts both games', async () => {
+test('app owns one daily route, preserves strict sharing, and hosts both games', async () => {
   const source = await readFile(new URL('../src/app.mjs', import.meta.url), 'utf8');
+  assert.match(source, /parseLocationInvite\(\); bindEvents\(\); applyLanguage\(\)/);
   assert.match(source, /setScreen\(initialScreenForInvite\(state\.invite\)\)/);
+  assert.match(source, /elements\.dailyStartButton\.addEventListener\('click', beginDailyRun\)/);
+  assert.match(source, /state\.activeDaily = \{ \.\.\.state\.daily \}/);
+  assert.match(source, /state\.newButton|elements\.newButton\.hidden = Boolean\(state\.activeDaily\)/);
   assert.match(source, /navigator\.clipboard\.writeText\(payload\.clipboardText\)/);
-  assert.match(source, /window\.prompt\(t\('shareUnavailable'\), payload\.clipboardText\)/);
   assert.match(source, /new OrbitLockGame/); assert.match(source, /new EchoGridGame/);
-  assert.doesNotMatch(source, /GameEngine|PluginRegistry/);
+  assert.doesNotMatch(source, /setInterval|GameEngine|PluginRegistry|CalendarService|RetentionEngine/);
 });
 
-test('persisted back-forward cache restore returns an interrupted run to instructions', async () => {
+test('persisted back-forward cache restore returns an interrupted run without refreshing its daily route', async () => {
   assert.equal(screenAfterPageShow({ persisted: true }, 'game'), 'instructions');
   assert.equal(screenAfterPageShow({ persisted: false }, 'game'), 'game');
   assert.equal(screenAfterPageShow({ persisted: true }, 'result'), 'result');
   const source = await readFile(new URL('../src/app.mjs', import.meta.url), 'utf8');
   assert.match(source, /window\.addEventListener\('pagehide', destroyGame\);/);
   assert.match(source, /window\.addEventListener\('pageshow', handlePageShow\);/);
+  assert.match(source, /if \(screen === 'discovery'\)[\s\S]*refreshDailyChallenge\(new Date\(\)\)/);
   assert.doesNotMatch(source, /pagehide[^\n]*once/);
 });
