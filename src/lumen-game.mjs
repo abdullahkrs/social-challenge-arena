@@ -133,10 +133,10 @@ export class LumenLanesGame {
     this.currentStage = stage;
     this.accepting = false;
     this.container.removeAttribute('data-feedback');
+    this.container.removeAttribute('data-target');
     this.container.dataset.mechanic = stage.mechanic;
     this.container.dataset.phase = stage.phase;
     this.container.dataset.zone = stage.zone;
-    this.container.dataset.target = stage.targetLane === null ? String(stage.cueLane) : String(stage.targetLane);
     this.container.style.setProperty('--lane-drift', String(stage.drift));
     this.buttons.forEach((button) => {
       button.disabled = false;
@@ -188,7 +188,6 @@ export class LumenLanesGame {
     stage.sequence.forEach((lane, index) => {
       this.schedule(() => {
         if (!this.running || this.currentStage !== stage) return;
-        this.container.dataset.target = String(lane);
         this.cue.textContent = CUES[lane];
         this.sequence.textContent = stage.sequence.slice(0, index + 1).map((value) => CUES[value]).join(' ');
       }, index * stepMs);
@@ -196,7 +195,6 @@ export class LumenLanesGame {
 
     this.schedule(() => {
       if (!this.running || this.currentStage !== stage) return;
-      this.container.removeAttribute('data-target');
       this.cue.textContent = '?';
       this.sequence.textContent = stage.sequence.map(() => '•').join(' ');
       this.accepting = true;
