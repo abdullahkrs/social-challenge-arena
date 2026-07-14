@@ -99,6 +99,7 @@ function resetSharedHud() {
   resultDetail?.setAttribute('hidden', '');
   activeStage = null;
   activeSnapshot = null;
+  lastResult = null;
   exitArmed = false;
   updateLaneLabels(null);
   updateAccessibleSequence(null);
