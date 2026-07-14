@@ -9,7 +9,9 @@ A mobile-first multilingual social arcade platform with two complete original sk
 
 Both use the complete journey:
 
-`discover → choose → understand → play → result → replay → share → friend attempt → compare → share again`
+`discover → choose → play → result → localized share → direct friend attempt → head-to-head comparison → rematch share`
+
+Valid invitation links open the selected challenge and target score directly, while normal catalog discovery remains available.
 
 ## Languages and access
 
