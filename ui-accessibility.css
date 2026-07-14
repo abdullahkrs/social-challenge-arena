@@ -7,6 +7,6 @@
   }
 
   .motion-control .fa-icon {
-    display: none;
+    display: inline-flex;
   }
 }
