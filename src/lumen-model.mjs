@@ -177,7 +177,7 @@ export function scoreEndlessLumen({ stage, elapsedMs, combo = 0, risk = false })
   return {
     reactionMs: elapsed,
     precision: Math.round(reaction * 100),
-    points: clamp(progress + reactionBonus + streakBonus + mechanicBonus + riskBonus + phaseBonus, 0, 90)
+    points: clamp(progress + reactionBonus + streakBonus + mechanicBonus + riskBonus + phaseBonus, 0, 78)
   };
 }
 
