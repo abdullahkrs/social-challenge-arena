@@ -1,7 +1,13 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
-import { mirrorPlan, scoreMirrorRound } from '../src/core.mjs';
+import { mirrorPlan, reflectPattern, scoreMirrorRound } from '../src/core.mjs';
+import {
+  describeMirrorPattern,
+  MIRROR_CELL_COUNT,
+  MIRROR_COLUMNS,
+  MIRROR_ROWS
+} from '../src/mirror-game.mjs';
 import { supportedLanguages, translate } from '../src/i18n.mjs';
 
 test('zero-millisecond Mirror Fuse response is preserved as the fastest valid input', () => {
@@ -55,4 +61,38 @@ test('Mirror Fuse exposes localized source and option patterns to assistive tech
     assert.ok(optionLabel.includes(row));
     assert.ok(optionLabel.includes('2'));
   }
+});
+
+test('Mirror Fuse uses one 4-by-3 geometry contract for rendering, reflection, and spoken rows', async () => {
+  const source = [1, 0, 1, 0, 1, 0, 1, 1, 0, 0, 0, 1];
+  const expectedRows = [
+    [1, 0, 1],
+    [0, 1, 0],
+    [1, 1, 0],
+    [0, 0, 1]
+  ];
+  const spoken = describeMirrorPattern(source, (key, values = {}) => {
+    if (key === 'mirrorCellOn') return '1';
+    if (key === 'mirrorCellOff') return '0';
+    return `row ${values.row}: ${values.cells}`;
+  });
+
+  assert.equal(MIRROR_ROWS, 4);
+  assert.equal(MIRROR_COLUMNS, 3);
+  assert.equal(MIRROR_CELL_COUNT, 12);
+  assert.equal(spoken, 'row 1: 1, 0, 1. row 2: 0, 1, 0. row 3: 1, 1, 0. row 4: 0, 0, 1');
+
+  const reflected = reflectPattern(source, MIRROR_COLUMNS);
+  assert.deepEqual(reflected, expectedRows.flatMap((row) => [...row].reverse()));
+
+  const stage = mirrorPlan(0x92f00d, 1)[0];
+  assert.equal(stage.source.length, MIRROR_CELL_COUNT);
+  assert.deepEqual(stage.options[stage.correctIndex], reflectPattern(stage.source, MIRROR_COLUMNS));
+
+  const implementation = await readFile(new URL('../src/mirror-game.mjs', import.meta.url), 'utf8');
+  assert.match(implementation, /grid\.style\.gridTemplateColumns = `repeat\(\$\{MIRROR_COLUMNS\}, 1fr\)`/);
+  assert.match(implementation, /grid\.style\.gridTemplateRows = `repeat\(\$\{MIRROR_ROWS\}, 1fr\)`/);
+  assert.match(implementation, /reflectPattern\(stage\.source, MIRROR_COLUMNS\)/);
+  assert.match(implementation, /Array\.from\(\{ length: MIRROR_ROWS \}/);
+  assert.match(implementation, /slice\(row \* MIRROR_COLUMNS, \(row \+ 1\) \* MIRROR_COLUMNS\)/);
 });
