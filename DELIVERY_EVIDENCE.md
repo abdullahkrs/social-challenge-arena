@@ -99,7 +99,11 @@ Lumen Current uses a neutral luminous three-lane current, discrete deterministic
 
 ### Verification
 
-- New deterministic model tests: **8/8 passing locally**.
-- JavaScript syntax checks passed for the new model, runtime, integration, localization, catalog, and test files.
-- Translation-key parity passed locally for Arabic, English, and Turkish.
-- Full repository `npm test`, production `npm run build`, static budget, deployable preview, and current browser inspection are required from the pull-request workflow before QA.
+- Reviewed implementation head before this evidence-only commit: `759ffd76a4343abef1ee9a2c19d3ac70cf4fa6fd`.
+- GitHub Actions CI **#109** passed `npm ci --ignore-scripts`, the complete `npm test` suite, production `npm run build`, and preview upload.
+- Focused endless-generation coverage is **8/8 passing** for same-seed reproducibility, different-seed mechanical variation, all four mechanic families, zones/layers/tension phases, fair route choices, memory/mirror decisions, score tuning, bounded chunk state, deliberate exit, result detail, lifecycle ownership, and no remote runtime dependency.
+- Arabic, English, and Turkish localization-key parity passed; existing strict version-1 invitations, daily fixtures, comparison/rematch, visual share-card, accessibility, lifecycle, and bfcache regression coverage remained green.
+- Production preview contains **18 files totaling 177,576 bytes**, within the unchanged **184,320-byte** static budget. The uploaded preview ZIP is **52,278 bytes** with SHA-256 digest `7ee69e40ae4c28c567d80efd61a988ee625e014e4288526897b0c508417efacf`.
+- Real Chromium inspection at **390 × 844 CSS px** completed a 24-gate run containing direct, mirrored, memory, and route-choice mechanics across multiple zones; deliberate exit produced a truthful result with gates, best streak, and accuracy.
+- The strict shared invitation reproduced the sender’s first six generated stages for the friend, preserved the target score, completed comparison/rematch flow, and remained language-independent.
+- Arabic result and surrounding interface rendered RTL while gameplay geometry remained LTR; Turkish result copy was localized; **320 × 720 CSS px** reduced-effects play retained the exact generated route, showed no horizontal overflow, and produced no browser console or page errors.
