@@ -38,7 +38,7 @@
         <div class="catalog-header">
           <p class="eyebrow" data-i18n="discoveryEyebrow">Pick your skill</p>
           <h1 tabindex="-1" data-i18n="catalogTitle">Choose a challenge</h1>
-          <p class="tagline" data-i18n="catalogHint">Two fast games. One score to beat.</p>
+          <p class="tagline" data-i18n="catalogHint">Three fast games. One score to beat.</p>
           <div id="invited-badge" class="invite-badge" hidden>
             <strong data-i18n="invited">Friend challenge</strong><span id="target-text"></span>
           </div>
@@ -63,6 +63,13 @@
           </button>
           <button class="challenge-card echo-card" type="button" data-challenge-id="echo-grid">
             <span class="card-visual echo-visual" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>
+            <span class="card-copy"><strong data-name></strong><small data-tagline></small></span>
+            <span class="card-meta"><span data-skill></span><span data-duration></span></span>
+          </button>
+          <button class="challenge-card lane-card" type="button" data-challenge-id="lane-spark">
+            <span class="card-visual lane-visual" aria-hidden="true">
+              <i>←</i><i>●</i><i>→</i>
+            </span>
             <span class="card-copy"><strong data-name></strong><small data-tagline></small></span>
             <span class="card-meta"><span data-skill></span><span data-duration></span></span>
           </button>
@@ -97,6 +104,17 @@
             <button type="button" data-cell="0"></button><button type="button" data-cell="1"></button><button type="button" data-cell="2"></button>
             <button type="button" data-cell="3"></button><button type="button" data-cell="4"></button><button type="button" data-cell="5"></button>
             <button type="button" data-cell="6"></button><button type="button" data-cell="7"></button><button type="button" data-cell="8"></button>
+          </div>
+          <div id="lane-board" class="lane-board" role="group" aria-label="Lane Spark three-lane board" hidden>
+            <div class="lane-signal-wrap" aria-hidden="true">
+              <strong data-lane-signal>●</strong>
+              <span class="lane-timer-track"><i data-lane-timer></i></span>
+            </div>
+            <div class="lane-buttons">
+              <button type="button" data-lane="0" aria-keyshortcuts="1"><span aria-hidden="true">←</span><span>Left lane</span></button>
+              <button type="button" data-lane="1" aria-keyshortcuts="2"><span aria-hidden="true">●</span><span>Middle lane</span></button>
+              <button type="button" data-lane="2" aria-keyshortcuts="3"><span aria-hidden="true">→</span><span>Right lane</span></button>
+            </div>
           </div>
           <p id="game-status" class="game-status" aria-hidden="true">Ready</p>
           <p id="controls-hint" class="controls-hint"></p>
