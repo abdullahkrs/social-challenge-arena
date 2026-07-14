@@ -1,0 +1,12 @@
+@media (max-width: 620px) {
+  .motion-control input {
+    position: static;
+    width: 20px;
+    height: 20px;
+    opacity: 1;
+  }
+
+  .motion-control .fa-icon {
+    display: none;
+  }
+}
