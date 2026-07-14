@@ -10,6 +10,7 @@
   <link rel="stylesheet" href="./styles.css">
   <link rel="stylesheet" href="./ui.css">
   <link rel="stylesheet" href="./ui-accessibility.css">
+  <link rel="stylesheet" href="./mirror.css">
 </head>
 <body>
   <div id="loading" class="loading" aria-live="polite" data-i18n="loading">Loading challenges</div>
@@ -42,7 +43,7 @@
         <div class="catalog-header">
           <p class="eyebrow" data-i18n="discoveryEyebrow">Pick your skill</p>
           <h1 tabindex="-1" data-i18n="catalogTitle">Choose a challenge</h1>
-          <p class="tagline" data-i18n="catalogHint">Three fast games. One score to beat.</p>
+          <p class="tagline" data-i18n="catalogHint">Four fast games. One score to beat.</p>
           <div id="invited-badge" class="invite-badge" hidden>
             <span class="fa-icon fa-user-group" aria-hidden="true"></span>
             <strong data-i18n="invited">Friend challenge</strong><span id="target-text"></span>
@@ -73,6 +74,15 @@
           </button>
           <button class="challenge-card lumen-card" type="button" data-challenge-id="lumen-lanes">
             <span class="card-visual lumen-visual" aria-hidden="true"><i></i><i></i><i></i><b>→</b></span>
+            <span class="card-copy"><strong data-name></strong><small data-tagline></small></span>
+            <span class="card-meta"><span data-skill></span><span data-duration></span></span>
+          </button>
+          <button class="challenge-card mirror-card" type="button" data-challenge-id="mirror-fuse">
+            <span class="card-visual mirror-visual" aria-hidden="true">
+              <span class="mirror-mini mirror-mini-source"><i>◆</i><i>·</i><i>◆</i><i>·</i><i>◆</i><i>·</i></span>
+              <b></b>
+              <span class="mirror-mini mirror-mini-answer"><i>◆</i><i>·</i><i>◆</i><i>·</i><i>◆</i><i>·</i></span>
+            </span>
             <span class="card-copy"><strong data-name></strong><small data-tagline></small></span>
             <span class="card-meta"><span data-skill></span><span data-duration></span></span>
           </button>
@@ -117,6 +127,18 @@
               <button type="button" data-lane="0" aria-label="Left lane"><span aria-hidden="true">←</span></button>
               <button type="button" data-lane="1" aria-label="Center lane"><span aria-hidden="true">◆</span></button>
               <button type="button" data-lane="2" aria-label="Right lane"><span aria-hidden="true">→</span></button>
+            </div>
+          </div>
+          <div id="mirror-fuse" class="mirror-fuse" role="group" aria-label="Mirror Fuse reflection puzzle" dir="ltr" hidden>
+            <div class="mirror-stage" aria-hidden="true">
+              <div class="mirror-grid mirror-source" data-mirror-source></div>
+              <span class="mirror-axis"></span>
+              <span class="mirror-question">?</span>
+            </div>
+            <div class="mirror-options">
+              <button type="button" data-mirror-option="0" aria-label="Mirror option 1"><span class="mirror-number" aria-hidden="true">1</span><span class="mirror-grid" data-mirror-grid aria-hidden="true"></span><span class="mirror-mark" data-mirror-mark aria-hidden="true"></span></button>
+              <button type="button" data-mirror-option="1" aria-label="Mirror option 2"><span class="mirror-number" aria-hidden="true">2</span><span class="mirror-grid" data-mirror-grid aria-hidden="true"></span><span class="mirror-mark" data-mirror-mark aria-hidden="true"></span></button>
+              <button type="button" data-mirror-option="2" aria-label="Mirror option 3"><span class="mirror-number" aria-hidden="true">3</span><span class="mirror-grid" data-mirror-grid aria-hidden="true"></span><span class="mirror-mark" data-mirror-mark aria-hidden="true"></span></button>
             </div>
           </div>
           <p id="game-status" class="game-status" aria-hidden="true">Ready</p>
