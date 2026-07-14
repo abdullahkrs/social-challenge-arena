@@ -1,4 +1,4 @@
-import { ECHO_GRID_ID, LUMEN_LANES_ID, ORBIT_LOCK_ID } from './core.mjs';
+import { ECHO_GRID_ID, LUMEN_LANES_ID, MIRROR_FUSE_ID, ORBIT_LOCK_ID } from './core.mjs';
 
 export const catalog = Object.freeze([
   Object.freeze({
@@ -39,6 +39,19 @@ export const catalog = Object.freeze([
     howToKey: 'lumenHowTo',
     arenaLabelKey: 'lumenArenaLabel',
     controlsHintKey: 'lumenControlsHint'
+  }),
+  Object.freeze({
+    id: MIRROR_FUSE_ID,
+    dimension: '2d',
+    skill: 'spatial',
+    durationSeconds: 30,
+    icon: '◫',
+    gradient: 'mirror',
+    nameKey: 'mirrorName',
+    taglineKey: 'mirrorTagline',
+    howToKey: 'mirrorHowTo',
+    arenaLabelKey: 'mirrorArenaLabel',
+    controlsHintKey: 'mirrorControlsHint'
   })
 ]);
 
