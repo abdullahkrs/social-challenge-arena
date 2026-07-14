@@ -20,7 +20,16 @@ for (const required of [
   if (!html.includes(required)) throw new Error(`Missing runtime reference: ${required}`);
 }
 
-const budgetBytes = 180 * 1024;
+for (const requiredModule of [
+  'src/echo-game.mjs', 'src/echo-model.mjs', 'src/echo-integration.mjs', 'src/echo-copy.mjs',
+  'src/echo.css', 'src/audio.mjs', 'src/audio-integration.mjs'
+]) {
+  await stat(join(dist, requiredModule));
+}
+
+// Echo Trail adds one complete endless challenge journey plus a shared synthesized-audio layer.
+// Keep the static deployment bounded while allowing this measured platform-and-challenge slice.
+const budgetBytes = 240 * 1024;
 async function sizeOf(path) {
   const info = await stat(path);
   if (info.isFile()) return info.size;
