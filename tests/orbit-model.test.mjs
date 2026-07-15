@@ -85,7 +85,15 @@ test('rules reject wrong orbits, distinguish risk, and keep score bounded', () =
   assert.ok(safePoints >= 30 && riskPoints <= 850);
 });
 
-test('run summary reports truthful bounded mastery detail', () => {
-  assert.deepEqual(summarizeOrbitRun({ attempts: 0, correct: 0 }), { accuracy: 100, precision: 0 });
+test('alignment checks preserve same-seed score parity', () => {
+  const stage = generateOrbitChunk(20260715, 1).find(({ mechanic }) => mechanic !== 'relay');
+  const evaluation = bestEvaluation(stage, stage.validRings[0]);
+  const withoutChecks = scoreOrbitLock(stage, evaluation, { combo: 4, switches: 1, assistChecks: 0 });
+  const withChecks = scoreOrbitLock(stage, evaluation, { combo: 4, switches: 1, assistChecks: 12 });
+  assert.equal(withChecks, withoutChecks);
+});
+
+test('zero-attempt result detail stays truthful after deliberate exit', () => {
+  assert.deepEqual(summarizeOrbitRun({ attempts: 0, correct: 0 }), { accuracy: 0, precision: 0 });
   assert.deepEqual(summarizeOrbitRun({ attempts: 8, correct: 6, precisionTotal: 510 }), { accuracy: 75, precision: 85 });
 });
