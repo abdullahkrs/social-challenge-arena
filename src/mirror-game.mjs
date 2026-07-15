@@ -84,6 +84,7 @@ export class MirrorFuseGame {
     this.running = false;
     this.accepting = false;
     this.exitArmed = false;
+    this.terminalPending = false;
   }
 
   emptySnapshot() {
@@ -134,6 +135,7 @@ export class MirrorFuseGame {
     this.snapshot = this.emptySnapshot();
     this.running = true;
     this.accepting = false;
+    this.terminalPending = false;
     this.startedAt = performance.now();
     this.container.dataset.reduced = String(this.reducedMotion);
     this.installListeners();
@@ -187,6 +189,8 @@ export class MirrorFuseGame {
   showStage() {
     if (!this.running) return;
     this.disarmExit();
+    this.terminalPending = false;
+    this.exitButton.disabled = false;
     this.clearTimer(this.deadlineTimer);
     this.deadlineTimer = null;
     this.stage = this.currentStage();
@@ -245,6 +249,7 @@ export class MirrorFuseGame {
     this.checkButton.hidden = this.stage.mechanic === 'sequence';
     this.toggleButton.setAttribute('aria-label', this.t('mirrorSwitchCell'));
     this.exitButton.textContent = this.t(this.exitArmed ? 'mirrorExitNow' : 'mirrorEndRun');
+    this.exitButton.disabled = this.terminalPending;
     const directionLabels = { up: 'mirrorDirectionUp', right: 'mirrorDirectionRight', down: 'mirrorDirectionDown', left: 'mirrorDirectionLeft' };
     this.directionButtons.forEach((button) => button.setAttribute('aria-label', this.t(directionLabels[button.dataset.mirrorDirection])));
     this.container.querySelector('[data-mirror-controls]').setAttribute('aria-label', this.t('mirrorMovementControls'));
@@ -452,6 +457,11 @@ export class MirrorFuseGame {
     this.snapshot.lives -= 1;
     this.snapshot.combo = 0;
     this.snapshot.round = this.stageIndex + 1;
+    if (this.snapshot.lives <= 0) {
+      this.terminalPending = true;
+      this.disarmExit();
+      this.exitButton.disabled = true;
+    }
     this.container.dataset.feedback = 'wrong';
     this.renderTarget();
     this.emitSnapshot();
@@ -459,7 +469,7 @@ export class MirrorFuseGame {
     const key = kind === 'timeout' ? 'mirrorTimeout' : kind === 'moves' ? 'mirrorMoveLimit' : kind === 'sequence' ? 'mirrorSequenceWrong' : 'mirrorWrong';
     this.onAnnounce({ key });
     this.dispatch('resolved', { correct: false, stage: this.stage, kind });
-    if (this.snapshot.lives <= 0) {
+    if (this.terminalPending) {
       this.schedule(() => this.finish('failed'), this.reducedMotion ? 320 : 720);
       return;
     }
@@ -473,7 +483,7 @@ export class MirrorFuseGame {
   }
 
   requestExit() {
-    if (!this.running) return;
+    if (!this.running || this.terminalPending) return;
     if (this.exitArmed) {
       this.disarmExit();
       this.finish('ended');
@@ -496,7 +506,7 @@ export class MirrorFuseGame {
   }
 
   finish(reason) {
-    if (!this.running) return;
+    if (!this.running || (reason === 'ended' && this.terminalPending)) return;
     this.running = false;
     this.accepting = false;
     this.clearTimer(this.deadlineTimer);
@@ -513,6 +523,7 @@ export class MirrorFuseGame {
   destroy() {
     this.running = false;
     this.accepting = false;
+    this.terminalPending = false;
     this.abortController?.abort();
     this.abortController = null;
     this.languageObserver?.disconnect();
@@ -522,6 +533,7 @@ export class MirrorFuseGame {
     this.deadlineTimer = null;
     this.exitTimer = null;
     this.exitArmed = false;
+    if (this.exitButton) this.exitButton.disabled = false;
     this.container?.removeAttribute('data-feedback');
     this.container?.removeAttribute('data-phase');
   }
