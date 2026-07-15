@@ -6,11 +6,13 @@ Build and continuously evolve the product in `PRODUCT_BRIEF.md` quickly, coheren
 
 ## Mandatory game direction
 
-Before selecting, designing, implementing, or reviewing any new or materially upgraded challenge, read `GAME_DIRECTION.md` and treat it as a binding product and quality contract.
+Before selecting, designing, implementing, or reviewing any new or materially upgraded challenge, read `GAME_DIRECTION.md`, `CHALLENGE_SPEC_TEMPLATE.md`, `VISUAL_DECISIONS.md`, and `CATALOG_RESET_STATUS.json` and treat them as binding product and quality contracts.
 
 The issue body may narrow delivery scope, but it may not weaken the endless challenge, procedural variety, movement-plus-puzzle, concentration, escalating-pressure, visual-reference, prototype, originality, sound, accessibility, localization, social-loop, or production-evidence requirements in `GAME_DIRECTION.md`.
 
-A challenge that contradicts `GAME_DIRECTION.md` must be reduced, redesigned, or rejected rather than merged for schedule convenience.
+Every challenge PR must complete the relevant sections of `CHALLENGE_SPEC_TEMPLATE.md`, update `VISUAL_DECISIONS.md`, and satisfy the Prototype Gate before QA. A challenge that contradicts these contracts must be reduced, redesigned, or rejected rather than merged for schedule convenience.
+
+`CATALOG_RESET_STATUS.json` is a temporary executable migration contract. Issue #114 must set `legacyAllowed` to `false` in the same PR that removes all legacy challenge references and ships the replacement flagship. QA must not pass the catalog reset while `legacyAllowed` remains `true`.
 
 ## Swarm topology
 
