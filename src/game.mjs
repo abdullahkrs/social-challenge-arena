@@ -85,6 +85,12 @@ export class OrbitLockGame {
     this.container.dataset.reduced = String(this.reducedMotion);
   }
 
+  isShortcutTarget(target) {
+    return target === this.canvas
+      || target === document.body
+      || (target instanceof Element && this.container.contains(target));
+  }
+
   installListeners() {
     const signal = this.abortController.signal;
     this.ringButtons.forEach((button) => {
@@ -95,6 +101,7 @@ export class OrbitLockGame {
     this.exitButton.addEventListener('click', () => this.requestExit(), { signal });
     window.addEventListener('keydown', (event) => {
       if (!this.running || event.altKey || event.ctrlKey || event.metaKey) return;
+      if (!this.isShortcutTarget(event.target)) return;
       const ring = KEY_RING[event.code];
       if (ring !== undefined) {
         event.preventDefault();
