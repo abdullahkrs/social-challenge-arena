@@ -29,13 +29,17 @@ jobs:
           node-version: 20
           cache: npm
       - run: npm ci
-      - name: Apply coherent delivery
+      - name: Apply and verify coherent delivery
         run: |
           git config user.name "Worker Swarm"
           git config user.email "actions@users.noreply.github.com"
           node scripts/worker-106-hotfix.mjs
           set +e
-          node scripts/worker-106-apply.mjs > /tmp/worker-106.log 2>&1
+          {
+            node scripts/worker-106-apply.mjs &&
+            npm test &&
+            npm run build
+          } > /tmp/worker-106.log 2>&1
           status=$?
           set -e
           cat /tmp/worker-106.log
@@ -47,8 +51,6 @@ jobs:
             git push origin "HEAD:${BRANCH_NAME}"
             exit "$status"
           fi
-      - run: npm test
-      - run: npm run build
       - run: rm -rf dist scripts/worker-106-hotfix.mjs worker-106-error.txt
       - name: Commit coherent delivery
         run: |
