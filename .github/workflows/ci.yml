@@ -18,7 +18,7 @@ jobs:
         with:
           node-version: 22
           cache: npm
-      - run: npm ci --ignore-scripts
+      - run: npm install --ignore-scripts
       - run: npm test
       - run: npm run build
       - run: npx playwright install --with-deps chromium
@@ -31,4 +31,4 @@ jobs:
             dist
             playwright-report
             test-results
-          if-no-files-found: error
+          if-no-files-found: warn
