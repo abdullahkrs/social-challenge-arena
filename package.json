@@ -1,12 +1,18 @@
 {
   "name": "social-challenge-arena",
-  "version": "0.2.0",
+  "version": "0.3.1",
   "private": true,
   "type": "module",
   "scripts": {
     "test": "node --test tests/rift-relay.test.mjs tests/catalog-reset-contract.test.mjs",
     "build": "node scripts/build.mjs",
     "check": "npm test && npm run build"
+  },
+  "dependencies": {
+    "phaser": "4.2.1"
+  },
+  "devDependencies": {
+    "esbuild": "0.25.12"
   },
   "engines": {
     "node": ">=20"
