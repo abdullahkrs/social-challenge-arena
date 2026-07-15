@@ -4,6 +4,10 @@ on:
   push:
     branches:
       - worker/106-unify-onboarding-status
+  pull_request:
+    branches:
+      - main
+    types: [opened, synchronize, reopened]
 
 permissions:
   contents: write
@@ -16,6 +20,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
+          ref: ${{ github.event.pull_request.head.ref || github.ref_name }}
           fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
@@ -27,9 +32,11 @@ jobs:
       - run: npm run build
       - run: rm -rf dist
       - name: Commit coherent delivery
+        env:
+          BRANCH_NAME: ${{ github.event.pull_request.head.ref || github.ref_name }}
         run: |
           git config user.name "Worker Swarm"
           git config user.email "actions@users.noreply.github.com"
           git add -A
           git commit -m "Unify concise onboarding and endless status"
-          git push
+          git push origin "HEAD:${BRANCH_NAME}"
