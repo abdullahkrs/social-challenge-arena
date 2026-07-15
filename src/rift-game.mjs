@@ -1,207 +1,34 @@
 import { generateRiftZone, scoreRiftAction } from './rift-relay-model.mjs';
 
-const LANES = [0, 1, 2];
-const SWIPE_THRESHOLD = 34;
-const TAP_MAX_DISTANCE = 18;
-const TAP_MAX_MS = 320;
-
-export class RiftRelayGame {
-  constructor({ container, reducedMotion = false, onUpdate = () => {}, onAnnounce = () => {}, onFinish = () => {} }) {
-    this.container = container;
-    this.reducedMotion = reducedMotion;
-    this.onUpdate = onUpdate;
-    this.onAnnounce = onAnnounce;
-    this.onFinish = onFinish;
-    this.abort = new AbortController();
-    this.running = false;
-    this.frame = 0;
-    this.lastTime = 0;
-    this.seed = 0;
-    this.lane = 1;
-    this.score = 0;
-    this.combo = 0;
-    this.lives = 3;
-    this.zoneNumber = 0;
-    this.segmentIndex = 0;
-    this.progress = 0;
-    this.jumpUntil = 0;
-    this.active = null;
-    this.pointer = null;
+const LANES=[0,1,2], SWIPE=34;
+export class RiftRelayGame{
+  constructor({container,reducedMotion=false,onUpdate=()=>{},onAnnounce=()=>{},onFinish=()=>{}}){
+    this.container=container;this.canvas=container.querySelector('canvas');this.ctx=this.canvas.getContext('2d');this.reducedMotion=reducedMotion;this.onUpdate=onUpdate;this.onAnnounce=onAnnounce;this.onFinish=onFinish;this.abort=new AbortController();this.lane=1;this.score=0;this.combo=0;this.lives=3;this.zoneNumber=0;this.segmentIndex=0;this.progress=0;this.jumpUntil=0;this.pointer=null;this.running=false;this.particles=[];this.shake=0;
   }
-
-  start(seed) {
-    this.seed = Number(seed) >>> 0;
-    this.running = true;
-    this.bind();
-    this.renderPlayer();
-    this.loadSegment();
-    this.lastTime = performance.now();
-    this.frame = requestAnimationFrame((time) => this.tick(time));
-    this.container.focus({ preventScroll: true });
-  }
-
-  bind() {
-    const signal = this.abort.signal;
-    this.container.querySelectorAll('[data-rift-lane]').forEach((button) => {
-      button.addEventListener('pointerdown', () => this.move(Number(button.dataset.riftLane)), { signal });
-    });
-    this.container.querySelector('[data-rift-jump]')?.addEventListener('pointerdown', () => this.jump(), { signal });
-    this.container.querySelector('[data-rift-exit]')?.addEventListener('click', (event) => {
-      event.stopPropagation();
-      this.finish('ended');
-    }, { signal });
-
-    this.container.addEventListener('pointerdown', (event) => {
-      if (!this.running || event.target.closest('[data-rift-exit]')) return;
-      this.pointer = { id: event.pointerId, x: event.clientX, y: event.clientY, at: performance.now() };
-      this.container.setPointerCapture?.(event.pointerId);
-      event.preventDefault();
-    }, { signal });
-
-    this.container.addEventListener('pointerup', (event) => {
-      if (!this.running || !this.pointer || this.pointer.id !== event.pointerId) return;
-      const dx = event.clientX - this.pointer.x;
-      const dy = event.clientY - this.pointer.y;
-      const elapsed = performance.now() - this.pointer.at;
-      const distance = Math.hypot(dx, dy);
-      this.pointer = null;
-
-      if (Math.abs(dx) >= SWIPE_THRESHOLD && Math.abs(dx) > Math.abs(dy) * 1.15) {
-        this.move(this.lane + (dx > 0 ? 1 : -1));
-      } else if (dy <= -SWIPE_THRESHOLD && Math.abs(dy) > Math.abs(dx)) {
-        this.jump();
-      } else if (distance <= TAP_MAX_DISTANCE && elapsed <= TAP_MAX_MS) {
-        this.jump();
-      }
-      event.preventDefault();
-    }, { signal });
-
-    this.container.addEventListener('pointercancel', () => { this.pointer = null; }, { signal });
-    this.container.addEventListener('contextmenu', (event) => event.preventDefault(), { signal });
-
-    this.container.addEventListener('keydown', (event) => {
-      if (event.key === 'ArrowLeft') this.move(this.lane - 1);
-      if (event.key === 'ArrowRight') this.move(this.lane + 1);
-      if (event.code === 'Space' || event.key === 'ArrowUp') this.jump();
-      if (event.key === 'Escape') this.finish('ended');
-      if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'Space'].includes(event.code) || ['ArrowLeft', 'ArrowRight', 'ArrowUp'].includes(event.key)) event.preventDefault();
-    }, { signal });
-  }
-
-  move(lane) {
-    if (!this.running) return;
-    const safeLane = Math.max(0, Math.min(2, Number(lane)));
-    if (!LANES.includes(safeLane) || safeLane === this.lane) return;
-    this.lane = safeLane;
-    this.renderPlayer();
-    this.container.dataset.input = 'move';
-    window.setTimeout(() => { if (this.running) delete this.container.dataset.input; }, 110);
-  }
-
-  jump() {
-    if (!this.running || performance.now() < this.jumpUntil - 320) return;
-    this.jumpUntil = performance.now() + 620;
-    this.container.classList.add('is-jumping');
-    window.setTimeout(() => this.container.classList.remove('is-jumping'), 640);
-  }
-
-  currentZone() {
-    const cycle = Math.floor(this.zoneNumber / 6);
-    return generateRiftZone(this.seed, cycle, this.zoneNumber % 6);
-  }
-
-  loadSegment() {
-    const zone = this.currentZone();
-    if (this.segmentIndex >= zone.segments.length) {
-      this.zoneNumber += 1;
-      this.segmentIndex = 0;
-      return this.loadSegment();
-    }
-    this.active = zone.segments[this.segmentIndex];
-    this.progress = 0;
-    this.container.dataset.zone = zone.type;
-    this.container.querySelector('[data-rift-zone]').textContent = `${zone.type} · ${this.zoneNumber + 1}`;
-    this.renderObstacle();
-    this.onUpdate({ score: this.score, round: this.zoneNumber, lives: this.lives, combo: this.combo });
-  }
-
-  renderPlayer() {
-    const player = this.container.querySelector('[data-rift-player]');
-    if (player) player.style.setProperty('--lane', String(this.lane));
-  }
-
-  renderObstacle() {
-    const obstacle = this.container.querySelector('[data-rift-obstacle]');
-    if (!obstacle || !this.active) return;
-    const blocked = this.active.obstacle.blockedLanes;
-    obstacle.innerHTML = LANES.map((lane) => {
-      const isBlocked = blocked.includes(lane);
-      const isAnswer = this.active.kind === 'puzzle' && this.active.puzzle?.correctLane === lane;
-      return `<span class="rift-gate ${isBlocked ? 'is-blocked' : 'is-open'} ${isAnswer ? 'is-signal' : ''}" data-lane="${lane}"><i></i></span>`;
-    }).join('');
-    obstacle.style.setProperty('--rift-progress', '0');
-    this.container.querySelector('[data-rift-rule]').textContent = this.active.kind === 'puzzle'
-      ? `Signal ${this.active.puzzle.cue + 1}: choose the lit route`
-      : this.active.riskyRoute ? 'Risk route active' : 'Find the open route';
-  }
-
-  tick(time) {
-    if (!this.running) return;
-    const delta = Math.min(48, Math.max(0, time - this.lastTime));
-    this.lastTime = time;
-    const zone = this.currentZone();
-    const duration = Math.max(720, this.active.obstacle.timing / zone.difficulty.speed);
-    this.progress += delta / duration;
-    const obstacle = this.container.querySelector('[data-rift-obstacle]');
-    obstacle?.style.setProperty('--rift-progress', String(Math.min(1, this.progress)));
-    if (this.progress >= 1) this.resolveSegment(time);
-    this.frame = requestAnimationFrame((next) => this.tick(next));
-  }
-
-  resolveSegment(time) {
-    const obstacle = this.active.obstacle;
-    const puzzleLane = this.active.kind === 'puzzle' ? this.active.puzzle.correctLane : null;
-    const blocked = obstacle.blockedLanes.includes(this.lane);
-    const puzzleWrong = puzzleLane !== null && this.lane !== puzzleLane;
-    const jumpRequired = obstacle.type === 'low-beam' || obstacle.type === 'gap';
-    const jumpMiss = jumpRequired && time > this.jumpUntil;
-    const success = !blocked && !puzzleWrong && !jumpMiss;
-
-    if (success) {
-      this.combo += 1;
-      const points = scoreRiftAction({
-        distance: this.zoneNumber + this.segmentIndex,
-        accuracy: 1,
-        streak: this.combo,
-        risk: this.active.rewardMultiplier,
-        puzzle: this.active.kind === 'puzzle'
-      });
-      this.score += points;
-      this.onAnnounce({ key: 'riftClear', values: { points } });
-      this.container.classList.add('is-success');
-    } else {
-      this.lives -= 1;
-      this.combo = 0;
-      this.onAnnounce({ key: 'riftHit', values: {} });
-      this.container.classList.add('is-hit');
-    }
-    window.setTimeout(() => this.container.classList.remove('is-success', 'is-hit'), this.reducedMotion ? 0 : 260);
-    this.segmentIndex += 1;
-    this.onUpdate({ score: this.score, round: this.zoneNumber, lives: this.lives, combo: this.combo });
-    if (this.lives <= 0) return this.finish('failed');
-    this.loadSegment();
-  }
-
-  finish(reason) {
-    if (!this.running) return;
-    this.running = false;
-    cancelAnimationFrame(this.frame);
-    this.onFinish({ score: this.score, reason, round: this.zoneNumber, combo: this.combo });
-  }
-
-  destroy() {
-    this.running = false;
-    cancelAnimationFrame(this.frame);
-    this.abort.abort();
-  }
+  start(seed){this.seed=Number(seed)>>>0;this.running=true;this.bind();this.resize();this.loadSegment();this.lastTime=performance.now();this.frame=requestAnimationFrame(t=>this.tick(t));this.container.focus({preventScroll:true})}
+  bind(){const s=this.abort.signal;this.container.querySelector('[data-rift-exit]')?.addEventListener('click',e=>{e.stopPropagation();this.finish('ended')},{signal:s});
+    this.container.addEventListener('pointerdown',e=>{if(e.target.closest('[data-rift-exit]'))return;this.pointer={id:e.pointerId,x:e.clientX,y:e.clientY,at:performance.now()};this.container.setPointerCapture?.(e.pointerId);e.preventDefault()},{signal:s});
+    this.container.addEventListener('pointerup',e=>{if(!this.pointer||this.pointer.id!==e.pointerId)return;const dx=e.clientX-this.pointer.x,dy=e.clientY-this.pointer.y;this.pointer=null;if(Math.abs(dx)>SWIPE&&Math.abs(dx)>Math.abs(dy)*1.1)this.move(this.lane+(dx>0?1:-1));else if(dy<-SWIPE)this.jump();else this.jump();e.preventDefault()},{signal:s});
+    this.container.addEventListener('keydown',e=>{if(e.key==='ArrowLeft')this.move(this.lane-1);if(e.key==='ArrowRight')this.move(this.lane+1);if(e.key==='ArrowUp'||e.code==='Space')this.jump();if(e.key==='Escape')this.finish('ended')},{signal:s});
+    addEventListener('resize',()=>this.resize(),{signal:s});this.container.addEventListener('contextmenu',e=>e.preventDefault(),{signal:s});}
+  resize(){const r=this.canvas.getBoundingClientRect(),d=Math.min(2,devicePixelRatio||1);this.canvas.width=Math.max(320,Math.round(r.width*d));this.canvas.height=Math.max(420,Math.round(r.height*d));this.ctx.setTransform(d,0,0,d,0,0);this.w=r.width;this.h=r.height}
+  move(l){this.lane=Math.max(0,Math.min(2,l));this.particles.push({x:this.laneX(this.lane),y:this.h*.77,a:1})}
+  jump(){if(performance.now()<this.jumpUntil-260)return;this.jumpUntil=performance.now()+620}
+  currentZone(){return generateRiftZone(this.seed,this.zoneNumber)}
+  loadSegment(){const z=this.currentZone();if(this.segmentIndex>=z.segments.length){if(z.difficulty.recovery&&this.lives<3)this.lives++;this.zoneNumber++;this.segmentIndex=0;return this.loadSegment()}this.active=z.segments[this.segmentIndex];this.progress=0;this.container.dataset.zone=z.zone;this.container.dataset.stage=z.stage;this.container.querySelector('[data-rift-zone]').textContent=`${z.zone} · ${this.zoneNumber+1}`;this.container.querySelector('[data-rift-rule]').textContent=this.ruleText();this.onUpdate({score:this.score,round:this.zoneNumber,lives:this.lives,combo:this.combo})}
+  ruleText(){if(this.active.kind==='movement')return this.active.obstacle.requiresJump?'JUMP + FIND THE OPEN PATH':'READ THE SILHOUETTES';const map={match:'MATCH THE CORE',direction:'FOLLOW THE ARROW',count:'CHOOSE THE COUNT',invert:'CHOOSE THE OPPOSITE',memory:'REMEMBER THE PULSE',transform:'ROTATE THEN AVOID'};return map[this.active.rule.family]||'SOLVE THE SIGNAL'}
+  laneX(l){return this.w*(.26+l*.24)}
+  tick(t){if(!this.running)return;const dt=Math.min(42,t-this.lastTime||16);this.lastTime=t;const z=this.currentZone();const duration=z.difficulty.decisionMs/z.difficulty.speed;this.progress+=dt/duration;if(this.progress>=1)this.resolve(t);this.draw(t,z);this.frame=requestAnimationFrame(n=>this.tick(n))}
+  resolve(t){const o=this.active.obstacle;const blocked=o.blockedLanes.includes(this.lane);const wrong=this.active.kind==='puzzle'&&this.lane!==this.active.rule.correctLane;const jumpMiss=o.requiresJump&&t>this.jumpUntil;const ok=!blocked&&!wrong&&!jumpMiss;if(ok){this.combo++;const p=scoreRiftAction({distance:this.zoneNumber*8+this.segmentIndex,accuracy:1,streak:this.combo,risk:this.active.risk,puzzle:this.active.kind==='puzzle',stage:this.zoneNumber%7});this.score+=p;this.burst('#70f6c2');this.onAnnounce({key:'riftClear',values:{points:p}})}else{this.lives--;this.combo=0;this.shake=10;this.burst('#ff647c');this.onAnnounce({key:'riftHit',values:{}})}this.segmentIndex++;this.onUpdate({score:this.score,round:this.zoneNumber,lives:this.lives,combo:this.combo});if(this.lives<=0)return this.finish('failed');this.loadSegment()}
+  burst(color){for(let i=0;i<14;i++)this.particles.push({x:this.laneX(this.lane),y:this.h*.78,vx:(Math.random()-.5)*5,vy:-Math.random()*5,a:1,color})}
+  draw(t,z){const c=this.ctx,w=this.w,h=this.h;c.save();if(this.shake&&!this.reducedMotion){c.translate((Math.random()-.5)*this.shake,(Math.random()-.5)*this.shake);this.shake*=.82}
+    const palettes={foundry:['#35140f','#f47c48'],skyway:['#0c2945','#55c8ff'],vault:['#25183f','#9d7cff'],horizon:['#211a35','#ffcf66'],surge:['#3a0f26','#ff5b84'],resonance:['#102a2d','#64f1c3'],sanctuary:['#16362e','#8df0b6']};const [bg,glow]=palettes[z.zone]||palettes.foundry;const g=c.createLinearGradient(0,0,0,h);g.addColorStop(0,bg);g.addColorStop(1,'#060a12');c.fillStyle=g;c.fillRect(0,0,w,h);
+    for(let i=0;i<7;i++){const yy=(i*110+(t*.05*z.difficulty.speed))%(h+120)-120;c.fillStyle=`${glow}18`;c.fillRect(0,yy,w,2)}
+    c.globalAlpha=.5;for(let i=0;i<5;i++){c.fillStyle=i%2?`${glow}20`:'#ffffff0b';c.beginPath();c.moveTo(w*.5,70);c.lineTo(i*w/4-60,h);c.lineTo(i*w/4+80,h);c.closePath();c.fill()}c.globalAlpha=1;
+    const p=Math.min(1,this.progress),scale=.25+p*.95,y=100+p*(h*.62);for(const lane of LANES){const x=this.laneX(lane);const blocked=this.active.obstacle.blockedLanes.includes(lane);const answer=this.active.kind==='puzzle'&&this.active.rule.correctLane===lane;c.save();c.translate(x,y);c.scale(scale,scale);c.fillStyle=blocked?'#ff5e73':answer?'#ffd75e':'#5bd7ff';c.strokeStyle='#06101b';c.lineWidth=5;c.beginPath();c.roundRect(-38,-42,76,84,14);c.fill();c.stroke();if(this.active.obstacle.requiresJump){c.fillStyle='#06101b';c.fillRect(-30,12,60,14)}if(this.active.kind==='puzzle'){c.fillStyle='#06101b';c.font='bold 30px system-ui';c.textAlign='center';c.fillText(['◆','▲','●','■'][this.active.rule.cue%4],0,10)}c.restore()}
+    const jump=t<this.jumpUntil?Math.sin(Math.max(0,Math.min(1,(this.jumpUntil-t)/620))*Math.PI)*80:0;const px=this.laneX(this.lane),py=h*.78-jump;c.fillStyle='#e9fbff';c.strokeStyle='#06101b';c.lineWidth=5;c.beginPath();c.moveTo(px,py-34);c.lineTo(px+24,py);c.lineTo(px,py+34);c.lineTo(px-24,py);c.closePath();c.fill();c.stroke();c.fillStyle=glow;c.beginPath();c.arc(px,py,8,0,Math.PI*2);c.fill();
+    this.particles=this.particles.filter(q=>q.a>.03);for(const q of this.particles){q.x+=(q.vx||0);q.y+=(q.vy||-1);q.a*=.92;c.globalAlpha=q.a;c.fillStyle=q.color||glow;c.fillRect(q.x,q.y,5,5)}c.globalAlpha=1;
+    c.fillStyle='#ffffff';c.font='800 13px system-ui';c.fillText(z.stage.toUpperCase(),14,h-18);c.restore()}
+  finish(reason){if(!this.running)return;this.running=false;cancelAnimationFrame(this.frame);this.onFinish({score:this.score,reason,round:this.zoneNumber,combo:this.combo})}
+  destroy(){this.running=false;cancelAnimationFrame(this.frame);this.abort.abort()}
 }
