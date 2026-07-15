@@ -2,7 +2,7 @@
 <html lang="en" dir="ltr">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
   <meta name="theme-color" content="#07101e">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'none'; font-src 'self' data:; object-src 'none'; base-uri 'self'; form-action 'none'">
   <meta name="description" content="Endless multilingual social skill challenges.">
@@ -34,7 +34,7 @@
         <div class="hero">
           <p class="eyebrow" data-copy="name">Rift Relay</p>
           <h1 data-copy="instructionTitle">Read the route before it reaches you.</h1>
-          <p data-copy="howTo">Move between three lanes, jump gaps, avoid blocked gates, and solve signal rules. The run ends when all chances are lost or you exit.</p>
+          <p data-copy="howTo">Swipe left or right to change lane. Tap to jump. Avoid blocked gates and follow signal rules.</p>
           <p id="invite-target" class="comparison" hidden></p>
           <div class="actions"><button class="btn primary" id="start-button" type="button" data-copy="start">Start run</button><button class="btn" id="back-button" type="button" data-copy="back">Back</button></div>
         </div>
@@ -46,15 +46,16 @@
           <div><span data-copy="lives">Chances</span><strong id="lives-value">3</strong></div>
           <div><span data-copy="streak">Streak</span><strong id="combo-value">0</strong></div>
         </div>
-        <div id="rift-arena" class="rift-arena" tabindex="0" role="application" aria-label="Rift Relay game arena">
+        <div id="rift-arena" class="rift-arena" tabindex="0" role="application" aria-label="Rift Relay game arena. Swipe left or right to move and tap to jump." aria-keyshortcuts="ArrowLeft ArrowRight ArrowUp Space Escape">
           <div class="rift-head"><span data-rift-zone>flow · 1</span><strong data-rift-rule>Find the open route</strong></div>
           <button class="btn rift-exit" type="button" data-rift-exit data-copy="exit">Exit</button>
           <div class="rift-track"><div class="rift-obstacle" data-rift-obstacle></div><div class="rift-player" data-rift-player></div></div>
-          <div class="rift-controls">
-            <button type="button" data-rift-lane="0" aria-label="Left">←</button>
-            <button type="button" data-rift-lane="1" aria-label="Center">◆</button>
-            <button type="button" data-rift-lane="2" aria-label="Right">→</button>
-            <button type="button" data-rift-jump aria-label="Jump">↑</button>
+          <div class="gesture-hint" data-copy="gestureHint" aria-hidden="true"><span>↔</span><b>Tap · Swipe</b><span>↑</span></div>
+          <div class="sr-only" role="group" aria-label="Keyboard controls">
+            <button type="button" data-rift-lane="0" tabindex="-1">Left</button>
+            <button type="button" data-rift-lane="1" tabindex="-1">Center</button>
+            <button type="button" data-rift-lane="2" tabindex="-1">Right</button>
+            <button type="button" data-rift-jump tabindex="-1">Jump</button>
           </div>
         </div>
         <p id="game-status" class="sr-only" aria-live="assertive"></p>
