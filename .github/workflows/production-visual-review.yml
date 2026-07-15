@@ -14,6 +14,7 @@ on:
 permissions:
   contents: read
   actions: read
+  issues: write
 
 concurrency:
   group: production-visual-review
@@ -96,3 +97,62 @@ jobs:
           path: production-review
           if-no-files-found: error
           retention-days: 14
+
+      - name: Record baseline production visual result
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REVIEW_SHA: ${{ github.sha }}
+          RUN_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          JOB_STATUS: ${{ job.status }}
+        shell: bash
+        run: |
+          issue_state=$(gh issue view 109 --repo "$GITHUB_REPOSITORY" --json state --jq '.state' 2>/dev/null || echo UNKNOWN)
+          if [[ "$issue_state" != "OPEN" ]]; then
+            echo "Baseline issue #109 is not open; no audit comment required."
+            exit 0
+          fi
+
+          report="production-review/report.json"
+          if [[ "$JOB_STATUS" == "success" && -f "$report" ]]; then
+            challenge_count=$(jq '[.discoveredChallenges[].id] | unique | length' "$report")
+            smoke_passes=$(jq '[.smoke[] | select(.status == "pass") | .id] | unique | length' "$report")
+            smoke_failures=$(jq '[.smoke[] | select(.status == "fail")] | length' "$report")
+            deep_pairs=$(jq '[.deep[] | select(.status == "pass") | "\(.id):\(.locale)"] | unique | length' "$report")
+            deep_failures=$(jq '[.deep[] | select(.status == "fail")] | length' "$report")
+            error_count=$(jq '.errors | length' "$report")
+            locales=$(jq -r '[.deep[].locale] | unique | sort | join(",")' "$report")
+            deep_all=$(jq -r '.plan.deepAll // false' "$report")
+            locale_plan=$(jq -r '.plan.locales // false' "$report")
+            expected_pairs=$((challenge_count * 3))
+
+            if [[ "$challenge_count" -gt 0 && "$smoke_passes" -eq "$challenge_count" && "$smoke_failures" -eq 0 && "$deep_pairs" -eq "$expected_pairs" && "$deep_failures" -eq 0 && "$error_count" -eq 0 && "$locales" == "ar,en,tr" && "$deep_all" == "true" && "$locale_plan" == "true" ]]; then
+              gh issue comment 109 --repo "$GITHUB_REPOSITORY" --body "$(cat <<EOF
+Production Visual Check: PASS
+
+- Production SHA: \`${REVIEW_SHA}\`.
+- Run and downloadable evidence: ${RUN_URL}.
+- Smoke: all ${challenge_count} discovered challenges passed.
+- Deep review: all ${challenge_count} challenges passed in Arabic RTL, English, and Turkish with zero recorded errors.
+EOF
+)"
+              exit 0
+            fi
+          fi
+
+          if [[ -f "$report" ]]; then
+            summary=$(jq -c '{plan, challenges: (.discoveredChallenges | length), smokeFailures: ([.smoke[] | select(.status == "fail")] | length), deepFailures: ([.deep[] | select(.status == "fail")] | length), errors: (.errors | length)}' "$report")
+          else
+            summary='report.json unavailable'
+          fi
+
+          gh issue comment 109 --repo "$GITHUB_REPOSITORY" --body "$(cat <<EOF
+Production Visual Check: FAIL
+
+- Production SHA: \`${REVIEW_SHA}\`; job status: \`${JOB_STATUS}\`.
+- Run and available evidence: ${RUN_URL}.
+- Report summary: \`${summary}\`.
+- Baseline remains open; no future product issue may start until this blocker is repaired or reduced.
+EOF
+)"
+          exit 1
