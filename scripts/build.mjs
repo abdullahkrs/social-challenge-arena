@@ -22,14 +22,15 @@ for (const required of [
 
 for (const requiredModule of [
   'src/echo-game.mjs', 'src/echo-model.mjs', 'src/echo-integration.mjs', 'src/echo-copy.mjs',
-  'src/echo.css', 'src/audio.mjs', 'src/audio-integration.mjs'
+  'src/echo.css', 'src/audio.mjs', 'src/audio-integration.mjs',
+  'src/mirror-game.mjs', 'src/mirror-model.mjs', 'src/mirror-integration.mjs', 'src/mirror-copy.mjs'
 ]) {
   await stat(join(dist, requiredModule));
 }
 
-// Echo Trail adds one complete endless challenge journey plus a shared synthesized-audio layer.
-// Keep the static deployment bounded while allowing this measured platform-and-challenge slice.
-const budgetBytes = 240 * 1024;
+// The measured Mirror Fuse conversion adds one complete endless spatial journey while reusing
+// the established platform, result, sharing, and synthesized-audio layers.
+const budgetBytes = 288 * 1024;
 async function sizeOf(path) {
   const info = await stat(path);
   if (info.isFile()) return info.size;
