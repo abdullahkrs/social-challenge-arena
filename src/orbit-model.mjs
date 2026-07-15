@@ -168,15 +168,14 @@ export function evaluateOrbitLock(stage, { elapsedMs, selectedRing, lockIndex = 
   return Object.freeze({ hit, validRing, ring, gate, markerAngle, gateAngle, distance, precision });
 }
 
-export function scoreOrbitLock(stage, evaluation, { combo = 0, switches = 0, assistChecks = 0, relayPartial = false } = {}) {
+export function scoreOrbitLock(stage, evaluation, { combo = 0, switches = 0, relayPartial = false } = {}) {
   const progress = Math.min(150, stage.index * 4);
   const precision = evaluation.precision * (relayPartial ? 0.72 : 1.35);
   const comboBonus = Math.min(180, Math.max(0, Number(combo) - 1) * 18);
   const mechanicBonus = { align: 0, switch: 30, polarity: 55, risk: 60, relay: 75 }[stage.mechanic] || 0;
   const efficientControl = Math.max(0, 24 - Math.max(0, Number(switches) - 1) * 8);
   const riskBonus = evaluation.gate.kind === 'risk' ? 145 : evaluation.gate.kind === 'relay' ? 50 : 0;
-  const assistAdjustment = Math.min(24, Math.max(0, Number(assistChecks)) * 4);
-  const points = Math.round((95 + progress + precision + comboBonus + mechanicBonus + efficientControl + riskBonus - assistAdjustment) * (evaluation.gate.multiplier || 1));
+  const points = Math.round((95 + progress + precision + comboBonus + mechanicBonus + efficientControl + riskBonus) * (evaluation.gate.multiplier || 1));
   return clamp(points, 30, relayPartial ? 360 : 850);
 }
 
@@ -191,7 +190,7 @@ export function orbitAlignmentBand(stage, evaluation) {
 export function summarizeOrbitRun(snapshot = {}) {
   const attempts = Math.max(0, Math.trunc(Number(snapshot.attempts) || 0));
   const correct = Math.max(0, Math.trunc(Number(snapshot.correct) || 0));
-  const accuracy = attempts ? Math.round((correct / attempts) * 100) : 100;
+  const accuracy = attempts ? Math.round((correct / attempts) * 100) : 0;
   const precision = correct ? Math.round((Number(snapshot.precisionTotal) || 0) / correct) : 0;
   return Object.freeze({ accuracy: clamp(accuracy, 0, 100), precision: clamp(precision, 0, 100) });
 }
