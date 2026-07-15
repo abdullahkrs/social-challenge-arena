@@ -104,6 +104,14 @@ export class OrbitLockGame {
   t(key, values = {}) { return translate(this.language(), key, values); }
   zoneText(stage = this.stage) { return this.t(ZONE_KEYS[stage?.zone] || 'orbitZoneHalo'); }
   ruleText(stage = this.stage) { return this.t(RULE_KEYS[stage?.mechanic] || 'orbitRuleDirect'); }
+  ruleDisplay(stage = this.stage) {
+    if (stage?.mechanic === 'opposite') return this.t('orbitOppositeFrom', { lane: this.ringText(stage.cueLane) });
+    if (stage?.mechanic === 'sequence') {
+      const sequence = stage.sequence.map((lane) => this.ringText(lane)).join(', ');
+      return this.t(stage.memoryRule === 'first' ? 'orbitSequenceFirst' : 'orbitSequenceLast', { sequence });
+    }
+    return this.ruleText(stage);
+  }
   ringText(lane = this.currentLane) { return this.t(RING_KEYS[clamp(Number(lane) || 0, 0, ORBIT_LANES - 1)]); }
 
   schedule(callback, delay) {
@@ -203,6 +211,7 @@ export class OrbitLockGame {
     this.announcedCycle = -1;
     this.feedback = null;
     this.runtime.removeAttribute('data-feedback');
+    this.canvas.removeAttribute('data-feedback');
     this.runtime.dataset.phase = this.stage.phase;
     this.deadlineTimer = this.schedule(() => this.resolveMiss('timeout'), this.stage.deadlineMs);
     this.renderText();
@@ -213,7 +222,7 @@ export class OrbitLockGame {
       : null;
     this.onAnnounce({
       key: 'orbitStageReady',
-      values: { value: this.stage.index + 1, rule: this.ruleText(), lane: this.ringText() },
+      values: { value: this.stage.index + 1, rule: this.ruleDisplay(), lane: this.ringText() },
       extraKey, extraValues: { sequence }
     });
     if (this.stage.milestone || this.stage.special) platformAudio.play('zone', (this.stage.index % 5) * 18);
@@ -228,7 +237,7 @@ export class OrbitLockGame {
 
   renderText() {
     this.zoneValue.textContent = this.zoneText();
-    this.ruleValue.textContent = this.ruleText();
+    this.ruleValue.textContent = this.ruleDisplay();
     this.progressValue.textContent = this.t('orbitGate', { value: this.stage.index + 1 });
     this.inButton.querySelector('small').textContent = this.t('orbitMoveIn');
     this.outButton.querySelector('small').textContent = this.t('orbitMoveOut');
@@ -248,7 +257,7 @@ export class OrbitLockGame {
     this.statusValue.textContent = status;
     this.statusValue.dataset.state = open ? 'ready' : 'approach';
     this.lockButton.dataset.ready = String(open);
-    const state = this.t('orbitState', { zone: this.zoneText(), rule: this.ruleText(), lane: this.ringText(), status });
+    const state = this.t('orbitState', { zone: this.zoneText(), rule: this.ruleDisplay(), lane: this.ringText(), status });
     this.canvas.setAttribute('aria-label', `${this.t('orbitArenaLabel')}. ${state}`);
     this.lockButton.setAttribute('aria-label', `${this.t('orbitLock')}. ${state}`);
   }
@@ -284,7 +293,7 @@ export class OrbitLockGame {
     this.stageMoves += 1;
     platformAudio.play('move', (next - 1) * 28);
     this.renderText();
-    this.onAnnounce({ key: 'orbitStageReady', values: { value: this.stage.index + 1, rule: this.ruleText(), lane: this.ringText() } });
+    this.onAnnounce({ key: 'orbitMoved', values: { lane: this.ringText() } });
   }
 
   lock() {
@@ -317,6 +326,7 @@ export class OrbitLockGame {
     this.feedback = { type: 'correct', points: result.points };
     this.feedbackUntil = performance.now() + (this.reducedMotion ? 260 : 620);
     this.runtime.dataset.feedback = 'correct';
+    this.canvas.dataset.feedback = 'correct';
     this.spawnParticles(result.risk ? this.stage.riskGateTick : this.stage.gateTick, result.risk);
     this.emitSnapshot();
     platformAudio.play('correct', Math.min(140, combo * 9 + (result.risk ? 40 : 0)));
@@ -341,6 +351,7 @@ export class OrbitLockGame {
     this.feedback = { type: 'wrong' };
     this.feedbackUntil = performance.now() + (this.reducedMotion ? 280 : 700);
     this.runtime.dataset.feedback = 'wrong';
+    this.canvas.dataset.feedback = 'wrong';
     this.emitSnapshot();
     platformAudio.play('wrong', kind === 'timeout' ? -70 : -25);
     this.onAnnounce({ key: kind === 'lane' ? 'orbitWrongLane' : kind === 'timeout' ? 'orbitTimeout' : 'orbitMiss' });
@@ -445,9 +456,13 @@ export class OrbitLockGame {
       c.lineWidth = size * (lane === this.currentLane ? .018 : .012);
       c.beginPath(); c.arc(0, 0, radius, 0, TAU); c.stroke();
     });
-    this.drawGate(c, radii[this.stage.targetLane], this.stage.gateTick, this.stage.gateWidth, colors[0], '◇');
+    if (this.stage.mechanic === 'opposite' || this.stage.mechanic === 'sequence') {
+      radii.forEach((ringRadius) => this.drawGate(c, ringRadius, this.stage.gateTick, this.stage.gateWidth, colors[0], '•'));
+    } else {
+      this.drawGate(c, radii[this.stage.targetLane], this.stage.gateTick, this.stage.gateWidth, colors[0], '◇');
+      for (const decoy of this.stage.decoys) this.drawGate(c, radii[decoy.lane], decoy.tick, decoy.width, '#ff9fbc', '×', true);
+    }
     if (this.stage.riskLane !== null) this.drawGate(c, radii[this.stage.riskLane], this.stage.riskGateTick, this.stage.riskWidth, '#ffd47a', '★');
-    for (const decoy of this.stage.decoys) this.drawGate(c, radii[decoy.lane], decoy.tick, decoy.width, '#ff9fbc', '×', true);
     const angle = position / ORBIT_TURN * TAU;
     const radius = radii[this.currentLane];
     const pulse = this.reducedMotion ? 1 : 1 + Math.sin(time / 160) * .08;
@@ -509,6 +524,7 @@ export class OrbitLockGame {
     this.exitTimer = null;
     this.exitArmed = false;
     this.particles = [];
+    this.canvas?.removeAttribute('data-feedback');
     if (this.exitButton) this.exitButton.disabled = false;
   }
 
