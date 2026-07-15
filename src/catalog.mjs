@@ -5,7 +5,8 @@ export const catalog = Object.freeze([
     id: ORBIT_LOCK_ID,
     dimension: '2d',
     skill: 'timing',
-    durationSeconds: 30,
+    durationSeconds: 0,
+    endless: true,
     icon: '◎',
     gradient: 'orbit',
     nameKey: 'orbitName',
@@ -58,6 +59,4 @@ export const catalog = Object.freeze([
   })
 ]);
 
-export function getChallenge(id) {
-  return catalog.find((challenge) => challenge.id === id) || null;
-}
+export function getChallenge(id) { return catalog.find((challenge) => challenge.id === id) || null; }
