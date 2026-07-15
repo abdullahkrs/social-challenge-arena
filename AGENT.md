@@ -4,6 +4,14 @@
 
 Build and continuously evolve the product in `PRODUCT_BRIEF.md` quickly, coherently, and autonomously.
 
+## Mandatory game direction
+
+Before selecting, designing, implementing, or reviewing any new or materially upgraded challenge, read `GAME_DIRECTION.md` and treat it as a binding product and quality contract.
+
+The issue body may narrow delivery scope, but it may not weaken the endless challenge, procedural variety, movement-plus-puzzle, concentration, escalating-pressure, visual-reference, prototype, originality, sound, accessibility, localization, social-loop, or production-evidence requirements in `GAME_DIRECTION.md`.
+
+A challenge that contradicts `GAME_DIRECTION.md` must be reduced, redesigned, or rejected rather than merged for schedule convenience.
+
 ## Swarm topology
 
 Only three scheduled roles are active:
