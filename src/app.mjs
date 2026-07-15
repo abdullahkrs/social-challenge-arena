@@ -5,6 +5,7 @@ import {
 } from './core.mjs';
 import { catalog, getChallenge } from './catalog.mjs';
 import { isRtl, normalizeLanguage, supportedLanguages, translate } from './i18n.mjs';
+import { classifyLocationInvite, stripInviteKeysFromUrl } from './invite-location.mjs';
 import { OrbitLockGame } from './game.mjs';
 import { EchoGridGame } from './echo-game.mjs';
 import { LumenLanesGame } from './lumen-game.mjs';
@@ -213,10 +214,11 @@ function updateEntryUI() {
 }
 
 function parseLocationInvite() {
-  const parsed = parseInvite(window.location.search);
+  const parsed = classifyLocationInvite(window.location.search, parseInvite);
   if (!parsed.ok) {
     state.invalidInvite = true; elements.errorBanner.hidden = false; elements.errorBanner.textContent = t('invalidLink');
-    history.replaceState({}, '', `${location.pathname}${location.hash}`); track('invite_invalid', { reason: parsed.reason }); return;
+    history.replaceState({}, '', stripInviteKeysFromUrl(window.location.href));
+    track('invite_invalid', { reason: parsed.reason }); return;
   }
   if (parsed.invite) {
     state.invite = parsed.invite; state.activeDaily = null; state.seed = parsed.invite.seed; state.challengeId = parsed.invite.challengeId;
