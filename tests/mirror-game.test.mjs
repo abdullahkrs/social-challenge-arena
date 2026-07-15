@@ -127,6 +127,20 @@ test('Mirror Fuse is endless in the catalog and its runtime owns lifecycle, exit
   assert.doesNotMatch(source, /setInterval|requestAnimationFrame|fetch\(|WebSocket|Audio\(/);
 });
 
+test('terminal failure becomes authoritative before delayed feedback can accept deliberate exit', async () => {
+  const source = await readFile(new URL('../src/mirror-game.mjs', import.meta.url), 'utf8');
+  const missStart = source.indexOf('resolveMiss(kind)');
+  const pendingIndex = source.indexOf('this.terminalPending = true;', missStart);
+  const disableIndex = source.indexOf('this.exitButton.disabled = true;', pendingIndex);
+  const failedScheduleIndex = source.indexOf("this.schedule(() => this.finish('failed')", pendingIndex);
+  assert.ok(missStart >= 0 && pendingIndex > missStart, 'final miss must enter terminal-pending state');
+  assert.ok(disableIndex > pendingIndex && failedScheduleIndex > disableIndex, 'exit must be disabled before delayed failure completion');
+  assert.match(source, /requestExit\(\) \{\s*if \(!this\.running \|\| this\.terminalPending\) return;/s);
+  assert.match(source, /finish\(reason\) \{\s*if \(!this\.running \|\| \(reason === 'ended' && this\.terminalPending\)\) return;/s);
+  assert.match(source, /showStage\(\) \{[\s\S]*?this\.terminalPending = false;[\s\S]*?this\.exitButton\.disabled = false;/);
+  assert.match(source, /destroy\(\) \{[\s\S]*?this\.terminalPending = false;[\s\S]*?this\.exitButton\) this\.exitButton\.disabled = false;/);
+});
+
 test('stage transitions preserve one announcement owner and return keyboard focus to the board', async () => {
   const integration = await readFile(new URL('../src/mirror-integration.mjs', import.meta.url), 'utf8');
   assert.match(integration, /sourceDescription\?\.removeAttribute\('aria-live'\)/);
