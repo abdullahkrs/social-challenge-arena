@@ -127,15 +127,13 @@ jobs:
             expected_pairs=$((challenge_count * 3))
 
             if [[ "$challenge_count" -gt 0 && "$smoke_passes" -eq "$challenge_count" && "$smoke_failures" -eq 0 && "$deep_pairs" -eq "$expected_pairs" && "$deep_failures" -eq 0 && "$error_count" -eq 0 && "$locales" == "ar,en,tr" && "$deep_all" == "true" && "$locale_plan" == "true" ]]; then
-              gh issue comment 109 --repo "$GITHUB_REPOSITORY" --body "$(cat <<EOF
-Production Visual Check: PASS
-
-- Production SHA: \`${REVIEW_SHA}\`.
-- Run and downloadable evidence: ${RUN_URL}.
-- Smoke: all ${challenge_count} discovered challenges passed.
-- Deep review: all ${challenge_count} challenges passed in Arabic RTL, English, and Turkish with zero recorded errors.
-EOF
-)"
+              printf -v body '%s\n\n%s\n%s\n%s\n%s' \
+                'Production Visual Check: PASS' \
+                "- Production SHA: \`${REVIEW_SHA}\`." \
+                "- Run and downloadable evidence: ${RUN_URL}." \
+                "- Smoke: all ${challenge_count} discovered challenges passed." \
+                "- Deep review: all ${challenge_count} challenges passed in Arabic RTL, English, and Turkish with zero recorded errors."
+              gh issue comment 109 --repo "$GITHUB_REPOSITORY" --body "$body"
               exit 0
             fi
           fi
@@ -146,13 +144,11 @@ EOF
             summary='report.json unavailable'
           fi
 
-          gh issue comment 109 --repo "$GITHUB_REPOSITORY" --body "$(cat <<EOF
-Production Visual Check: FAIL
-
-- Production SHA: \`${REVIEW_SHA}\`; job status: \`${JOB_STATUS}\`.
-- Run and available evidence: ${RUN_URL}.
-- Report summary: \`${summary}\`.
-- Baseline remains open; no future product issue may start until this blocker is repaired or reduced.
-EOF
-)"
+          printf -v body '%s\n\n%s\n%s\n%s\n%s' \
+            'Production Visual Check: FAIL' \
+            "- Production SHA: \`${REVIEW_SHA}\`; job status: \`${JOB_STATUS}\`." \
+            "- Run and available evidence: ${RUN_URL}." \
+            "- Report summary: \`${summary}\`." \
+            '- Baseline remains open; no future product issue may start until this blocker is repaired or reduced.'
+          gh issue comment 109 --repo "$GITHUB_REPOSITORY" --body "$body"
           exit 1
