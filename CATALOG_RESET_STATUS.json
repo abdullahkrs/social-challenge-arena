@@ -1,0 +1,11 @@
+{
+  "activeIssue": 114,
+  "legacyChallengeIds": [
+    "orbit-lock",
+    "echo-grid",
+    "lumen-lanes",
+    "mirror-fuse"
+  ],
+  "legacyAllowed": true,
+  "completionRule": "Issue #114 must set legacyAllowed to false in the same PR that removes all legacy challenge code, tests, styles, copy, assets, catalog entries, and production-review assumptions while shipping the replacement flagship."
+}
