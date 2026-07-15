@@ -50,7 +50,7 @@ test('catalog owns localized endless status and challenge progress metadata', ()
 test('catalog, daily, and invitation share the compact instruction entry', async () => {
   const app = await read('src/app.mjs');
   const dailyStart = app.indexOf('function beginDailyRun()');
-  const dailyEnd = app.indexOf('\n}', dailyStart);
+  const dailyEnd = app.indexOf('\\n}', dailyStart);
   const dailyBody = app.slice(dailyStart, dailyEnd + 2);
   assert.ok(app.includes("elements.cards.forEach((card) => card.addEventListener('click', () => selectChallenge(card.dataset.challengeId)))"));
   assert.ok(dailyBody.includes("setScreen('instructions')"));
