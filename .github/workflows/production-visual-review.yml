@@ -1,0 +1,98 @@
+name: Production Visual Review
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      full_review:
+        description: Run the full baseline deep review
+        required: false
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: production-visual-review
+  cancel-in-progress: true
+
+env:
+  PRODUCTION_URL: https://abdullahkrs.github.io/social-challenge-arena
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci --ignore-scripts
+      - name: Install production browser
+        run: |
+          npm install --no-save --ignore-scripts playwright@1.54.1
+          npx playwright install --with-deps chromium
+
+      - name: Determine merged impact
+        shell: bash
+        run: |
+          mkdir -p production-review
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" && "${{ inputs.full_review }}" == "true" ]]; then
+            echo "FULL_REVIEW" > production-review/changed-files.txt
+          elif [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            git diff --name-only HEAD^ HEAD > production-review/changed-files.txt
+          else
+            git diff --name-only "${{ github.event.before }}" "${{ github.sha }}" > production-review/changed-files.txt
+          fi
+          cat production-review/changed-files.txt
+
+      - name: Wait for matching GitHub Pages deployment
+        env:
+          GH_TOKEN: ${{ github.token }}
+          EXPECTED_SHA: ${{ github.sha }}
+        shell: bash
+        run: |
+          matched=false
+          for attempt in {1..30}; do
+            response=$(curl -fsSL \
+              -H "Authorization: Bearer ${GH_TOKEN}" \
+              -H "Accept: application/vnd.github+json" \
+              "https://api.github.com/repos/${GITHUB_REPOSITORY}/pages/builds/latest" 2>/dev/null || true)
+            commit=$(printf '%s' "$response" | jq -r '.commit // empty')
+            status=$(printf '%s' "$response" | jq -r '.status // empty')
+            echo "Pages attempt ${attempt}: commit=${commit:-unknown} status=${status:-unknown}"
+            if [[ "$commit" == "$EXPECTED_SHA" && "$status" == "built" ]]; then
+              matched=true
+              break
+            fi
+            sleep 20
+          done
+          if [[ "$matched" != "true" ]]; then
+            echo "GitHub Pages did not confirm the merged commit ${EXPECTED_SHA}."
+            exit 1
+          fi
+          curl --fail --retry 8 --retry-delay 5 --max-time 30 "${PRODUCTION_URL}/?production-review=${EXPECTED_SHA}" >/dev/null
+
+      - name: Run production smoke and affected deep review
+        env:
+          FULL_REVIEW: ${{ inputs.full_review || 'false' }}
+          REVIEW_SHA: ${{ github.sha }}
+        run: node tests/production-visual-review.mjs
+
+      - name: Upload production review evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: production-visual-review-${{ github.sha }}
+          path: production-review
+          if-no-files-found: error
+          retention-days: 14
