@@ -17,6 +17,12 @@ function replaceOnce(content, before, after, label) {
   return `${content.slice(0, index)}${after}${content.slice(index + before.length)}`;
 }
 
+function replaceFirst(content, before, after, label) {
+  const index = content.indexOf(before);
+  if (index < 0) throw new Error(`Missing replacement target: ${label}`);
+  return `${content.slice(0, index)}${after}${content.slice(index + before.length)}`;
+}
+
 function removeExact(content, fragment, label) {
   if (!content.includes(fragment)) throw new Error(`Missing removal target: ${label}`);
   return content.replace(fragment, '');
@@ -39,11 +45,12 @@ async function patchCatalog() {
   let content = await read('src/catalog.mjs');
   const progressKeys = ['orbitGateLabel', 'echoTrail', 'lumenDistance', 'mirrorPattern'];
   for (const progressLabelKey of progressKeys) {
-    content = replaceOnce(content,
+    content = replaceFirst(content,
       '    durationSeconds: 0,\n    endless: true,',
       `    statusKey: 'endless',\n    progressLabelKey: '${progressLabelKey}',\n    endless: true,`,
       `registry metadata for ${progressLabelKey}`);
   }
+  if (content.includes('durationSeconds')) throw new Error('Catalog still contains fixed-duration metadata');
   await write('src/catalog.mjs', content);
 }
 
@@ -89,6 +96,7 @@ async function patchApp() {
     '  renderCatalog(); renderChallengeText(); updateEntryUI();\n  safeBeginRun();\n}',
     "  renderCatalog(); renderChallengeText(); updateEntryUI();\n  setScreen('instructions');\n}",
     'daily context-aware instruction route');
+  if (content.includes("querySelector('#round-value')") || content.includes('elements.round')) throw new Error('App still contains fixed-round HUD ownership');
   await write('src/app.mjs', content);
 }
 
@@ -143,26 +151,27 @@ async function patchCopy() {
   }
 }
 
-async function patchIntegration(path, kind) {
+async function patchIntegration(path, challengeId) {
   let content = await read(path);
-  const shared = [
-    ["const roundCell = document.querySelector('#round-value')?.closest('div');\n", 'round cell'],
-    ["const roundLabel = roundCell?.querySelector('span');\n", 'round label'],
-    ["const roundValue = document.querySelector('#round-value');\n", 'round value'],
+  const sharedConstants = [
+    "const roundCell = document.querySelector('#round-value')?.closest('div');\n",
+    "const roundLabel = roundCell?.querySelector('span');\n",
+    "const roundValue = document.querySelector('#round-value');\n"
   ];
-  for (const [fragment, label] of shared) content = removeExact(content, fragment, `${kind} ${label}`);
-  const durationLine = `const durationValue = document.querySelector('[data-challenge-id="${kind}"] [data-duration]');\n`;
-  content = removeExact(content, durationLine, `${kind} duration reference`);
-  content = content.replace(/function updateCatalogDuration\(\) \{[^\n]*\}\n/g, '');
-  content = content.replace(/^\s*if \(roundLabel\)[^\n]*\n/gm, '');
-  content = content.replace(/^\s*if \(roundValue\)[^\n]*\n/gm, '');
-  content = content.replace(/^\s*updateCatalogDuration\(\);\n/gm, '');
-  content = content.replace(/^if \(durationValue\)[\s\S]*?\n\}\n/gm, '');
-  content = content.replace(/^if \(durationValue\) new MutationObserver[^\n]*\n/gm, '');
-  content = content.replace(/^queueMicrotask\(updateCatalogDuration\);\n/gm, '');
-  content = content.replace(/^updateCatalogDuration\(\);\n/gm, '');
-  if (content.includes('roundLabel') || content.includes('roundValue') || content.includes('durationValue') || content.includes('updateCatalogDuration')) {
-    throw new Error(`${kind} still owns shared catalog or HUD truth`);
+  for (const fragment of sharedConstants) content = removeExact(content, fragment, `${challengeId} shared HUD constant`);
+  content = removeExact(content, `const durationValue = document.querySelector('[data-challenge-id="${challengeId}"] [data-duration]');\n`, `${challengeId} duration reference`);
+
+  content = content.replace(/^\s*function updateCatalogDuration\(\) \{\n\s*if \(durationValue[^\n]*\n\s*\}\n?/m, '');
+  content = content.replace(/^\s*function updateCatalogDuration\(\) \{[^\n]*\}\n?/m, '');
+  content = content.replace(/^\s*if \(durationValue\) \{\n\s*new MutationObserver[^\n]*\n\s*\}\n?/m, '');
+  content = content.replace(/^\s*if \(durationValue\) new MutationObserver[^\n]*\n?/m, '');
+  content = content.replace(/^\s*queueMicrotask\(updateCatalogDuration\);\n?/m, '');
+  content = content.replace(/^\s*updateCatalogDuration\(\);\n?/gm, '');
+  content = content.replace(/^\s*if \(roundLabel\)[^\n]*\n?/gm, '');
+  content = content.replace(/^\s*if \(roundValue\)[^\n]*\n?/gm, '');
+
+  if (/durationValue|updateCatalogDuration|roundLabel|roundValue|round-value/.test(content)) {
+    throw new Error(`${challengeId} still owns shared catalog or HUD truth`);
   }
   await write(path, content);
 }
@@ -233,12 +242,18 @@ test('entry copy stays concise, localized, and truthful about endless exit', () 
   await write('tests/onboarding-status.test.mjs', content);
 }
 
+console.log('worker-106: patch index');
 await patchIndex();
+console.log('worker-106: patch catalog');
 await patchCatalog();
+console.log('worker-106: patch app');
 await patchApp();
+console.log('worker-106: patch localization');
 await patchI18n();
 await patchCopy();
+console.log('worker-106: remove observer repairs');
 await patchIntegrations();
+console.log('worker-106: add focused tests');
 await addTests();
 
 await unlink(new URL('scripts/worker-106-apply.mjs', root));
