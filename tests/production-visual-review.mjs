@@ -1,5 +1,6 @@
 import { readFile, mkdir, writeFile } from 'node:fs/promises';
 import { chromium } from 'playwright';
+import { assertProductionSurface } from './production-surface-guard.mjs';
 
 const baseUrl = process.env.PRODUCTION_URL || 'https://abdullahkrs.github.io/social-challenge-arena';
 const reviewSha = process.env.REVIEW_SHA || 'manual';
@@ -74,6 +75,14 @@ page.on('console', (message) => {
 page.on('pageerror', (error) => report.errors.push({ type: 'pageerror', text: error.message }));
 page.on('requestfailed', (request) => report.errors.push({ type: 'requestfailed', text: `${request.method()} ${request.url()} ${request.failure()?.errorText || ''}` }));
 
+async function assertCleanSurface(label) {
+  const errorBanner = page.locator('#error-banner');
+  const errorBannerVisible = await errorBanner.isVisible().catch(() => false);
+  const errorBannerText = errorBannerVisible ? await errorBanner.innerText().catch(() => '') : '';
+  const overflowPx = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+  assertProductionSurface({ label, errorBannerVisible, errorBannerText, overflowPx, errorCount: report.errors.length });
+}
+
 async function loadHome(locale = 'en') {
   await page.goto(`${baseUrl}/?production-review=${encodeURIComponent(reviewSha)}`, { waitUntil: 'networkidle' });
   await page.locator('#app').waitFor({ state: 'visible' });
@@ -82,8 +91,7 @@ async function loadHome(locale = 'en') {
     await select.selectOption(locale);
     await page.waitForTimeout(150);
   }
-  const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
-  if (overflow > 1) throw new Error(`Horizontal overflow on discovery: ${overflow}px`);
+  await assertCleanSurface(`discovery/${locale}`);
 }
 
 async function discoverChallenges() {
@@ -114,13 +122,13 @@ async function openChallenge(id, deep = false, locale = 'en') {
   await card.waitFor({ state: 'visible' });
   await card.click();
   await page.locator('[data-screen="instructions"]').waitFor({ state: 'visible' });
+  await assertCleanSurface(`${id}/${locale}/instructions`);
   if (deep) await page.screenshot({ path: `${evidenceDir}/screenshots/${id}-${locale}-instructions.png`, fullPage: true });
   await page.locator('#start-button').click();
   await page.locator('[data-screen="game"]').waitFor({ state: 'visible' });
   await safeInteraction(id);
   await page.waitForTimeout(250);
-  const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
-  if (overflow > 1) throw new Error(`Horizontal overflow in ${id}/${locale}: ${overflow}px`);
+  await assertCleanSurface(`${id}/${locale}/game`);
   if (deep) await page.screenshot({ path: `${evidenceDir}/screenshots/${id}-${locale}-game.png`, fullPage: true });
 }
 
@@ -128,6 +136,7 @@ try {
   const challenges = await discoverChallenges();
   if (challenges.length === 0) throw new Error('No production challenges discovered');
   report.discoveredChallenges = challenges;
+  await assertCleanSurface('discovery/en/screenshot');
   await page.screenshot({ path: `${evidenceDir}/screenshots/discovery-en.png`, fullPage: true });
 
   for (const challenge of challenges) {
@@ -163,6 +172,7 @@ try {
   if (plan.locales) {
     for (const locale of ['ar', 'tr']) {
       await loadHome(locale);
+      await assertCleanSurface(`discovery/${locale}/screenshot`);
       await page.screenshot({ path: `${evidenceDir}/screenshots/discovery-${locale}.png`, fullPage: true });
     }
   }
