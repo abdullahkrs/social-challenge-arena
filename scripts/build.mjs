@@ -23,14 +23,15 @@ for (const required of [
 for (const requiredModule of [
   'src/echo-game.mjs', 'src/echo-model.mjs', 'src/echo-integration.mjs', 'src/echo-copy.mjs',
   'src/echo.css', 'src/audio.mjs', 'src/audio-integration.mjs',
-  'src/mirror-game.mjs', 'src/mirror-model.mjs', 'src/mirror-integration.mjs', 'src/mirror-copy.mjs'
+  'src/mirror-game.mjs', 'src/mirror-model.mjs', 'src/mirror-integration.mjs', 'src/mirror-copy.mjs',
+  'src/orbit-model.mjs', 'src/orbit-copy.mjs', 'src/orbit.css'
 ]) {
   await stat(join(dist, requiredModule));
 }
 
-// The measured Mirror Fuse conversion adds one complete endless spatial journey while reusing
-// the established platform, result, sharing, and synthesized-audio layers.
-const budgetBytes = 288 * 1024;
+// The measured endless Orbit conversion adds deterministic movement, rule layers, localized copy,
+// and accessible controls while reusing the existing canvas, social flow, and synthesized audio.
+const budgetBytes = 306 * 1024;
 async function sizeOf(path) {
   const info = await stat(path);
   if (info.isFile()) return info.size;
