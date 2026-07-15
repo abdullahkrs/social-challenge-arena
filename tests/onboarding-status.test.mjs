@@ -16,7 +16,7 @@ test('the central registry owns endless status and progress labels', async () =>
   assert.equal((catalog.match(/statusKey: 'endless'/g) || []).length, 4);
   assert.equal((catalog.match(/progressLabelKey:/g) || []).length, 4);
   assert.equal((catalog.match(/endless: true/g) || []).length, 4);
-  assert.doesNotMatch(catalog, /durationSeconds/);
+  assert.equal((catalog.match(/durationSeconds: 0/g) || []).length, 4, 'legacy metadata remains compatible but is never rendered');
 });
 
 test('all languages use concise progressive entry copy', async () => {
