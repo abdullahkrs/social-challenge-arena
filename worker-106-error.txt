@@ -1,0 +1,15 @@
+worker-106: patch index
+worker-106: patch catalog
+worker-106: patch app
+worker-106: patch localization
+worker-106: remove observer repairs
+file:///home/runner/work/social-challenge-arena/social-challenge-arena/scripts/worker-106-apply.mjs:177
+    throw new Error(`${challengeId} still owns shared catalog or HUD truth`);
+          ^
+
+Error: orbit-lock still owns shared catalog or HUD truth
+    at patchIntegration (file:///home/runner/work/social-challenge-arena/social-challenge-arena/scripts/worker-106-apply.mjs:177:11)
+    at async patchIntegrations (file:///home/runner/work/social-challenge-arena/social-challenge-arena/scripts/worker-106-apply.mjs:183:3)
+    at async file:///home/runner/work/social-challenge-arena/social-challenge-arena/scripts/worker-106-apply.mjs:258:1
+
+Node.js v20.20.2
