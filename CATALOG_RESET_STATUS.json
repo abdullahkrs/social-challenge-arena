@@ -11,7 +11,7 @@
   ],
   "legacyAllowed": true,
   "agentsPaused": true,
-  "status": "visual-prototype-ready",
+  "status": "main-platform-integrated",
   "completed": [
     "flagship specification",
     "procedural run model",
@@ -19,14 +19,20 @@
     "lane movement and jump controls",
     "generated obstacles and puzzle gates",
     "zone color variants",
-    "prototype sound feedback"
+    "prototype sound feedback",
+    "Rift Relay integrated into the main platform shell",
+    "single shipped catalog entry",
+    "same-seed friend challenge links",
+    "Arabic RTL, English and Turkish shell",
+    "replay and new-route result loop"
   ],
   "next": [
-    "review prototype behavior",
-    "integrate Rift Relay into the main platform shell",
-    "replace catalog, daily and invite contracts",
-    "delete legacy challenge code and tests",
-    "run CI and production visual review"
+    "delete legacy challenge code, styles and tests",
+    "replace remaining legacy core and workflow assumptions",
+    "run repository-wide legacy path scan",
+    "run tests and production build",
+    "open one manual reset pull request",
+    "run QA and production visual review"
   ],
   "completionRule": "Set legacyAllowed to false only after all legacy challenges are removed and Rift Relay passes tests, build, QA, and production visual review."
 }
