@@ -9,6 +9,7 @@ import { OrbitLockGame } from './game.mjs';
 import { EchoGridGame } from './echo-game.mjs';
 import { LumenLanesGame } from './lumen-game.mjs';
 import { MirrorFuseGame } from './mirror-game.mjs';
+import './onboarding-copy.mjs';
 import { buildFileShareData, buildResultCardModel, isShareCancellation, renderResultCard, supportsFileShare, supportsTextShare } from './share-card.mjs';
 
 function browserStorage() { try { return window.localStorage; } catch { return null; } }
@@ -20,7 +21,8 @@ const state = {
   language: normalizeLanguage(readPreference('sca-language') || navigator.language),
   reducedMotion: readPreference('sca-reduced-motion') === 'true' || systemReducedMotion,
   screen: 'discovery', challengeId: CHALLENGE_ID, seed: createSeed(), invite: null, result: null, invalidInvite: false, events: [],
-  daily: null, activeDaily: null, dailyBest: null, dailyStorageAvailable: true
+  daily: null, activeDaily: null, dailyBest: null, dailyStorageAvailable: true,
+  hud: { score: 0, progress: 1, lives: 3, combo: 0 }
 };
 
 const elements = {
@@ -35,9 +37,10 @@ const elements = {
   dailyStartButton: document.querySelector('#daily-start-button'), gameHeading: document.querySelector('#game-heading'), canvas: document.querySelector('#game-canvas'),
   echoGrid: document.querySelector('#echo-grid'), lumenLanes: document.querySelector('#lumen-lanes'), mirrorFuse: document.querySelector('#mirror-fuse'),
   controlsHint: document.querySelector('#controls-hint'), gameStatus: document.querySelector('#game-status'),
-  score: document.querySelector('#score-value'), round: document.querySelector('#round-value'), lives: document.querySelector('#lives-value'), combo: document.querySelector('#combo-value'),
+  score: document.querySelector('#score-value'), progressLabel: document.querySelector('#round-value')?.closest('div')?.querySelector('span'),
+  progress: document.querySelector('#round-value'), lives: document.querySelector('#lives-value'), combo: document.querySelector('#combo-value'),
   resultScore: document.querySelector('#result-score'), resultHeading: document.querySelector('#result-heading'), resultSummary: document.querySelector('#result-summary'),
-  resultChallenge: document.querySelector('#result-challenge'), dailyResult: document.querySelector('#daily-result'), comparison: document.querySelector('#comparison'),
+  resultChallenge: document.querySelector('#result-challenge'), resultDetail: document.querySelector('#result-detail'), dailyResult: document.querySelector('#daily-result'), comparison: document.querySelector('#comparison'),
   comparisonText: document.querySelector('#comparison-text'), comparisonSymbol: document.querySelector('#comparison-symbol'), challengerScore: document.querySelector('#challenger-score'),
   playerScore: document.querySelector('#player-score'), differenceText: document.querySelector('#difference-text'), replayButton: document.querySelector('#replay-button'),
   newButton: document.querySelector('#new-button'), catalogButton: document.querySelector('#catalog-button'), shareButton: document.querySelector('#share-button'),
@@ -71,10 +74,25 @@ function renderCatalog() {
     card.querySelector('[data-name]').textContent = name;
     card.querySelector('[data-tagline]').textContent = t(challenge.taglineKey);
     card.querySelector('[data-skill]').textContent = t(skillKeys[challenge.skill] || 'play');
-    card.querySelector('[data-duration]').textContent = t('seconds', { value: challenge.durationSeconds });
+    card.querySelector('[data-duration]').textContent = t(challenge.statusKey);
     card.setAttribute('aria-label', t('challengeCard', { name }));
     card.setAttribute('aria-current', challenge.id === state.challengeId ? 'true' : 'false');
   });
+}
+
+function renderHud() {
+  const challenge = currentChallenge();
+  if (!challenge) return;
+  elements.progressLabel.textContent = t(challenge.progressLabelKey);
+  elements.score.textContent = String(state.hud.score);
+  elements.progress.textContent = String(state.hud.progress);
+  elements.lives.textContent = String(state.hud.lives);
+  elements.combo.textContent = String(state.hud.combo);
+}
+
+function resetHud() {
+  state.hud = { score: 0, progress: 1, lives: 3, combo: 0 };
+  renderHud();
 }
 
 function renderChallengeText() {
@@ -94,6 +112,7 @@ function renderChallengeText() {
   [...elements.lumenLanes.querySelectorAll('[data-lane]')].forEach((button, index) => button.setAttribute('aria-label', t(laneKeys[index])));
   [...elements.mirrorFuse.querySelectorAll('[data-mirror-option]')].forEach((button, index) => button.setAttribute('aria-label', t('mirrorOptionLabel', { value: index + 1 })));
   elements.resultChallenge.textContent = t(challenge.nameKey);
+  renderHud();
 }
 
 function formatDailyDate(dateKey) {
@@ -172,19 +191,25 @@ function setScreen(screen) {
 
 function updateEntryUI() {
   const invited = Boolean(state.invite);
-  const dailyRecovery = Boolean(state.activeDaily && !invited);
+  const dailyEntry = Boolean(state.activeDaily && !invited);
   const name = challengeName();
-  document.documentElement.dataset.entry = invited ? 'invite' : dailyRecovery ? 'daily' : 'normal';
+  document.documentElement.dataset.entry = invited ? 'invite' : dailyEntry ? 'daily' : 'normal';
   elements.invitedBadge.hidden = !invited;
   elements.targetText.textContent = invited ? `${name} · ${t('beatScore', { score: state.invite.target })}` : '';
   elements.instructionCard.classList.toggle('is-invite', invited);
-  elements.instructionCard.classList.toggle('is-daily', dailyRecovery);
-  elements.instructionEyebrow.hidden = !invited && !dailyRecovery;
-  elements.instructionEyebrow.textContent = invited ? t('invited') : dailyRecovery ? t('dailyTitle') : '';
+  elements.instructionCard.classList.toggle('is-daily', dailyEntry);
+  elements.instructionEyebrow.hidden = true;
+  elements.instructionEyebrow.textContent = '';
   elements.backButtons.forEach((button) => { button.hidden = invited; });
   elements.inviteCatalogButton.hidden = !invited;
-  elements.startButton.textContent = invited ? t('acceptChallenge', { name }) : dailyRecovery ? t('dailyPlay') : t('start');
-  elements.instructionTarget.textContent = invited ? t('challengerTarget', { score: state.invite.target }) : dailyRecovery ? t('dailySameRoute') : t('sameRun');
+  elements.startButton.textContent = invited ? t('acceptChallenge', { name }) : dailyEntry ? t('dailyPlay') : t('start');
+  elements.instructionTarget.hidden = !invited && !dailyEntry;
+  elements.instructionTarget.textContent = invited
+    ? `${t('invited')} · ${t('challengerTarget', { score: state.invite.target })}`
+    : dailyEntry ? `${t('dailyTitle')} · ${t('dailySameRoute')}` : '';
+  const descriptions = ['instruction-copy'];
+  if (!elements.instructionTarget.hidden) descriptions.push('instruction-target');
+  elements.startButton.setAttribute('aria-describedby', descriptions.join(' '));
 }
 
 function parseLocationInvite() {
@@ -206,7 +231,7 @@ function selectChallenge(id, openInstructions = true) {
   if (state.invite && state.invite.challengeId !== id) {
     state.invite = null; state.seed = createSeed(); history.replaceState({}, '', location.pathname);
   }
-  state.challengeId = id; state.result = null; renderCatalog(); renderChallengeText(); updateEntryUI();
+  state.challengeId = id; state.result = null; resetHud(); renderCatalog(); renderChallengeText(); updateEntryUI();
   track('challenge_selected', { challenge: id });
   if (openInstructions) setScreen('instructions');
 }
@@ -245,13 +270,20 @@ function resultAnnouncement() {
 function beginRun() {
   const challenge = currentChallenge();
   if (!challenge) throw new Error('Challenge registry entry missing');
+  resetHud();
+  elements.resultDetail.hidden = true;
+  elements.resultDetail.textContent = '';
   setScreen('game'); state.result = null; elements.gameStatus.textContent = t('ready');
   const callbacks = {
     reducedMotion: state.reducedMotion,
     onUpdate: (snapshot) => {
-      elements.score.textContent = snapshot.score;
-      elements.round.textContent = `${Math.min(snapshot.round + 1, snapshot.rounds)}/${snapshot.rounds}`;
-      elements.lives.textContent = snapshot.lives; elements.combo.textContent = snapshot.combo;
+      state.hud = {
+        score: snapshot.score,
+        progress: Math.max(1, Number(snapshot.round ?? 0) + 1),
+        lives: snapshot.lives,
+        combo: snapshot.combo
+      };
+      renderHud();
     },
     onAnnounce: handleGameAnnouncement,
     onFinish: (result) => {
@@ -299,14 +331,15 @@ function beginDailyRun() {
   state.seed = state.activeDaily.seed;
   state.result = null;
   history.replaceState({}, '', location.pathname);
-  renderCatalog(); renderChallengeText(); updateEntryUI();
-  safeBeginRun();
+  resetHud(); renderCatalog(); renderChallengeText(); updateEntryUI();
+  setScreen('instructions');
 }
 
 function renderResult() {
   if (!state.result) return;
   elements.resultScore.textContent = state.result.score; elements.resultHeading.textContent = t('resultTitle');
-  elements.resultSummary.textContent = t(state.result.reason === 'complete' ? 'complete' : 'failed');
+  const reasonKey = state.result.reason === 'complete' ? 'complete' : state.result.reason === 'ended' ? 'ended' : 'failed';
+  elements.resultSummary.textContent = t(reasonKey);
   elements.resultChallenge.textContent = challengeName();
   elements.dailyResult.hidden = !state.result.dailyBest;
   elements.dailyResult.textContent = dailyResultText(state.result.dailyBest);
@@ -470,10 +503,10 @@ function bindEvents() {
   elements.inviteCatalogButton.addEventListener('click', () => setScreen('discovery'));
   elements.replayButton.addEventListener('click', safeBeginRun);
   elements.newButton.addEventListener('click', () => {
-    state.activeDaily = null; state.seed = createSeed(); state.invite = null; history.replaceState({}, '', location.pathname); updateEntryUI(); setScreen('instructions');
+    state.activeDaily = null; state.seed = createSeed(); state.invite = null; history.replaceState({}, '', location.pathname); resetHud(); updateEntryUI(); setScreen('instructions');
   });
   elements.catalogButton.addEventListener('click', () => {
-    state.activeDaily = null; state.seed = createSeed(); state.invite = null; history.replaceState({}, '', location.pathname); updateEntryUI(); setScreen('discovery');
+    state.activeDaily = null; state.seed = createSeed(); state.invite = null; history.replaceState({}, '', location.pathname); resetHud(); updateEntryUI(); setScreen('discovery');
   });
   elements.shareButton.addEventListener('click', shareResult);
   window.addEventListener('pagehide', destroyGame);

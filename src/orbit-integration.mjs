@@ -33,9 +33,6 @@ if (!document.querySelector('link[data-orbit-style]')) {
 
 const orbit = ensureOrbitShell();
 const gameScreen = document.querySelector('[data-screen="game"]');
-const roundCell = document.querySelector('#round-value')?.closest('div');
-const roundLabel = roundCell?.querySelector('span');
-const roundValue = document.querySelector('#round-value');
 const zoneValue = orbit?.querySelector('[data-orbit-zone]');
 const ruleValue = orbit?.querySelector('[data-orbit-rule]');
 const progressValue = orbit?.querySelector('[data-orbit-progress]');
@@ -47,10 +44,8 @@ const exitButton = orbit?.querySelector('[data-orbit-exit]');
 const canvas = orbit?.querySelector('#game-canvas');
 const resultDetail = document.querySelector('#result-detail');
 const resultSummary = document.querySelector('#result-summary');
-const durationValue = document.querySelector('[data-challenge-id="orbit-lock"] [data-duration]');
 
 let activeStage = null;
-let activeSnapshot = null;
 let selectedRing = 0;
 let lockIndex = 0;
 let lastResult = null;
@@ -78,10 +73,6 @@ function windowName(stage = activeStage, relayIndex = lockIndex) {
   return t('orbitWindowTight');
 }
 
-function updateCatalogDuration() {
-  if (durationValue && durationValue.textContent !== t('endless')) durationValue.textContent = t('endless');
-}
-
 function updateControls() {
   ringButtons.forEach((button, index) => {
     const name = ringName(index);
@@ -105,8 +96,6 @@ function updateControls() {
 function updateStage() {
   if (!activeStage || !orbit) return;
   gameScreen?.setAttribute('data-orbit-active', 'true');
-  if (roundLabel) roundLabel.textContent = t('orbitGateLabel');
-  if (roundValue) roundValue.textContent = String((activeSnapshot?.round ?? activeStage.index) + 1);
   if (zoneValue) zoneValue.textContent = t(zoneKeys[activeStage.zone] || 'orbitZoneHalo');
   if (ruleValue) ruleValue.textContent = ruleText();
   if (progressValue) progressValue.textContent = t('orbitGate', { value: activeStage.index + 1 });
@@ -134,12 +123,10 @@ function updateResult(result = lastResult) {
   if (resultSummary && result.reason === 'ended') resultSummary.textContent = t('orbitEnded');
 }
 
-function resetSharedHud() {
+function resetSharedState() {
   gameScreen?.removeAttribute('data-orbit-active');
-  if (roundLabel) roundLabel.textContent = t('round');
   resultDetail?.setAttribute('hidden', '');
   activeStage = null;
-  activeSnapshot = null;
   lastResult = null;
   selectedRing = 0;
   lockIndex = 0;
@@ -149,20 +136,16 @@ function resetSharedHud() {
 }
 
 if (orbit) {
-  orbit.addEventListener('orbit:start', (event) => {
-    activeSnapshot = event.detail.snapshot;
+  orbit.addEventListener('orbit:start', () => {
     activeStage = null;
     lastResult = null;
     exitArmed = false;
     resultDetail?.setAttribute('hidden', '');
     gameScreen?.setAttribute('data-orbit-active', 'true');
-    if (roundLabel) roundLabel.textContent = t('orbitGateLabel');
-    if (roundValue) roundValue.textContent = '1';
     updateControls();
   });
   orbit.addEventListener('orbit:stage', (event) => {
     activeStage = event.detail.stage;
-    activeSnapshot = event.detail.snapshot;
     selectedRing = event.detail.selectedRing;
     lockIndex = event.detail.lockIndex || 0;
     orbit.dataset.phase = activeStage.tension;
@@ -175,14 +158,9 @@ if (orbit) {
   });
   orbit.addEventListener('orbit:relay', (event) => {
     activeStage = event.detail.stage;
-    activeSnapshot = event.detail.snapshot;
     selectedRing = event.detail.selectedRing;
     lockIndex = event.detail.lockIndex;
     updateStage();
-  });
-  orbit.addEventListener('orbit:snapshot', (event) => {
-    activeSnapshot = event.detail.snapshot;
-    if (activeStage && roundValue) roundValue.textContent = String(activeSnapshot.round + 1);
   });
   orbit.addEventListener('orbit:exit-armed', () => { exitArmed = true; updateControls(); });
   orbit.addEventListener('orbit:exit-disarmed', () => { exitArmed = false; updateControls(); });
@@ -197,17 +175,14 @@ if (orbit) {
     syncVisibility();
   }
   new MutationObserver(() => {
-    if (orbit.hidden && gameScreen?.hidden === false) resetSharedHud();
+    if (orbit.hidden && gameScreen?.hidden === false) resetSharedState();
   }).observe(orbit, { attributes: true, attributeFilter: ['hidden'] });
 }
 
 new MutationObserver(() => {
-  updateCatalogDuration();
   updateControls();
   if (activeStage) updateStage();
   if (lastResult) updateResult();
 }).observe(document.documentElement, { attributes: true, attributeFilter: ['lang', 'dir'] });
 
-if (durationValue) new MutationObserver(updateCatalogDuration).observe(durationValue, { childList: true, characterData: true, subtree: true });
-queueMicrotask(updateCatalogDuration);
 updateControls();

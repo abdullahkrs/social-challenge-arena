@@ -2,9 +2,6 @@ import { normalizeLanguage, translate } from './i18n.mjs';
 
 const lumen = document.querySelector('#lumen-lanes');
 const gameScreen = document.querySelector('[data-screen="game"]');
-const roundCell = document.querySelector('#round-value')?.closest('div');
-const roundLabel = roundCell?.querySelector('span');
-const roundValue = document.querySelector('#round-value');
 const zoneValue = lumen?.querySelector('[data-lumen-zone]');
 const distanceValue = lumen?.querySelector('[data-lumen-distance]');
 const ruleValues = lumen ? [...lumen.querySelectorAll('[data-lumen-rule]')] : [];
@@ -13,10 +10,8 @@ const laneButtons = lumen ? [...lumen.querySelectorAll('[data-lane]')] : [];
 const accessibleSequence = lumen?.querySelector('[data-lumen-accessible-sequence]');
 const resultDetail = document.querySelector('#result-detail');
 const resultSummary = document.querySelector('#result-summary');
-const durationValue = document.querySelector('[data-challenge-id="lumen-lanes"] [data-duration]');
 
 let activeStage = null;
-let activeSnapshot = null;
 let lastResult = null;
 let exitArmed = false;
 let memoryAnnouncement = 'none';
@@ -42,10 +37,6 @@ const ruleKeys = {
   choice: 'lumenRuleChoice',
   memory: 'lumenRuleMemory'
 };
-
-function updateCatalogDuration() {
-  if (durationValue && durationValue.textContent !== t('endless')) durationValue.textContent = t('endless');
-}
 
 function laneName(index) {
   return t(['laneLeft', 'laneCenter', 'laneRight'][index]);
@@ -96,11 +87,9 @@ function updateAccessibleSequence(stage = activeStage) {
   accessibleSequence.textContent = `${t(watchKey, { count: stage.sequence.length })}. ${stage.sequence.map(laneName).join(', ')}. ${t(chooseKey)}. ${t('ready')}.`;
 }
 
-function updateStage(stage = activeStage, snapshot = activeSnapshot) {
+function updateStage(stage = activeStage) {
   if (!stage || !lumen) return;
   gameScreen?.setAttribute('data-lumen-active', 'true');
-  if (roundLabel) roundLabel.textContent = t('lumenDistance');
-  if (roundValue) roundValue.textContent = String((snapshot?.round ?? stage.index) + 1);
   if (zoneValue) zoneValue.textContent = t(zoneKeys[stage.zone] || 'lumenZonePrism');
   if (distanceValue) distanceValue.textContent = t('lumenGate', { value: stage.index + 1 });
   ruleValues.forEach((element) => { element.textContent = t(ruleKeys[stage.mechanic] || 'lumenRuleDirect'); });
@@ -120,12 +109,10 @@ function updateResult(result = lastResult) {
   if (resultSummary && result.reason === 'ended') resultSummary.textContent = t('lumenEnded');
 }
 
-function resetSharedHud() {
+function resetSharedState() {
   gameScreen?.removeAttribute('data-lumen-active');
-  if (roundLabel) roundLabel.textContent = t('round');
   resultDetail?.setAttribute('hidden', '');
   activeStage = null;
-  activeSnapshot = null;
   lastResult = null;
   exitArmed = false;
   memoryAnnouncement = 'none';
@@ -134,16 +121,13 @@ function resetSharedHud() {
 }
 
 if (lumen) {
-  lumen.addEventListener('lumen:start', (event) => {
+  lumen.addEventListener('lumen:start', () => {
     lastResult = null;
     resultDetail?.setAttribute('hidden', '');
-    activeSnapshot = event.detail.snapshot;
     exitArmed = false;
     memoryAnnouncement = 'none';
     updateAccessibleSequence(null);
     gameScreen?.setAttribute('data-lumen-active', 'true');
-    if (roundLabel) roundLabel.textContent = t('lumenDistance');
-    if (roundValue) roundValue.textContent = '1';
     if (exitButton) exitButton.textContent = t('lumenEndRun');
   });
 
@@ -154,7 +138,6 @@ if (lumen) {
 
   lumen.addEventListener('lumen:stage', (event) => {
     activeStage = event.detail.stage;
-    activeSnapshot = event.detail.snapshot;
     memoryAnnouncement = 'none';
     updateStage();
     updateAccessibleSequence();
@@ -171,11 +154,6 @@ if (lumen) {
     activeStage = event.detail.stage;
     memoryAnnouncement = 'choose';
     updateAccessibleSequence();
-  });
-
-  lumen.addEventListener('lumen:snapshot', (event) => {
-    activeSnapshot = event.detail.snapshot;
-    if (activeStage && roundValue) roundValue.textContent = String(activeSnapshot.round + 1);
   });
 
   lumen.addEventListener('lumen:exit-armed', () => {
@@ -196,22 +174,16 @@ if (lumen) {
   });
 
   new MutationObserver(() => {
-    if (lumen.hidden && document.querySelector('[data-screen="game"]')?.hidden === false) resetSharedHud();
+    if (lumen.hidden && document.querySelector('[data-screen="game"]')?.hidden === false) resetSharedState();
   }).observe(lumen, { attributes: true, attributeFilter: ['hidden'] });
 }
 
 new MutationObserver(() => {
-  updateCatalogDuration();
   if (activeStage) updateStage();
   if (lastResult) updateResult();
   if (!activeStage) updateLaneLabels(null);
   updateAccessibleSequence();
 }).observe(document.documentElement, { attributes: true, attributeFilter: ['lang', 'dir'] });
 
-if (durationValue) {
-  new MutationObserver(updateCatalogDuration).observe(durationValue, { childList: true, characterData: true, subtree: true });
-}
-queueMicrotask(updateCatalogDuration);
-updateCatalogDuration();
 updateLaneLabels(null);
 if (exitButton) exitButton.textContent = t('lumenEndRun');

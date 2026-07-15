@@ -8,23 +8,17 @@ Object.assign(messages.tr, { mirrorDirectionUp: 'Yukarı', mirrorDirectionRight:
 if (typeof document !== 'undefined') {
   const mirror = document.querySelector('#mirror-fuse');
   const gameScreen = document.querySelector('[data-screen="game"]');
-  const roundCell = document.querySelector('#round-value')?.closest('div');
-  const roundLabel = roundCell?.querySelector('span');
-  const roundValue = document.querySelector('#round-value');
   const gameStatus = document.querySelector('#game-status');
   const liveRegion = document.querySelector('#live-region');
   const resultDetail = document.querySelector('#result-detail');
   const resultSummary = document.querySelector('#result-summary');
-  const durationValue = document.querySelector('[data-challenge-id="mirror-fuse"] [data-duration]');
   const ruleKeys = { horizontal: 'mirrorRuleHorizontal', vertical: 'mirrorRuleVertical', rotate180: 'mirrorRuleRotate180', rotateRight: 'mirrorRuleRotateRight' };
   const mechanicKeys = { rebuild: 'mirrorMechanicRebuild', anchor: 'mirrorMechanicAnchor', repair: 'mirrorMechanicRepair', sequence: 'mirrorMechanicSequence' };
   let activeStage = null;
-  let activeSnapshot = null;
   let lastResult = null;
 
   function language() { return normalizeLanguage(document.documentElement.lang); }
   function t(key, values = {}) { return translate(language(), key, values); }
-  function updateCatalogDuration() { if (durationValue && durationValue.textContent !== t('endless')) durationValue.textContent = t('endless'); }
 
   function stageStatus() {
     if (!activeStage) return '';
@@ -45,47 +39,36 @@ if (typeof document !== 'undefined') {
     }
   }
 
-  function updateHud() {
-    if (!mirror || !activeStage) return;
-    gameScreen?.setAttribute('data-mirror-active', 'true');
-    if (roundLabel) roundLabel.textContent = t('mirrorPattern');
-    if (roundValue) roundValue.textContent = String((activeSnapshot?.round ?? activeStage.index) + 1);
-  }
-
   function updateResult(result = lastResult) {
     if (!result || !resultDetail) return;
+    const attempts = Math.max(0, Number(result.totalActions) || 0);
+    const accuracy = attempts > 0 ? (result.accuracy ?? 0) : 0;
     resultDetail.hidden = false;
     resultDetail.textContent = t('mirrorResultDetail', {
       patterns: result.patterns ?? result.round ?? 0,
       combo: result.bestCombo ?? 0,
-      accuracy: result.accuracy ?? 0
+      accuracy
     });
     if (resultSummary && result.reason === 'ended') resultSummary.textContent = t('mirrorEnded');
   }
 
-  function resetSharedHud() {
+  function resetSharedState() {
     gameScreen?.removeAttribute('data-mirror-active');
-    if (roundLabel) roundLabel.textContent = t('round');
     resultDetail?.setAttribute('hidden', '');
     activeStage = null;
-    activeSnapshot = null;
     lastResult = null;
   }
 
   if (mirror) {
-    mirror.addEventListener('mirror:start', (event) => {
-      activeSnapshot = event.detail.snapshot;
+    mirror.addEventListener('mirror:start', () => {
       activeStage = null;
       lastResult = null;
       resultDetail?.setAttribute('hidden', '');
       gameScreen?.setAttribute('data-mirror-active', 'true');
-      if (roundLabel) roundLabel.textContent = t('mirrorPattern');
-      if (roundValue) roundValue.textContent = '1';
     });
     mirror.addEventListener('mirror:stage', (event) => {
       activeStage = event.detail.stage;
-      activeSnapshot = event.detail.snapshot;
-      updateHud();
+      gameScreen?.setAttribute('data-mirror-active', 'true');
 
       // The shared live region owns stage announcements. Keeping the hidden
       // spatial description non-live prevents overlapping duplicate speech.
@@ -99,25 +82,17 @@ if (typeof document !== 'undefined') {
         mirror.querySelector('[data-mirror-target-cell][data-current="true"]')?.focus({ preventScroll: true });
       });
     });
-    mirror.addEventListener('mirror:snapshot', (event) => {
-      activeSnapshot = event.detail.snapshot;
-      if (roundValue) roundValue.textContent = String((activeSnapshot.round ?? 0) + 1);
-    });
     mirror.addEventListener('mirror:finish', (event) => {
       lastResult = event.detail.result;
       queueMicrotask(() => updateResult());
     });
     new MutationObserver(() => {
-      if (mirror.hidden && gameScreen?.hidden === false) resetSharedHud();
+      if (mirror.hidden && gameScreen?.hidden === false) resetSharedState();
     }).observe(mirror, { attributes: true, attributeFilter: ['hidden'] });
   }
 
   new MutationObserver(() => {
-    updateCatalogDuration();
-    updateHud();
     updateActiveStatus(true);
     updateResult();
   }).observe(document.documentElement, { attributes: true, attributeFilter: ['lang', 'dir'] });
-  if (durationValue) new MutationObserver(updateCatalogDuration).observe(durationValue, { childList: true, characterData: true, subtree: true });
-  queueMicrotask(updateCatalogDuration);
 }
