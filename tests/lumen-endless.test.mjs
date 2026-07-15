@@ -90,13 +90,15 @@ test('visual movement never reveals the correct lane before the player decides',
 test('deliberate exit and accessible memory cues support the endless result journey', async () => {
   const source = await readFile(new URL('../src/lumen-game.mjs', import.meta.url), 'utf8');
   const integration = await readFile(new URL('../src/lumen-integration.mjs', import.meta.url), 'utf8');
+  const app = await readFile(new URL('../src/app.mjs', import.meta.url), 'utf8');
   const html = await readFile(new URL('../index.html', import.meta.url), 'utf8');
   assert.match(source, /if \(this\.exitArmed\) \{\s*this\.finish\('ended'\)/);
   assert.match(source, /this\.exitTimer = this\.schedule[\s\S]*3000/);
   assert.match(source, /emit\('finish'/);
   assert.match(integration, /lumenResultDetail/);
   assert.match(integration, /stage\.sequence\.map\(laneName\)/);
-  assert.match(integration, /MutationObserver\(updateCatalogDuration\)/);
+  assert.doesNotMatch(integration, /updateCatalogDuration|data-duration/);
+  assert.match(app, /card\.querySelector\('\[data-duration\]'\)\.textContent = t\(challenge\.statusKey\)/);
   assert.match(html, /data-lumen-exit/);
   assert.match(html, /data-lumen-accessible-sequence/);
   assert.match(html, /id="result-detail"/);
