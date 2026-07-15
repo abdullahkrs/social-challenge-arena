@@ -1,5 +1,7 @@
 {
   "activeIssue": 114,
+  "mode": "manual-reset",
+  "branch": "manual/catalog-reset-flagship",
   "legacyChallengeIds": [
     "orbit-lock",
     "echo-grid",
@@ -7,5 +9,7 @@
     "mirror-fuse"
   ],
   "legacyAllowed": true,
-  "completionRule": "Issue #114 must set legacyAllowed to false in the same PR that removes all legacy challenge code, tests, styles, copy, assets, catalog entries, and production-review assumptions while shipping the replacement flagship."
+  "agentsPaused": true,
+  "status": "manual-in-progress",
+  "completionRule": "Set legacyAllowed to false only after all legacy challenges are removed and one replacement flagship passes tests, build, QA, and production visual review."
 }
