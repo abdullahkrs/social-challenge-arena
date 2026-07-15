@@ -8,9 +8,7 @@ const files = ['index.html', 'styles.css', 'ui.css', 'ui-accessibility.css', 'mi
 
 await rm(dist, { recursive: true, force: true });
 await mkdir(dist, { recursive: true });
-for (const file of files) {
-  await cp(join(root, file), join(dist, file), { recursive: true });
-}
+for (const file of files) await cp(join(root, file), join(dist, file), { recursive: true });
 
 const html = await readFile(join(dist, 'index.html'), 'utf8');
 for (const required of [
@@ -21,16 +19,15 @@ for (const required of [
 }
 
 for (const requiredModule of [
-  'src/echo-game.mjs', 'src/echo-model.mjs', 'src/echo-integration.mjs', 'src/echo-copy.mjs',
-  'src/echo.css', 'src/audio.mjs', 'src/audio-integration.mjs',
+  'src/game.mjs', 'src/orbit-model.mjs', 'src/orbit-integration.mjs', 'src/orbit-copy.mjs', 'src/orbit.css',
+  'src/echo-game.mjs', 'src/echo-model.mjs', 'src/echo-integration.mjs', 'src/echo-copy.mjs', 'src/echo.css',
+  'src/audio.mjs', 'src/audio-integration.mjs',
   'src/mirror-game.mjs', 'src/mirror-model.mjs', 'src/mirror-integration.mjs', 'src/mirror-copy.mjs'
-]) {
-  await stat(join(dist, requiredModule));
-}
+]) await stat(join(dist, requiredModule));
 
-// The measured Mirror Fuse conversion adds one complete endless spatial journey while reusing
-// the established platform, result, sharing, and synthesized-audio layers.
-const budgetBytes = 288 * 1024;
+// The bounded increase covers one complete endless Orbit journey, deterministic model,
+// accessible controls, localization, and shared-audio integration while retaining a static no-network build.
+const budgetBytes = 336 * 1024;
 async function sizeOf(path) {
   const info = await stat(path);
   if (info.isFile()) return info.size;
@@ -39,7 +36,6 @@ async function sizeOf(path) {
   for (const entry of entries) sum += await sizeOf(join(path, entry));
   return sum;
 }
-
 let total = 0;
 for (const file of files) total += await sizeOf(join(dist, file));
 if (total > budgetBytes) throw new Error(`Static bundle exceeds ${budgetBytes} bytes: ${total}`);

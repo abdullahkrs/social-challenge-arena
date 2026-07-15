@@ -1,0 +1,111 @@
+.orbit-lock {
+  direction: ltr;
+  width: min(100%, 640px);
+  min-height: min(70svh, 660px);
+  display: grid;
+  grid-template-rows: auto minmax(280px, 1fr) auto auto;
+  gap: clamp(9px, 2vw, 14px);
+  padding: clamp(11px, 3vw, 20px);
+  border: 1px solid rgba(124, 246, 212, .16);
+  border-radius: 28px;
+  background:
+    radial-gradient(circle at 20% 18%, rgba(124, 246, 212, .11), transparent 30%),
+    radial-gradient(circle at 82% 66%, rgba(169, 156, 255, .14), transparent 32%),
+    linear-gradient(180deg, #17214a, #080d22);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+.orbit-run-head {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  color: #d9deff;
+  font-size: clamp(.74rem, 2.6vw, .9rem);
+}
+.orbit-run-head span { min-width: 0; display: flex; align-items: center; gap: 7px; }
+.orbit-run-head b, .orbit-run-head em, .orbit-run-head strong { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.orbit-run-head b { color: #7cf6d4; }
+.orbit-run-head em { color: #b6a8ff; font-style: normal; }
+.orbit-run-head strong { color: var(--text-muted); }
+
+.orbit-stage {
+  position: relative;
+  min-height: 280px;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(176, 193, 255, .12);
+  border-radius: 22px;
+  overflow: hidden;
+  background: rgba(7, 11, 30, .48);
+}
+#game-canvas { width: 100%; height: 100%; min-height: 280px; display: block; touch-action: none; border: 0; border-radius: 0; box-shadow: none; }
+.orbit-legend {
+  position: absolute;
+  inset-inline: 10px;
+  bottom: 9px;
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  pointer-events: none;
+  color: #aebbe8;
+  font-size: .7rem;
+  font-weight: 800;
+}
+.orbit-legend span { padding: 4px 8px; border-radius: 999px; background: rgba(8, 13, 34, .74); }
+
+.orbit-controls {
+  display: grid;
+  grid-template-columns: minmax(76px, 1fr) minmax(104px, 1.25fr) minmax(76px, 1fr);
+  gap: 8px;
+}
+.orbit-controls button { min-height: 52px; }
+.orbit-ring-button {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 7px;
+  padding-inline: 10px;
+  border: 1px solid rgba(176, 193, 255, .22);
+  border-radius: 16px;
+  color: #d9deff;
+  background: #202b54;
+}
+.orbit-ring-button.is-selected {
+  border-color: rgba(124, 246, 212, .72);
+  background: linear-gradient(145deg, rgba(95, 131, 255, .36), rgba(124, 246, 212, .18));
+  box-shadow: inset 0 0 0 1px rgba(124, 246, 212, .2);
+}
+.orbit-ring-symbol { color: #7cf6d4; font-size: 1.05rem; }
+.orbit-lock-button { border-radius: 16px; font-weight: 900; }
+.orbit-lock-mark { margin-inline-end: 7px; font-size: 1.1rem; }
+
+.orbit-secondary-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.orbit-secondary-actions button { min-height: 48px; }
+.orbit-lock[data-phase="recovery"] { border-color: rgba(124, 246, 212, .34); }
+.orbit-lock[data-phase="special"] { border-color: rgba(255, 207, 107, .34); }
+.orbit-lock[data-phase="mastery"] { border-color: rgba(169, 156, 255, .42); }
+.orbit-lock[data-feedback="correct"] .orbit-stage { box-shadow: inset 0 0 0 2px rgba(124, 246, 212, .35); }
+.orbit-lock[data-feedback="wrong"] .orbit-stage { box-shadow: inset 0 0 0 2px rgba(255, 159, 188, .34); }
+
+@media (max-width: 430px) {
+  .orbit-lock { min-height: 0; padding: 10px; border-radius: 22px; }
+  .orbit-stage, #game-canvas { min-height: 270px; }
+  .orbit-controls { grid-template-columns: 1fr 1.18fr 1fr; gap: 6px; }
+  .orbit-ring-button { grid-template-columns: 1fr; justify-items: center; gap: 2px; padding: 6px 4px; font-size: .7rem; }
+  .orbit-lock-button { padding-inline: 8px; }
+  .orbit-secondary-actions { gap: 6px; }
+}
+
+@media (max-width: 340px) {
+  .orbit-stage, #game-canvas { min-height: 250px; }
+  .orbit-run-head { font-size: .68rem; }
+  .orbit-legend { font-size: .62rem; }
+  .orbit-secondary-actions { grid-template-columns: 1fr; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .orbit-ring-button { transition: none; }
+}
