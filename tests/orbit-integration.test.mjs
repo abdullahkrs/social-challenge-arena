@@ -30,3 +30,12 @@ test('Orbit is integrated as an endless accessible platform journey', async () =
   assert.match(build, /orbit-model\.mjs/);
   assert.doesNotMatch([html, app, catalog, game, integration, copy, css].join('\n'), /https?:\/\//);
 });
+
+test('Orbit keyboard shortcuts stay inside the game shell', async () => {
+  const game = await read('src/game.mjs');
+  const guard = 'if (!this.isShortcutTarget(event.target)) return;';
+  const ringLookup = 'const ring = KEY_RING[event.code];';
+  assert.match(game, /target instanceof Element && this\.container\.contains\(target\)/);
+  assert.ok(game.indexOf(guard) >= 0, 'shortcut target guard is required');
+  assert.ok(game.indexOf(guard) < game.indexOf(ringLookup), 'shortcut target guard must run before ring shortcuts');
+});
