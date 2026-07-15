@@ -1,6 +1,9 @@
 import { generateRiftZone, scoreRiftAction } from './rift-relay-model.mjs';
 
 const LANES = [0, 1, 2];
+const SWIPE_THRESHOLD = 34;
+const TAP_MAX_DISTANCE = 18;
+const TAP_MAX_MS = 320;
 
 export class RiftRelayGame {
   constructor({ container, reducedMotion = false, onUpdate = () => {}, onAnnounce = () => {}, onFinish = () => {} }) {
@@ -23,12 +26,14 @@ export class RiftRelayGame {
     this.progress = 0;
     this.jumpUntil = 0;
     this.active = null;
+    this.pointer = null;
   }
 
   start(seed) {
     this.seed = Number(seed) >>> 0;
     this.running = true;
     this.bind();
+    this.renderPlayer();
     this.loadSegment();
     this.lastTime = performance.now();
     this.frame = requestAnimationFrame((time) => this.tick(time));
@@ -41,23 +46,60 @@ export class RiftRelayGame {
       button.addEventListener('pointerdown', () => this.move(Number(button.dataset.riftLane)), { signal });
     });
     this.container.querySelector('[data-rift-jump]')?.addEventListener('pointerdown', () => this.jump(), { signal });
-    this.container.querySelector('[data-rift-exit]')?.addEventListener('click', () => this.finish('ended'), { signal });
+    this.container.querySelector('[data-rift-exit]')?.addEventListener('click', (event) => {
+      event.stopPropagation();
+      this.finish('ended');
+    }, { signal });
+
+    this.container.addEventListener('pointerdown', (event) => {
+      if (!this.running || event.target.closest('[data-rift-exit]')) return;
+      this.pointer = { id: event.pointerId, x: event.clientX, y: event.clientY, at: performance.now() };
+      this.container.setPointerCapture?.(event.pointerId);
+      event.preventDefault();
+    }, { signal });
+
+    this.container.addEventListener('pointerup', (event) => {
+      if (!this.running || !this.pointer || this.pointer.id !== event.pointerId) return;
+      const dx = event.clientX - this.pointer.x;
+      const dy = event.clientY - this.pointer.y;
+      const elapsed = performance.now() - this.pointer.at;
+      const distance = Math.hypot(dx, dy);
+      this.pointer = null;
+
+      if (Math.abs(dx) >= SWIPE_THRESHOLD && Math.abs(dx) > Math.abs(dy) * 1.15) {
+        this.move(this.lane + (dx > 0 ? 1 : -1));
+      } else if (dy <= -SWIPE_THRESHOLD && Math.abs(dy) > Math.abs(dx)) {
+        this.jump();
+      } else if (distance <= TAP_MAX_DISTANCE && elapsed <= TAP_MAX_MS) {
+        this.jump();
+      }
+      event.preventDefault();
+    }, { signal });
+
+    this.container.addEventListener('pointercancel', () => { this.pointer = null; }, { signal });
+    this.container.addEventListener('contextmenu', (event) => event.preventDefault(), { signal });
+
     this.container.addEventListener('keydown', (event) => {
-      if (event.key === 'ArrowLeft') this.move(Math.max(0, this.lane - 1));
-      if (event.key === 'ArrowRight') this.move(Math.min(2, this.lane + 1));
+      if (event.key === 'ArrowLeft') this.move(this.lane - 1);
+      if (event.key === 'ArrowRight') this.move(this.lane + 1);
       if (event.code === 'Space' || event.key === 'ArrowUp') this.jump();
       if (event.key === 'Escape') this.finish('ended');
+      if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'Space'].includes(event.code) || ['ArrowLeft', 'ArrowRight', 'ArrowUp'].includes(event.key)) event.preventDefault();
     }, { signal });
   }
 
   move(lane) {
-    if (!this.running || !LANES.includes(lane)) return;
-    this.lane = lane;
+    if (!this.running) return;
+    const safeLane = Math.max(0, Math.min(2, Number(lane)));
+    if (!LANES.includes(safeLane) || safeLane === this.lane) return;
+    this.lane = safeLane;
     this.renderPlayer();
+    this.container.dataset.input = 'move';
+    window.setTimeout(() => { if (this.running) delete this.container.dataset.input; }, 110);
   }
 
   jump() {
-    if (!this.running) return;
+    if (!this.running || performance.now() < this.jumpUntil - 320) return;
     this.jumpUntil = performance.now() + 620;
     this.container.classList.add('is-jumping');
     window.setTimeout(() => this.container.classList.remove('is-jumping'), 640);
