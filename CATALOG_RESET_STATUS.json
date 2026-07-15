@@ -1,11 +1,31 @@
 {
   "activeIssue": 114,
-  "legacyChallengeIds": [
-    "orbit-lock",
-    "echo-grid",
-    "lumen-lanes",
-    "mirror-fuse"
+  "mode": "manual-reset",
+  "branch": "manual/catalog-reset-flagship",
+  "replacementChallenge": "rift-relay",
+  "legacyAllowed": false,
+  "agentsPaused": true,
+  "status": "ready-for-ci-verification",
+  "completed": [
+    "flagship specification",
+    "procedural run model",
+    "playable visual prototype",
+    "Rift Relay integrated into the main platform shell",
+    "single shipped catalog entry",
+    "same-seed friend challenge links",
+    "Arabic RTL, English and Turkish shell",
+    "touch and keyboard controls",
+    "replay and new-route result loop",
+    "removed legacy runtimes, models, copy and integration modules",
+    "replaced legacy core identifiers, daily selection and invitation contracts",
+    "added focused Rift Relay tests"
   ],
-  "legacyAllowed": true,
-  "completionRule": "Issue #114 must set legacyAllowed to false in the same PR that removes all legacy challenge code, tests, styles, copy, assets, catalog entries, and production-review assumptions while shipping the replacement flagship."
+  "next": [
+    "run pull request CI",
+    "review deployable preview",
+    "merge after checks pass",
+    "run production visual review",
+    "re-enable agents only after production passes"
+  ],
+  "completionRule": "The reset is complete only after the pull request checks and post-merge production visual review pass."
 }

@@ -1,10 +1,10 @@
 {
   "name": "social-challenge-arena",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "type": "module",
   "scripts": {
-    "test": "node --test",
+    "test": "node --test tests/rift-relay.test.mjs tests/catalog-reset-contract.test.mjs",
     "build": "node scripts/build.mjs",
     "check": "npm test && npm run build"
   },
