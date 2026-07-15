@@ -12,282 +12,282 @@ TAP version 13
 # Subtest: orbit plan is deterministic and bounded
 ok 1 - orbit plan is deterministic and bounded
   ---
-  duration_ms: 1.935281
+  duration_ms: 2.830016
   ...
 # Subtest: echo plan is deterministic, bounded, and avoids immediate repeats
 ok 2 - echo plan is deterministic, bounded, and avoids immediate repeats
   ---
-  duration_ms: 0.406182
+  duration_ms: 0.543524
   ...
 # Subtest: lumen route is deterministic, bounded, and avoids triple lane repeats
 ok 3 - lumen route is deterministic, bounded, and avoids triple lane repeats
   ---
-  duration_ms: 0.446229
+  duration_ms: 0.711793
   ...
 # Subtest: mirror route is deterministic with one exact reflected option per round
 ok 4 - mirror route is deterministic with one exact reflected option per round
   ---
-  duration_ms: 2.139013
+  duration_ms: 3.428791
   ...
 # Subtest: catalog exposes four materially different live challenges
 ok 5 - catalog exposes four materially different live challenges
   ---
-  duration_ms: 0.239801
+  duration_ms: 0.27704
   ...
 # Subtest: UTC date keys are canonical and independent of local offsets
 ok 6 - UTC date keys are canonical and independent of local offsets
   ---
-  duration_ms: 0.211395
+  duration_ms: 0.353894
   ...
 # Subtest: daily expansion preserves exact legacy assignments through July and starts on the documented boundary
 ok 7 - daily expansion preserves exact legacy assignments through July and starts on the documented boundary
   ---
-  duration_ms: 0.318769
+  duration_ms: 0.535792
   ...
 # Subtest: future daily fixtures deterministically select all four challenge IDs
 ok 8 - future daily fixtures deterministically select all four challenge IDs
   ---
-  duration_ms: 0.250005
+  duration_ms: 0.369917
   ...
 # Subtest: daily rollover refreshes only on a safe discovery return
 ok 9 - daily rollover refreshes only on a safe discovery return
   ---
-  duration_ms: 0.25834
+  duration_ms: 0.424108
   ...
 # Subtest: daily best accepts only the exact current route and bounded score
 ok 10 - daily best accepts only the exact current route and bounded score
   ---
-  duration_ms: 0.457279
+  duration_ms: 0.6759
   ...
 # Subtest: daily best updates only upward and keeps the exact route
 ok 11 - daily best updates only upward and keeps the exact route
   ---
-  duration_ms: 0.296608
+  duration_ms: 0.413792
   ...
 # Subtest: corrupt or stale local best is discarded and storage failure stays playable
 ok 12 - corrupt or stale local best is discarded and storage failure stays playable
   ---
-  duration_ms: 0.46692
+  duration_ms: 0.581991
   ...
 # Subtest: daily best persistence stores only date challenge seed and best
 ok 13 - daily best persistence stores only date challenge seed and best
   ---
-  duration_ms: 0.23189
+  duration_ms: 0.335696
   ...
 # Subtest: strict invite round-trips all challenges and keeps the legacy v1 shape
 ok 14 - strict invite round-trips all challenges and keeps the legacy v1 shape
   ---
-  duration_ms: 1.156019
+  duration_ms: 1.559427
   ...
 # Subtest: strict invite rejects extras unknown challenges malformed values and out-of-range score
 ok 15 - strict invite rejects extras unknown challenges malformed values and out-of-range score
   ---
-  duration_ms: 0.414408
+  duration_ms: 0.664703
   ...
 # Subtest: valid fourth-challenge invitation takes precedence and invalid links recover
 ok 16 - valid fourth-challenge invitation takes precedence and invalid links recover
   ---
-  duration_ms: 0.569046
+  duration_ms: 0.733284
   ...
 # Subtest: invite URL is language-independent and clears fragments
 ok 17 - invite URL is language-independent and clears fragments
   ---
-  duration_ms: 0.671568
+  duration_ms: 0.726795
   ...
 # Subtest: daily score shares as a strict non-expiring same-route invitation
 ok 18 - daily score shares as a strict non-expiring same-route invitation
   ---
-  duration_ms: 0.456315
+  duration_ms: 0.482954
   ...
 # Subtest: localized native and clipboard invitation payloads include challenge score CTA and strict URL
 ok 19 - localized native and clipboard invitation payloads include challenge score CTA and strict URL
   ---
-  duration_ms: 0.625187
+  duration_ms: 0.602911
   ...
 # Subtest: rematch links keep each challenge and deterministic route while using the new score
 ok 20 - rematch links keep each challenge and deterministic route while using the new score
   ---
-  duration_ms: 0.503322
+  duration_ms: 0.838841
   ...
 # Subtest: score comparison handles win loss and tie with non-color symbols
 ok 21 - score comparison handles win loss and tie with non-color symbols
   ---
-  duration_ms: 0.311587
+  duration_ms: 0.40541
   ...
 # Subtest: all four scoring models remain bounded and deterministic
 ok 22 - all four scoring models remain bounded and deterministic
   ---
-  duration_ms: 0.328179
+  duration_ms: 0.513379
   ...
 # Subtest: all required languages have matching keys and localized fourth-challenge states
 ok 23 - all required languages have matching keys and localized fourth-challenge states
   ---
-  duration_ms: 1.337643
+  duration_ms: 1.907842
   ...
 # Subtest: daily entry four cards and Mirror Fuse options are accessible in the real entry point
 ok 24 - daily entry four cards and Mirror Fuse options are accessible in the real entry point
   ---
-  duration_ms: 34.665884
+  duration_ms: 24.407702
   ...
 # Subtest: game keyboard attempts are consumed only from the focused canvas target
 ok 25 - game keyboard attempts are consumed only from the focused canvas target
   ---
-  duration_ms: 0.330236
+  duration_ms: 0.322527
   ...
 # Subtest: app owns one daily route preserves strict sharing and hosts all four games
 ok 26 - app owns one daily route preserves strict sharing and hosts all four games
   ---
-  duration_ms: 2.451991
+  duration_ms: 1.741195
   ...
 # Subtest: lumen lifecycle owns timers and reduced effects never changes route or deadlines
 ok 27 - lumen lifecycle owns timers and reduced effects never changes route or deadlines
   ---
-  duration_ms: 2.578123
+  duration_ms: 1.242387
   ...
 # Subtest: persisted back-forward cache restore returns an interrupted run without refreshing its daily route
 ok 28 - persisted back-forward cache restore returns an interrupted run without refreshing its daily route
   ---
-  duration_ms: 1.226029
+  duration_ms: 2.95163
   ...
 # Subtest: echo chunks are deterministic, bounded, and mechanically varied
 ok 29 - echo chunks are deterministic, bounded, and mechanically varied
   ---
-  duration_ms: 17.930277
+  duration_ms: 13.240588
   ...
 # Subtest: realistic echo run reaches all progression and tension families
 ok 30 - realistic echo run reaches all progression and tension families
   ---
-  duration_ms: 5.26288
+  duration_ms: 8.057887
   ...
 # Subtest: cross-seed variation changes route and rules, not only cosmetics
 ok 31 - cross-seed variation changes route and rules, not only cosmetics
   ---
-  duration_ms: 5.362876
+  duration_ms: 2.369805
   ...
 # Subtest: score rewards mastery while staying inside invitation bounds
 ok 32 - score rewards mastery while staying inside invitation bounds
   ---
-  duration_ms: 0.647832
+  duration_ms: 5.756694
   ...
 # Subtest: endless Lumen windows are reproducible and different seeds change decisions
 ok 33 - endless Lumen windows are reproducible and different seeds change decisions
   ---
-  duration_ms: 22.976443
+  duration_ms: 23.7408
   ...
 # Subtest: realistic endless play exposes four mechanics, zones, layers, and tension phases safely
 ok 34 - realistic endless play exposes four mechanics, zones, layers, and tension phases safely
   ---
-  duration_ms: 7.168342
+  duration_ms: 2.921922
   ...
 # Subtest: route-choice stages always offer two fair routes and one explicit risk route
 ok 35 - route-choice stages always offer two fair routes and one explicit risk route
   ---
-  duration_ms: 4.981566
+  duration_ms: 2.645042
   ...
 # Subtest: memory and mirror decisions change the required lane rather than only timing
 ok 36 - memory and mirror decisions change the required lane rather than only timing
   ---
-  duration_ms: 1.979319
+  duration_ms: 3.464524
   ...
 # Subtest: endless scoring rewards mastery without quickly saturating the strict score bound
 ok 37 - endless scoring rewards mastery without quickly saturating the strict score bound
   ---
-  duration_ms: 0.469924
+  duration_ms: 0.644684
   ...
 # Subtest: the runtime keeps only one bounded chunk and has no fixed completion branch
 ok 38 - the runtime keeps only one bounded chunk and has no fixed completion branch
   ---
-  duration_ms: 8.062945
+  duration_ms: 9.93312
   ...
 # Subtest: visual movement never reveals the correct lane before the player decides
 ok 39 - visual movement never reveals the correct lane before the player decides
   ---
-  duration_ms: 1.427006
+  duration_ms: 1.671101
   ...
 # Subtest: deliberate exit and accessible memory cues support the endless result journey
 ok 40 - deliberate exit and accessible memory cues support the endless result journey
   ---
-  duration_ms: 2.097718
+  duration_ms: 3.261213
   ...
 # Subtest: endless Lumen adds no remote runtime or copied asset dependency
 ok 41 - endless Lumen adds no remote runtime or copied asset dependency
   ---
-  duration_ms: 7.823372
+  duration_ms: 2.934029
   ...
 # Subtest: switching away from Lumen clears result state before later language updates
 ok 42 - switching away from Lumen clears result state before later language updates
   ---
-  duration_ms: 7.311612
+  duration_ms: 7.791754
   ...
 # Subtest: a terminal miss cannot be reclassified as a voluntary exit
 ok 43 - a terminal miss cannot be reclassified as a voluntary exit
   ---
-  duration_ms: 4.658998
+  duration_ms: 2.871437
   ...
 # Subtest: memory stages use one ordered announcement path and start the unchanged deadline only after Ready
 ok 44 - memory stages use one ordered announcement path and start the unchanged deadline only after Ready
   ---
-  duration_ms: 3.634064
+  duration_ms: 3.151431
   ...
 # Subtest: zero-millisecond Lumen reaction is preserved as valid fastest input
 ok 45 - zero-millisecond Lumen reaction is preserved as valid fastest input
   ---
-  duration_ms: 1.835221
+  duration_ms: 2.97537
   ...
 # Subtest: Mirror transformations preserve exact deterministic geometry
 ok 46 - Mirror transformations preserve exact deterministic geometry
   ---
-  duration_ms: 2.89475
+  duration_ms: 2.652392
   ...
 # Subtest: same seed reproduces the endless journey and different seeds change mechanics and boards
 ok 47 - same seed reproduces the endless journey and different seeds change mechanics and boards
   ---
-  duration_ms: 11.636322
+  duration_ms: 17.051878
   ...
 # Subtest: bounded chunks are safe, solvable, distinct, and never imply a fixed ending
 ok 48 - bounded chunks are safe, solvable, distinct, and never imply a fixed ending
   ---
-  duration_ms: 18.570261
+  duration_ms: 27.577309
   ...
 # Subtest: realistic play windows expose staged layers, multiple decisions, zones, and tension rhythm
 ok 49 - realistic play windows expose staged layers, multiple decisions, zones, and tension rhythm
   ---
-  duration_ms: 2.225328
+  duration_ms: 1.996042
   ...
 # Subtest: scoring rewards mastery, efficiency, focus, rules, and special phases within bounds
 ok 50 - scoring rewards mastery, efficiency, focus, rules, and special phases within bounds
   ---
-  duration_ms: 0.533266
+  duration_ms: 0.514121
   ...
 # Subtest: Mirror Fuse is endless in the catalog and its runtime owns lifecycle, exit, sound, and first-input timing
 ok 51 - Mirror Fuse is endless in the catalog and its runtime owns lifecycle, exit, sound, and first-input timing
   ---
-  duration_ms: 9.371795
+  duration_ms: 10.276734
   ...
 # Subtest: terminal failure becomes authoritative before delayed feedback can accept deliberate exit
 ok 52 - terminal failure becomes authoritative before delayed feedback can accept deliberate exit
   ---
-  duration_ms: 1.976402
+  duration_ms: 1.701867
   ...
 # Subtest: stage transitions preserve one announcement owner and return keyboard focus to the board
 ok 53 - stage transitions preserve one announcement owner and return keyboard focus to the board
   ---
-  duration_ms: 1.126273
+  duration_ms: 1.148618
   ...
 # Subtest: Arabic, English, and Turkish provide complete endless Mirror copy and non-audio equivalents
 ok 54 - Arabic, English, and Turkish provide complete endless Mirror copy and non-audio equivalents
   ---
-  duration_ms: 0.764848
+  duration_ms: 0.780915
   ...
 # Subtest: responsive UI preserves explicit spatial LTR geometry, focus, non-color cues, and reduced effects
 ok 55 - responsive UI preserves explicit spatial LTR geometry, focus, non-color cues, and reduced effects
   ---
-  duration_ms: 2.51843
+  duration_ms: 2.101237
   ...
-# file:///home/runner/work/social-challenge-arena/social-challenge-arena/tests/onboarding-status.test.mjs:24
-#   const dailyEnd = app.indexOf('
-#                                ^
-# SyntaxError: Invalid or unexpected token
+# file:///home/runner/work/social-challenge-arena/social-challenge-arena/tests/onboarding-status.test.mjs:38
+#   assert.ok(!/1/12|round-value|data-i18n="round"/.test(html));
+#              ^
+# SyntaxError: Invalid regular expression flags
 #     at compileSourceTextModule (node:internal/modules/esm/utils:346:16)
 #     at ModuleLoader.moduleStrategy (node:internal/modules/esm/translators:146:18)
 #     at \#translate (node:internal/modules/esm/loader:497:12)
@@ -297,7 +297,7 @@ ok 55 - responsive UI preserves explicit spatial LTR geometry, focus, non-color 
 # Subtest: /home/runner/work/social-challenge-arena/social-challenge-arena/tests/onboarding-status.test.mjs
 not ok 7 - /home/runner/work/social-challenge-arena/social-challenge-arena/tests/onboarding-status.test.mjs
   ---
-  duration_ms: 37.24501
+  duration_ms: 58.298955
   location: '/home/runner/work/social-challenge-arena/social-challenge-arena/tests/onboarding-status.test.mjs:1:1'
   failureType: 'testCodeFailure'
   exitCode: 1
@@ -308,117 +308,117 @@ not ok 7 - /home/runner/work/social-challenge-arena/social-challenge-arena/tests
 # Subtest: Orbit is integrated as an endless accessible platform journey
 ok 57 - Orbit is integrated as an endless accessible platform journey
   ---
-  duration_ms: 10.84801
+  duration_ms: 11.1503
   ...
 # Subtest: Orbit keyboard shortcuts stay inside the game shell
 ok 58 - Orbit keyboard shortcuts stay inside the game shell
   ---
-  duration_ms: 2.640612
+  duration_ms: 4.418875
   ...
 # Subtest: Orbit chunks are bounded, endless-ready, deterministic, and mechanically varied
 ok 59 - Orbit chunks are bounded, endless-ready, deterministic, and mechanically varied
   ---
-  duration_ms: 6.006949
+  duration_ms: 6.725837
   ...
 # Subtest: generated stages stay readable, finite, and contain reachable valid windows
 ok 60 - generated stages stay readable, finite, and contain reachable valid windows
   ---
-  duration_ms: 1264.228952
+  duration_ms: 1739.52837
   ...
 # Subtest: same elapsed input has frame-cadence-independent truth
 ok 61 - same elapsed input has frame-cadence-independent truth
   ---
-  duration_ms: 0.343861
+  duration_ms: 0.449856
   ...
 # Subtest: rules reject wrong orbits, distinguish risk, and keep score bounded
 ok 62 - rules reject wrong orbits, distinguish risk, and keep score bounded
   ---
-  duration_ms: 5.784061
+  duration_ms: 4.27309
   ...
 # Subtest: alignment checks preserve same-seed score parity
 ok 63 - alignment checks preserve same-seed score parity
   ---
-  duration_ms: 3.700658
+  duration_ms: 2.36654
   ...
 # Subtest: zero-attempt result detail stays truthful after deliberate exit
 ok 64 - zero-attempt result detail stays truthful after deliberate exit
   ---
-  duration_ms: 0.408103
+  duration_ms: 0.271021
   ...
 # Subtest: persisted discovery restore refreshes a rolled-over daily route using injected time only
 ok 65 - persisted discovery restore refreshes a rolled-over daily route using injected time only
   ---
-  duration_ms: 8.43026
+  duration_ms: 7.196053
   ...
 # Subtest: real Chromium keeps every localized solo and duel PNG inside the share bound
 ok 66 - real Chromium keeps every localized solo and duel PNG inside the share bound
   ---
-  duration_ms: 9789.815328
+  duration_ms: 2526.957044
   ...
 # Subtest: builds deterministic privacy-safe solo models for all challenge IDs
 ok 67 - builds deterministic privacy-safe solo models for all challenge IDs
   ---
-  duration_ms: 19.272779
+  duration_ms: 18.341175
   ...
 # Subtest: models invited win, loss, and tie without color-only meaning
 ok 68 - models invited win, loss, and tie without color-only meaning
   ---
-  duration_ms: 0.599177
+  duration_ms: 0.589612
   ...
 # Subtest: preserves Arabic RTL metadata and clamps bounded scores
 ok 69 - preserves Arabic RTL metadata and clamps bounded scores
   ---
-  duration_ms: 0.322249
+  duration_ms: 0.375265
   ...
 # Subtest: preserves text sharing while requiring explicit support for files
 ok 70 - preserves text sharing while requiring explicit support for files
   ---
-  duration_ms: 0.273692
+  duration_ms: 0.289539
   ...
 # Subtest: enforces generated file size bounds and cancellation semantics
 ok 71 - enforces generated file size bounds and cancellation semantics
   ---
-  duration_ms: 1.270518
+  duration_ms: 1.47376
   ...
 # Subtest: share-card status and artifact text keep Arabic, English, and Turkish parity
 ok 72 - share-card status and artifact text keep Arabic, English, and Turkish parity
   ---
-  duration_ms: 0.55045
+  duration_ms: 0.585817
   ...
 # Subtest: constructs a native file payload without mutating text share data
 ok 73 - constructs a native file payload without mutating text share data
   ---
-  duration_ms: 0.230515
+  duration_ms: 0.259124
   ...
 # Subtest: renders a bounded PNG file and releases its canvas deterministically
 ok 74 - renders a bounded PNG file and releases its canvas deterministically
   ---
-  duration_ms: 1.07396
+  duration_ms: 1.217951
   ...
 # Subtest: aborted or oversized rendering fails without producing a share file
 ok 75 - aborted or oversized rendering fails without producing a share file
   ---
-  duration_ms: 0.934467
+  duration_ms: 1.018195
   ...
 # Subtest: Font Awesome is local, selective, licensed, and included in the production build
 ok 76 - Font Awesome is local, selective, licensed, and included in the production build
   ---
-  duration_ms: 1.914533
+  duration_ms: 2.514108
   ...
 # Subtest: retained platform icons use explicit accessible Font Awesome treatments
 ok 77 - retained platform icons use explicit accessible Font Awesome treatments
   ---
-  duration_ms: 0.246788
+  duration_ms: 0.298812
   ...
 # Subtest: mobile reduced-effects control keeps a visible recognizable indicator
 ok 78 - mobile reduced-effects control keeps a visible recognizable indicator
   ---
-  duration_ms: 0.28038
+  duration_ms: 0.375645
   ...
 # Subtest: localized text actions do not expose Font Awesome pseudo-element glyphs
 ok 79 - localized text actions do not expose Font Awesome pseudo-element glyphs
   ---
-  duration_ms: 0.455744
+  duration_ms: 0.590193
   ...
 1..79
 # tests 79
@@ -428,4 +428,4 @@ ok 79 - localized text actions do not expose Font Awesome pseudo-element glyphs
 # cancelled 0
 # skipped 0
 # todo 0
-# duration_ms 10134.684518
+# duration_ms 2917.702856
