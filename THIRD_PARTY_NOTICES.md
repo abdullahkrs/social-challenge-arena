@@ -2,15 +2,25 @@
 
 ## Phaser
 
-This product uses **Phaser 4.2.1**, an open-source HTML5 game framework, loaded from jsDelivr at runtime.
+This product uses **Phaser 4.2.1**, an open-source HTML5 game framework bundled into the production build.
 
 - Project: Phaser
 - Version: 4.2.1
 - License: MIT
 - Source: `https://github.com/phaserjs/phaser`
-- Distribution: `https://cdn.jsdelivr.net/npm/phaser@4.2.1/dist/phaser.min.js`
 
-Phaser provides scene management, WebGL/Canvas rendering, Arcade Physics, camera effects, particles, tweens, scaling and unified touch/keyboard input for the game runtime.
+Phaser provides scenes, rendering, scaling, cameras, particles, tweens and unified input.
+
+## Matter.js
+
+This product uses **Matter.js 0.20.0**, an open-source 2D rigid-body physics engine bundled into the production build.
+
+- Project: Matter.js
+- Version: 0.20.0
+- License: MIT
+- Source: `https://github.com/liabru/matter-js`
+
+Matter.js provides the player body, gravity, collision events, sensors and deterministic physics integration used by Pulsebound.
 
 ## Font Awesome Free
 
