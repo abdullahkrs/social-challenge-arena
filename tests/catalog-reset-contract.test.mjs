@@ -14,7 +14,6 @@ const shippedEntries = [
   'src/core.mjs',
   'src/rift-game.mjs',
   'src/rift-relay-model.mjs',
-  'scripts/build.mjs',
   '.github/workflows/production-visual-review.yml'
 ];
 
