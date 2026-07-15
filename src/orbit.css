@@ -16,8 +16,8 @@
 .orbit-actions .orbit-lock[data-ready="true"] { box-shadow:0 0 0 3px rgba(124,246,212,.35),0 0 28px rgba(124,246,212,.28); }
 .orbit-actions button:disabled { cursor:default; opacity:.52; }
 .orbit-exit { justify-self:center; min-height:44px; }
-.orbit-runtime[data-feedback="correct"] #game-canvas { border-color:rgba(124,246,212,.72); }
-.orbit-runtime[data-feedback="wrong"] #game-canvas { border-color:rgba(255,159,188,.76); }
+#game-canvas[data-feedback="correct"] { border-color:rgba(124,246,212,.72); }
+#game-canvas[data-feedback="wrong"] { border-color:rgba(255,159,188,.76); }
 .orbit-runtime[data-phase="recovery"] .orbit-run-head::before { content:'+'; display:grid; place-items:center; width:22px; height:22px; border-radius:50%; color:var(--accent-ink); background:var(--accent); font-weight:900; }
 .orbit-runtime[data-phase="special"] .orbit-run-head::before { content:'★'; color:#ffd47a; }
 html[data-reduced-motion="true"] .orbit-actions .orbit-lock { box-shadow:none; }
