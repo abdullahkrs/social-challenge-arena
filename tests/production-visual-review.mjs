@@ -13,6 +13,8 @@ await mkdir(`${evidenceDir}/screenshots`, { recursive: true });
 function impactPlan(files) {
   if (fullReview) return { skip: false, deepAll: true, locales: true, reasons: ['manual full review'] };
   if (files.length === 0) return { skip: false, deepAll: true, locales: true, reasons: ['unknown empty diff'] };
+  const reviewInfrastructureChanged = files.some((file) => file === '.github/workflows/production-visual-review.yml' || file === 'tests/production-visual-review.mjs');
+  if (reviewInfrastructureChanged) return { skip: false, deepAll: true, locales: true, reasons: ['initial or changed production-review infrastructure'] };
 
   const docsOnly = files.every((file) => /^(README|CHANGELOG|ROADMAP|TASK_LOG|DECISIONS|BACKLOG|EXPERIMENTS|METRICS|AGENT|SWARM|.*\.md$)/.test(file));
   const testOnly = files.every((file) => /^(tests\/|\.github\/)/.test(file));
