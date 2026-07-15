@@ -1,0 +1,35 @@
+name: Worker 106 apply
+
+on:
+  push:
+    branches:
+      - worker/106-unify-onboarding-status
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: node scripts/worker-106-apply.mjs
+      - run: npm test
+      - run: npm run build
+      - run: rm -rf dist
+      - name: Commit coherent delivery
+        run: |
+          git config user.name "Worker Swarm"
+          git config user.email "actions@users.noreply.github.com"
+          git add -A
+          git commit -m "Unify concise onboarding and endless status"
+          git push
