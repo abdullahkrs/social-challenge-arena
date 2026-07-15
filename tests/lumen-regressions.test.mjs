@@ -7,10 +7,10 @@ const integrationUrl = new URL('../src/lumen-integration.mjs', import.meta.url);
 
 test('switching away from Lumen clears result state before later language updates', async () => {
   const source = await readFile(integrationUrl, 'utf8');
-  const resetSharedHud = source.match(/function resetSharedHud\(\) \{([\s\S]*?)\n\}/)?.[1] ?? '';
+  const resetSharedState = source.match(/function resetSharedState\(\) \{([\s\S]*?)\n\}/)?.[1] ?? '';
 
-  assert.match(resetSharedHud, /resultDetail\?\.setAttribute\('hidden', ''\)/);
-  assert.match(resetSharedHud, /lastResult = null;/);
+  assert.match(resetSharedState, /resultDetail\?\.setAttribute\('hidden', ''\)/);
+  assert.match(resetSharedState, /lastResult = null;/);
   assert.match(source, /if \(lastResult\) updateResult\(\);/);
 });
 
