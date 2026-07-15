@@ -11,7 +11,7 @@
   ],
   "legacyAllowed": true,
   "agentsPaused": true,
-  "status": "main-platform-integrated",
+  "status": "legacy-runtime-removal-in-progress",
   "completed": [
     "flagship specification",
     "procedural run model",
@@ -24,10 +24,14 @@
     "single shipped catalog entry",
     "same-seed friend challenge links",
     "Arabic RTL, English and Turkish shell",
-    "replay and new-route result loop"
+    "replay and new-route result loop",
+    "removed Orbit Lock runtime",
+    "removed Echo Grid runtime",
+    "removed Lumen Lanes runtime",
+    "removed Mirror Fuse runtime"
   ],
   "next": [
-    "delete legacy challenge code, styles and tests",
+    "delete legacy models, integrations, copy, styles and tests",
     "replace remaining legacy core and workflow assumptions",
     "run repository-wide legacy path scan",
     "run tests and production build",
