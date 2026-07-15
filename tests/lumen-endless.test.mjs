@@ -96,7 +96,7 @@ test('deliberate exit and accessible memory cues support the endless result jour
   assert.match(source, /emit\('finish'/);
   assert.match(integration, /lumenResultDetail/);
   assert.match(integration, /stage\.sequence\.map\(laneName\)/);
-  assert.match(integration, /MutationObserver\(updateCatalogDuration\)/);
+  assert.doesNotMatch(integration, /durationValue|updateCatalogDuration|round-value/);
   assert.match(html, /data-lumen-exit/);
   assert.match(html, /data-lumen-accessible-sequence/);
   assert.match(html, /id="result-detail"/);

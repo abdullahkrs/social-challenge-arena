@@ -2,9 +2,6 @@ import { normalizeLanguage, translate } from './i18n.mjs';
 
 const lumen = document.querySelector('#lumen-lanes');
 const gameScreen = document.querySelector('[data-screen="game"]');
-const roundCell = document.querySelector('#round-value')?.closest('div');
-const roundLabel = roundCell?.querySelector('span');
-const roundValue = document.querySelector('#round-value');
 const zoneValue = lumen?.querySelector('[data-lumen-zone]');
 const distanceValue = lumen?.querySelector('[data-lumen-distance]');
 const ruleValues = lumen ? [...lumen.querySelectorAll('[data-lumen-rule]')] : [];
@@ -13,7 +10,6 @@ const laneButtons = lumen ? [...lumen.querySelectorAll('[data-lane]')] : [];
 const accessibleSequence = lumen?.querySelector('[data-lumen-accessible-sequence]');
 const resultDetail = document.querySelector('#result-detail');
 const resultSummary = document.querySelector('#result-summary');
-const durationValue = document.querySelector('[data-challenge-id="lumen-lanes"] [data-duration]');
 
 let activeStage = null;
 let activeSnapshot = null;
@@ -43,9 +39,6 @@ const ruleKeys = {
   memory: 'lumenRuleMemory'
 };
 
-function updateCatalogDuration() {
-  if (durationValue && durationValue.textContent !== t('endless')) durationValue.textContent = t('endless');
-}
 
 function laneName(index) {
   return t(['laneLeft', 'laneCenter', 'laneRight'][index]);
@@ -99,8 +92,6 @@ function updateAccessibleSequence(stage = activeStage) {
 function updateStage(stage = activeStage, snapshot = activeSnapshot) {
   if (!stage || !lumen) return;
   gameScreen?.setAttribute('data-lumen-active', 'true');
-  if (roundLabel) roundLabel.textContent = t('lumenDistance');
-  if (roundValue) roundValue.textContent = String((snapshot?.round ?? stage.index) + 1);
   if (zoneValue) zoneValue.textContent = t(zoneKeys[stage.zone] || 'lumenZonePrism');
   if (distanceValue) distanceValue.textContent = t('lumenGate', { value: stage.index + 1 });
   ruleValues.forEach((element) => { element.textContent = t(ruleKeys[stage.mechanic] || 'lumenRuleDirect'); });
@@ -122,7 +113,6 @@ function updateResult(result = lastResult) {
 
 function resetSharedHud() {
   gameScreen?.removeAttribute('data-lumen-active');
-  if (roundLabel) roundLabel.textContent = t('round');
   resultDetail?.setAttribute('hidden', '');
   activeStage = null;
   activeSnapshot = null;
@@ -142,8 +132,6 @@ if (lumen) {
     memoryAnnouncement = 'none';
     updateAccessibleSequence(null);
     gameScreen?.setAttribute('data-lumen-active', 'true');
-    if (roundLabel) roundLabel.textContent = t('lumenDistance');
-    if (roundValue) roundValue.textContent = '1';
     if (exitButton) exitButton.textContent = t('lumenEndRun');
   });
 
@@ -175,7 +163,6 @@ if (lumen) {
 
   lumen.addEventListener('lumen:snapshot', (event) => {
     activeSnapshot = event.detail.snapshot;
-    if (activeStage && roundValue) roundValue.textContent = String(activeSnapshot.round + 1);
   });
 
   lumen.addEventListener('lumen:exit-armed', () => {
@@ -201,17 +188,11 @@ if (lumen) {
 }
 
 new MutationObserver(() => {
-  updateCatalogDuration();
   if (activeStage) updateStage();
   if (lastResult) updateResult();
   if (!activeStage) updateLaneLabels(null);
   updateAccessibleSequence();
 }).observe(document.documentElement, { attributes: true, attributeFilter: ['lang', 'dir'] });
 
-if (durationValue) {
-  new MutationObserver(updateCatalogDuration).observe(durationValue, { childList: true, characterData: true, subtree: true });
-}
-queueMicrotask(updateCatalogDuration);
-updateCatalogDuration();
 updateLaneLabels(null);
 if (exitButton) exitButton.textContent = t('lumenEndRun');

@@ -109,7 +109,9 @@ test('scoring rewards mastery, efficiency, focus, rules, and special phases with
 test('Mirror Fuse is endless in the catalog and its runtime owns lifecycle, exit, sound, and first-input timing', async () => {
   const mirror = catalog.find((challenge) => challenge.id === 'mirror-fuse');
   assert.equal(mirror?.endless, true);
-  assert.equal(mirror?.durationSeconds, 0);
+  assert.equal(mirror?.statusKey, 'endless');
+  assert.equal(mirror?.progressLabelKey, 'mirrorPattern');
+  assert.equal('durationSeconds' in mirror, false);
   const source = await readFile(new URL('../src/mirror-game.mjs', import.meta.url), 'utf8');
   assert.match(source, /generateMirrorChunk\(this\.seed, this\.chunkIndex\)/);
   assert.match(source, /this\.stageIndex \+= 1/);

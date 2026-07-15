@@ -2,7 +2,7 @@ import { messages } from './i18n.mjs';
 
 Object.assign(messages.en, {
   mirrorName: 'Mirror Fuse', mirrorTagline: 'Endless spatial circuit',
-  mirrorHowTo: 'Read the source shape and its transformation. Move the cursor across the target board, switch cells, and rebuild the exact result. Later zones add anchors, repairs, ordered traces, rotations, and tighter route budgets. Continue until your chances end or you confirm exit.',
+  mirrorHowTo: 'Move across the board and switch cells to match the transformed shape. Continue until your chances end or you choose to exit.',
   mirrorControlsHint: 'Use arrows or adjacent cells to move; Space or the center control switches the current cell; check the pattern, and press End journey twice to stop safely',
   mirrorArenaLabel: 'Endless Mirror Fuse spatial construction journey', mirrorPattern: 'Pattern', mirrorStep: 'Pattern {value}',
   mirrorSource: 'Source', mirrorTarget: 'Build', mirrorMoves: '{used}/{budget} moves', mirrorCheckPattern: 'Check pattern', mirrorSwitchCell: 'Switch cell',
@@ -20,7 +20,7 @@ Object.assign(messages.en, {
 
 Object.assign(messages.ar, {
   mirrorName: 'دمج المرآة', mirrorTagline: 'مسار مكاني لا نهائي',
-  mirrorHowTo: 'اقرأ الشكل الأصلي وقاعدة تحويله، ثم حرّك المؤشر على لوحة البناء وبدّل الخلايا لتكوين النتيجة الدقيقة. تضيف المناطق اللاحقة نقاط تثبيت وإصلاحات ومسارات مرتبة ودورانًا وميزانية حركة أضيق. تستمر الرحلة حتى تنتهي فرصك أو تؤكد الخروج.',
+  mirrorHowTo: 'تحرّك على اللوحة وبدّل الخلايا لتطابق الشكل المحوّل. تستمر الرحلة حتى تنتهي فرصك أو تختار الخروج.',
   mirrorControlsHint: 'استخدم الأسهم أو الخلايا المجاورة للحركة، واضغط المسافة أو زر الوسط لتبديل الخلية الحالية، ثم افحص الشكل، واضغط إنهاء الرحلة مرتين للتوقف بأمان',
   mirrorArenaLabel: 'رحلة البناء المكاني اللانهائية لدمج المرآة', mirrorPattern: 'النمط', mirrorStep: 'النمط {value}',
   mirrorSource: 'الأصل', mirrorTarget: 'البناء', mirrorMoves: '{used}/{budget} حركة', mirrorCheckPattern: 'فحص النمط', mirrorSwitchCell: 'تبديل الخلية',
@@ -38,7 +38,7 @@ Object.assign(messages.ar, {
 
 Object.assign(messages.tr, {
   mirrorName: 'Ayna Birleştirme', mirrorTagline: 'Sonsuz uzamsal devre',
-  mirrorHowTo: 'Kaynak şekli ve dönüşüm kuralını oku. İmleci hedef tahtada hareket ettir, hücreleri değiştir ve kesin sonucu yeniden kur. Sonraki bölgeler sabit noktalar, onarımlar, sıralı izler, dönüşler ve daha sıkı hareket bütçeleri ekler. Hakların bitene veya çıkışı onaylayana kadar yolculuk sürer.',
+  mirrorHowTo: 'Tahtada hareket et ve dönüştürülmüş şekli eşleştirmek için hücreleri değiştir. Hakların bitene veya çıkmayı seçene kadar yolculuk sürer.',
   mirrorControlsHint: 'Hareket etmek için okları veya komşu hücreleri kullan; geçerli hücreyi değiştirmek için Boşluk ya da orta düğmeye bas; deseni kontrol et ve güvenle durmak için Yolculuğu bitir düğmesine iki kez bas',
   mirrorArenaLabel: 'Sonsuz Ayna Birleştirme uzamsal kurma yolculuğu', mirrorPattern: 'Desen', mirrorStep: 'Desen {value}',
   mirrorSource: 'Kaynak', mirrorTarget: 'Kur', mirrorMoves: '{used}/{budget} hareket', mirrorCheckPattern: 'Deseni kontrol et', mirrorSwitchCell: 'Hücreyi değiştir',

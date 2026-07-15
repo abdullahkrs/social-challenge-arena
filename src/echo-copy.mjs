@@ -1,8 +1,8 @@
 import { messages } from './i18n.mjs';
 
 Object.assign(messages.en, {
-  soundEffects: 'Sound', soundOn: 'Sound on', soundOff: 'Sound muted', catalogHint: 'Four games. One score to beat.',
-  echoTagline: 'Endless memory trail', echoHowTo: 'Watch a path, read its rule, then move the marker to reconstruct, reverse, turn, or decode it. The journey continues until your chances end or you confirm exit.',
+  soundEffects: 'Sound', soundOn: 'Sound on', soundOff: 'Sound muted', catalogHint: 'Four endless skill journeys. One score to beat.',
+  echoTagline: 'Endless memory trail', echoHowTo: 'Watch the route, then move the marker to repeat it. Continue until your chances end or you choose to exit.',
   echoWatchPath: 'Watch {count} moves', echoCueReady: 'Path ready. Replay it or begin moving', echoMoveNow: 'Move now',
   echoStepCorrect: 'Step {value} of {count}', echoWrongMove: 'That move breaks the path', echoTooSlow: 'The path faded', echoTrailCleared: 'Trail cleared +{points}', echoRecovery: 'One chance restored',
   echoTrail: 'Trail', echoStep: 'Trail {value}', echoEndRun: 'End journey', echoExitNow: 'Confirm end journey', echoExitConfirm: 'Press again within three seconds to end the journey',
@@ -15,8 +15,8 @@ Object.assign(messages.en, {
 });
 
 Object.assign(messages.ar, {
-  soundEffects: 'الصوت', soundOn: 'الصوت مفعّل', soundOff: 'الصوت مكتوم', catalogHint: 'أربع ألعاب ونتيجة واحدة للتجاوز.',
-  echoTagline: 'مسار ذاكرة لا نهائي', echoHowTo: 'راقب المسار واقرأ قاعدته، ثم حرّك العلامة لتكراره أو عكسه أو تدويره أو فك إشاراته. تستمر الرحلة حتى تنتهي فرصك أو تؤكد الخروج.',
+  soundEffects: 'الصوت', soundOn: 'الصوت مفعّل', soundOff: 'الصوت مكتوم', catalogHint: 'أربع رحلات مهارية لا نهائية ونتيجة واحدة للتجاوز.',
+  echoTagline: 'مسار ذاكرة لا نهائي', echoHowTo: 'راقب المسار، ثم حرّك العلامة لتكراره. تستمر الرحلة حتى تنتهي فرصك أو تختار الخروج.',
   echoWatchPath: 'راقب {count} حركات', echoCueReady: 'المسار جاهز. أعد عرضه أو ابدأ الحركة', echoMoveNow: 'تحرّك الآن',
   echoStepCorrect: 'الخطوة {value} من {count}', echoWrongMove: 'هذه الحركة تقطع المسار', echoTooSlow: 'اختفى المسار', echoTrailCleared: 'تم اجتياز المسار +{points}', echoRecovery: 'استعدت فرصة واحدة',
   echoTrail: 'المسار', echoStep: 'المسار {value}', echoEndRun: 'إنهاء الرحلة', echoExitNow: 'تأكيد إنهاء الرحلة', echoExitConfirm: 'اضغط مرة أخرى خلال ثلاث ثوانٍ لإنهاء الرحلة',
@@ -29,8 +29,8 @@ Object.assign(messages.ar, {
 });
 
 Object.assign(messages.tr, {
-  soundEffects: 'Ses', soundOn: 'Ses açık', soundOff: 'Ses kapalı', catalogHint: 'Dört oyun. Geçilecek tek puan.',
-  echoTagline: 'Sonsuz hafıza yolu', echoHowTo: 'Yolu izle, kuralını oku ve işaretçiyi yolu tekrar etmek, tersine dönmek, çevirmek veya kodunu çözmek için hareket ettir. Hakların bitene veya çıkışı onaylayana kadar yolculuk sürer.',
+  soundEffects: 'Ses', soundOn: 'Ses açık', soundOff: 'Ses kapalı', catalogHint: 'Dört sonsuz beceri yolculuğu. Geçilecek tek puan.',
+  echoTagline: 'Sonsuz hafıza yolu', echoHowTo: 'Rotayı izle, sonra işaretçiyi hareket ettirerek rotayı tekrarla. Hakların bitene veya çıkmayı seçene kadar yolculuk sürer.',
   echoWatchPath: '{count} hareketi izle', echoCueReady: 'Yol hazır. Yeniden oynat veya hareket etmeye başla', echoMoveNow: 'Şimdi hareket et',
   echoStepCorrect: '{count} adımın {value}. adımı', echoWrongMove: 'Bu hareket yolu bozuyor', echoTooSlow: 'Yol kayboldu', echoTrailCleared: 'Yol tamamlandı +{points}', echoRecovery: 'Bir hak geri geldi',
   echoTrail: 'Yol', echoStep: 'Yol {value}', echoEndRun: 'Yolculuğu bitir', echoExitNow: 'Yolculuğu bitirmeyi onayla', echoExitConfirm: 'Yolculuğu bitirmek için üç saniye içinde tekrar bas',

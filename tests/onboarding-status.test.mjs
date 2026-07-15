@@ -1,33 +1,4 @@
-import { readFile, writeFile } from 'node:fs/promises';
-
-const root = new URL('../', import.meta.url);
-const read = (path) => readFile(new URL(path, root), 'utf8');
-const write = (path, content) => writeFile(new URL(path, root), content, 'utf8');
-
-function replaceRequired(content, before, after, label) {
-  if (!content.includes(before)) throw new Error(`Missing test target: ${label}`);
-  return content.replace(before, after);
-}
-
-let lumen = await read('tests/lumen-endless.test.mjs');
-lumen = replaceRequired(
-  lumen,
-  "  assert.match(integration, /MutationObserver\\(updateCatalogDuration\\)/);",
-  "  assert.doesNotMatch(integration, /durationValue|updateCatalogDuration|round-value/);",
-  'Lumen direct endless status ownership'
-);
-await write('tests/lumen-endless.test.mjs', lumen);
-
-let mirror = await read('tests/mirror-game.test.mjs');
-mirror = replaceRequired(
-  mirror,
-  "  assert.equal(mirror?.durationSeconds, 0);",
-  "  assert.equal(mirror?.statusKey, 'endless');\n  assert.equal(mirror?.progressLabelKey, 'mirrorPattern');\n  assert.equal('durationSeconds' in mirror, false);",
-  'Mirror registry status metadata'
-);
-await write('tests/mirror-game.test.mjs', mirror);
-
-const onboarding = `import test from 'node:test';
+import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import { catalog } from '../src/catalog.mjs';
@@ -50,7 +21,7 @@ test('catalog owns localized endless status and challenge progress metadata', ()
 test('catalog, daily, and invitation share the compact instruction entry', async () => {
   const app = await read('src/app.mjs');
   const dailyStart = app.indexOf('function beginDailyRun()');
-  const dailyEnd = app.indexOf('\\n}', dailyStart);
+  const dailyEnd = app.indexOf('\n}', dailyStart);
   const dailyBody = app.slice(dailyStart, dailyEnd + 2);
   assert.ok(app.includes("elements.cards.forEach((card) => card.addEventListener('click', () => selectChallenge(card.dataset.challengeId)))"));
   assert.ok(dailyBody.includes("setScreen('instructions')"));
@@ -86,5 +57,3 @@ test('entry copy stays concise, localized, and truthful about endless exit', () 
     }
   }
 });
-`;
-await write('tests/onboarding-status.test.mjs', onboarding);

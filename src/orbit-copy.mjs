@@ -2,7 +2,7 @@ import { messages } from './i18n.mjs';
 
 Object.assign(messages.en, {
   orbitName: 'Orbit Lock', orbitTagline: 'Endless precision relay',
-  orbitHowTo: 'Choose an orbit, read the rule, and lock the moving pulse inside the correct window. Later gates add symbol rules, safe-versus-risky routes, drifting windows, and two-lock relays. Continue until your chances end or you confirm exit.',
+  orbitHowTo: 'Choose an orbit, then lock the pulse inside the marked gate. Continue until your chances end or you choose to exit.',
   orbitControlsHint: 'Use Inner/Outer and Lock, or ↑/↓ and Space. Check alignment provides a non-visual timing cue; press End journey twice to stop safely.',
   orbitArenaLabel: 'Endless Orbit Lock precision journey', orbitGateLabel: 'Gate', orbitGate: 'Gate {value}',
   orbitInner: 'Inner orbit', orbitOuter: 'Outer orbit', orbitLock: 'Lock', orbitCheck: 'Check alignment', orbitControls: 'Orbit controls',
@@ -18,7 +18,7 @@ Object.assign(messages.en, {
 
 Object.assign(messages.ar, {
   orbitName: 'قفل المدار', orbitTagline: 'تتابع دقة لا نهائي',
-  orbitHowTo: 'اختر المدار واقرأ القاعدة، ثم ثبّت النبضة المتحركة داخل النافذة الصحيحة. تضيف البوابات اللاحقة قواعد رموز ومسارات آمنة أو عالية المخاطرة ونوافذ متحركة وتتابعات من قفلين. تستمر الرحلة حتى تنتهي فرصك أو تؤكد الخروج.',
+  orbitHowTo: 'اختر مدارًا، ثم ثبّت النبضة داخل البوابة المحددة. تستمر الرحلة حتى تنتهي فرصك أو تختار الخروج.',
   orbitControlsHint: 'استخدم المدار الداخلي أو الخارجي ثم زر التثبيت، أو السهمين أعلى وأسفل والمسافة. زر فحص المحاذاة يوفر إشارة توقيت غير بصرية، واضغط إنهاء الرحلة مرتين للتوقف بأمان.',
   orbitArenaLabel: 'رحلة الدقة اللانهائية لقفل المدار', orbitGateLabel: 'البوابة', orbitGate: 'البوابة {value}',
   orbitInner: 'المدار الداخلي', orbitOuter: 'المدار الخارجي', orbitLock: 'تثبيت', orbitCheck: 'فحص المحاذاة', orbitControls: 'أزرار المدار',
@@ -34,7 +34,7 @@ Object.assign(messages.ar, {
 
 Object.assign(messages.tr, {
   orbitName: 'Yörünge Kilidi', orbitTagline: 'Sonsuz hassasiyet rölesi',
-  orbitHowTo: 'Bir yörünge seç, kuralı oku ve hareket eden nabzı doğru pencerenin içinde kilitle. Sonraki kapılar simge kuralları, güvenli ya da riskli rotalar, kayan pencereler ve iki kilitli röleler ekler. Hakların bitene veya çıkışı onaylayana kadar yolculuk sürer.',
+  orbitHowTo: 'Bir yörünge seç, sonra nabzı işaretli kapının içinde kilitle. Hakların bitene veya çıkmayı seçene kadar yolculuk sürer.',
   orbitControlsHint: 'İç/Dış ve Kilitle düğmelerini ya da ↑/↓ ve Boşluk tuşunu kullan. Hizalamayı kontrol et görsel olmayan bir zamanlama ipucu verir; güvenle durmak için Yolculuğu bitir düğmesine iki kez bas.',
   orbitArenaLabel: 'Sonsuz Yörünge Kilidi hassasiyet yolculuğu', orbitGateLabel: 'Kapı', orbitGate: 'Kapı {value}',
   orbitInner: 'İç yörünge', orbitOuter: 'Dış yörünge', orbitLock: 'Kilitle', orbitCheck: 'Hizalamayı kontrol et', orbitControls: 'Yörünge kontrolleri',

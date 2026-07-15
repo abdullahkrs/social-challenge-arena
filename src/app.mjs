@@ -20,7 +20,7 @@ const state = {
   language: normalizeLanguage(readPreference('sca-language') || navigator.language),
   reducedMotion: readPreference('sca-reduced-motion') === 'true' || systemReducedMotion,
   screen: 'discovery', challengeId: CHALLENGE_ID, seed: createSeed(), invite: null, result: null, invalidInvite: false, events: [],
-  daily: null, activeDaily: null, dailyBest: null, dailyStorageAvailable: true
+  daily: null, activeDaily: null, dailyBest: null, dailyStorageAvailable: true, progressSnapshot: null
 };
 
 const elements = {
@@ -35,7 +35,7 @@ const elements = {
   dailyStartButton: document.querySelector('#daily-start-button'), gameHeading: document.querySelector('#game-heading'), canvas: document.querySelector('#game-canvas'),
   echoGrid: document.querySelector('#echo-grid'), lumenLanes: document.querySelector('#lumen-lanes'), mirrorFuse: document.querySelector('#mirror-fuse'),
   controlsHint: document.querySelector('#controls-hint'), gameStatus: document.querySelector('#game-status'),
-  score: document.querySelector('#score-value'), round: document.querySelector('#round-value'), lives: document.querySelector('#lives-value'), combo: document.querySelector('#combo-value'),
+  score: document.querySelector('#score-value'), progressLabel: document.querySelector('#progress-label'), progress: document.querySelector('#progress-value'), lives: document.querySelector('#lives-value'), combo: document.querySelector('#combo-value'),
   resultScore: document.querySelector('#result-score'), resultHeading: document.querySelector('#result-heading'), resultSummary: document.querySelector('#result-summary'),
   resultChallenge: document.querySelector('#result-challenge'), dailyResult: document.querySelector('#daily-result'), comparison: document.querySelector('#comparison'),
   comparisonText: document.querySelector('#comparison-text'), comparisonSymbol: document.querySelector('#comparison-symbol'), challengerScore: document.querySelector('#challenger-score'),
@@ -60,6 +60,13 @@ function track(name, detail = {}) { state.events.push({ name, detail, at: Date.n
 function t(key, values) { return translate(state.language, key, values); }
 function currentChallenge() { return getChallenge(state.challengeId); }
 function challengeName() { const challenge = currentChallenge(); return challenge ? t(challenge.nameKey) : ''; }
+function renderProgress(snapshot = state.progressSnapshot) {
+  const challenge = currentChallenge();
+  if (!challenge) return;
+  const completed = Math.max(0, Math.trunc(Number(snapshot?.round) || 0));
+  elements.progressLabel.textContent = t(challenge.progressLabelKey);
+  elements.progress.textContent = String(completed + 1);
+}
 function announce(message) { elements.liveRegion.textContent = ''; requestAnimationFrame(() => { elements.liveRegion.textContent = message; }); }
 
 function renderCatalog() {
@@ -71,7 +78,7 @@ function renderCatalog() {
     card.querySelector('[data-name]').textContent = name;
     card.querySelector('[data-tagline]').textContent = t(challenge.taglineKey);
     card.querySelector('[data-skill]').textContent = t(skillKeys[challenge.skill] || 'play');
-    card.querySelector('[data-duration]').textContent = t('seconds', { value: challenge.durationSeconds });
+    card.querySelector('[data-duration]').textContent = t(challenge.statusKey || 'endless');
     card.setAttribute('aria-label', t('challengeCard', { name }));
     card.setAttribute('aria-current', challenge.id === state.challengeId ? 'true' : 'false');
   });
@@ -94,6 +101,7 @@ function renderChallengeText() {
   [...elements.lumenLanes.querySelectorAll('[data-lane]')].forEach((button, index) => button.setAttribute('aria-label', t(laneKeys[index])));
   [...elements.mirrorFuse.querySelectorAll('[data-mirror-option]')].forEach((button, index) => button.setAttribute('aria-label', t('mirrorOptionLabel', { value: index + 1 })));
   elements.resultChallenge.textContent = t(challenge.nameKey);
+  renderProgress();
 }
 
 function formatDailyDate(dateKey) {
@@ -184,7 +192,8 @@ function updateEntryUI() {
   elements.backButtons.forEach((button) => { button.hidden = invited; });
   elements.inviteCatalogButton.hidden = !invited;
   elements.startButton.textContent = invited ? t('acceptChallenge', { name }) : dailyRecovery ? t('dailyPlay') : t('start');
-  elements.instructionTarget.textContent = invited ? t('challengerTarget', { score: state.invite.target }) : dailyRecovery ? t('dailySameRoute') : t('sameRun');
+  elements.instructionTarget.hidden = !invited && !dailyRecovery;
+  elements.instructionTarget.textContent = invited ? t('challengerTarget', { score: state.invite.target }) : dailyRecovery ? t('dailySameRoute') : '';
 }
 
 function parseLocationInvite() {
@@ -206,7 +215,7 @@ function selectChallenge(id, openInstructions = true) {
   if (state.invite && state.invite.challengeId !== id) {
     state.invite = null; state.seed = createSeed(); history.replaceState({}, '', location.pathname);
   }
-  state.challengeId = id; state.result = null; renderCatalog(); renderChallengeText(); updateEntryUI();
+  state.challengeId = id; state.result = null; state.progressSnapshot = null; renderCatalog(); renderChallengeText(); updateEntryUI();
   track('challenge_selected', { challenge: id });
   if (openInstructions) setScreen('instructions');
 }
@@ -245,12 +254,12 @@ function resultAnnouncement() {
 function beginRun() {
   const challenge = currentChallenge();
   if (!challenge) throw new Error('Challenge registry entry missing');
-  setScreen('game'); state.result = null; elements.gameStatus.textContent = t('ready');
+  setScreen('game'); state.result = null; state.progressSnapshot = null; renderProgress(); elements.gameStatus.textContent = t('ready');
   const callbacks = {
     reducedMotion: state.reducedMotion,
     onUpdate: (snapshot) => {
       elements.score.textContent = snapshot.score;
-      elements.round.textContent = `${Math.min(snapshot.round + 1, snapshot.rounds)}/${snapshot.rounds}`;
+      state.progressSnapshot = { ...snapshot }; renderProgress(snapshot);
       elements.lives.textContent = snapshot.lives; elements.combo.textContent = snapshot.combo;
     },
     onAnnounce: handleGameAnnouncement,
@@ -300,7 +309,7 @@ function beginDailyRun() {
   state.result = null;
   history.replaceState({}, '', location.pathname);
   renderCatalog(); renderChallengeText(); updateEntryUI();
-  safeBeginRun();
+  setScreen('instructions');
 }
 
 function renderResult() {
