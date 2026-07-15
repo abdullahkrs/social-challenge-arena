@@ -1,0 +1,32 @@
+.orbit-runtime { width:min(100%,640px); display:grid; gap:10px; direction:ltr; }
+.orbit-run-head { display:flex; align-items:center; justify-content:space-between; gap:10px; min-height:42px; padding:8px 12px; border:1px solid var(--line); border-radius:15px; background:rgba(15,23,54,.78); }
+.orbit-run-head span { min-width:0; display:flex; align-items:center; gap:7px; color:var(--text-muted); font-size:.78rem; }
+.orbit-run-head b { color:#fff; white-space:nowrap; }
+.orbit-run-head em { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-style:normal; }
+.orbit-run-head strong { color:var(--accent); white-space:nowrap; }
+.orbit-status { margin:0; min-height:24px; display:flex; justify-content:center; align-items:center; gap:7px; color:var(--text-muted); font-size:.84rem; font-weight:800; }
+.orbit-status::before { content:'…'; width:20px; height:20px; display:grid; place-items:center; border:1px solid var(--line); border-radius:50%; }
+.orbit-status[data-state="ready"] { color:var(--accent); }
+.orbit-status[data-state="ready"]::before { content:'✓'; color:var(--accent-ink); background:var(--accent); border-color:transparent; }
+.orbit-actions { display:grid; grid-template-columns:1fr 1.35fr 1fr; gap:9px; }
+.orbit-actions button { min-width:48px; min-height:58px; border:1px solid rgba(176,193,255,.22); border-radius:17px; color:#fff; background:#26325f; font-weight:900; }
+.orbit-actions button span { display:block; font-size:1.35rem; line-height:1; }
+.orbit-actions button small { display:block; margin-top:4px; color:var(--text-muted); font-size:.68rem; font-weight:800; }
+.orbit-actions .orbit-lock { color:var(--accent-ink); background:linear-gradient(135deg,#9affdf,#6fe8c7); }
+.orbit-actions .orbit-lock[data-ready="true"] { box-shadow:0 0 0 3px rgba(124,246,212,.35),0 0 28px rgba(124,246,212,.28); }
+.orbit-actions button:disabled { cursor:default; opacity:.52; }
+.orbit-exit { justify-self:center; min-height:44px; }
+.orbit-runtime[data-feedback="correct"] #game-canvas { border-color:rgba(124,246,212,.72); }
+.orbit-runtime[data-feedback="wrong"] #game-canvas { border-color:rgba(255,159,188,.76); }
+.orbit-runtime[data-phase="recovery"] .orbit-run-head::before { content:'+'; display:grid; place-items:center; width:22px; height:22px; border-radius:50%; color:var(--accent-ink); background:var(--accent); font-weight:900; }
+.orbit-runtime[data-phase="special"] .orbit-run-head::before { content:'★'; color:#ffd47a; }
+html[data-reduced-motion="true"] .orbit-actions .orbit-lock { box-shadow:none; }
+@media (max-width:390px) {
+  .orbit-runtime { gap:7px; }
+  .orbit-run-head { min-height:38px; padding:7px 9px; }
+  .orbit-run-head span { font-size:.7rem; }
+  .orbit-actions { gap:6px; }
+  .orbit-actions button { min-height:52px; border-radius:15px; }
+  .orbit-actions button small { font-size:.62rem; }
+  .orbit-status { font-size:.76rem; }
+}
