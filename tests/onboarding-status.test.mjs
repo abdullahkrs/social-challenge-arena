@@ -60,6 +60,20 @@ test('challenge integrations no longer repair core catalog or shared HUD truth',
   }
 });
 
+test('zero-attempt Echo exits render 0% instead of perfect accuracy', async () => {
+  const echo = functionBody(await source('src/echo-integration.mjs'), 'updateResult', 'resetSharedState');
+  assert.match(echo, /Number\(result\.totalMoves\)/);
+  assert.match(echo, /const accuracy = attempts > 0 \? \(result\.accuracy \?\? 0\) : 0;/);
+  assert.match(echo, /echoResultDetail[\s\S]*accuracy/);
+});
+
+test('zero-attempt Mirror exits render 0% instead of perfect accuracy', async () => {
+  const mirror = functionBody(await source('src/mirror-integration.mjs'), 'updateResult', 'resetSharedState');
+  assert.match(mirror, /Number\(result\.totalActions\)/);
+  assert.match(mirror, /const accuracy = attempts > 0 \? \(result\.accuracy \?\? 0\) : 0;/);
+  assert.match(mirror, /mirrorResultDetail[\s\S]*accuracy/);
+});
+
 test('the instruction card has at most two visible text blocks before Start', async () => {
   const html = await source('index.html');
   const card = html.slice(html.indexOf('<div class="instruction-card">'), html.indexOf('<button id="start-button"'));
