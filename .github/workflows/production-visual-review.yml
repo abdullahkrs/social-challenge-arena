@@ -38,7 +38,9 @@ jobs:
 
       - run: npm ci --ignore-scripts
       - name: Install production browser
-        run: npx --yes playwright@1.54.1 install --with-deps chromium
+        run: |
+          npm install --no-save --ignore-scripts playwright@1.54.1
+          npx playwright install --with-deps chromium
 
       - name: Determine merged impact
         shell: bash
@@ -84,7 +86,7 @@ jobs:
         env:
           FULL_REVIEW: ${{ inputs.full_review || 'false' }}
           REVIEW_SHA: ${{ github.sha }}
-        run: npx --yes -p playwright@1.54.1 node tests/production-visual-review.mjs
+        run: node tests/production-visual-review.mjs
 
       - name: Upload production review evidence
         if: always()
