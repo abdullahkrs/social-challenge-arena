@@ -27,10 +27,11 @@ jobs:
           node-version: 20
           cache: npm
       - run: npm ci
+      - run: node scripts/worker-106-hotfix.mjs
       - run: node scripts/worker-106-apply.mjs
       - run: npm test
       - run: npm run build
-      - run: rm -rf dist
+      - run: rm -rf dist scripts/worker-106-hotfix.mjs
       - name: Commit coherent delivery
         env:
           BRANCH_NAME: ${{ github.event.pull_request.head.ref || github.ref_name }}
