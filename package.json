@@ -1,15 +1,21 @@
 {
   "name": "social-challenge-arena",
-  "version": "0.3.1",
+  "version": "0.3.0",
   "private": true,
   "type": "module",
   "scripts": {
     "test": "node --test tests/rift-relay.test.mjs tests/catalog-reset-contract.test.mjs",
-    "build": "node scripts/build.mjs",
-    "check": "npm test && npm run build"
+    "build": "vite build",
+    "check": "npm test && npm run build",
+    "test:e2e": "playwright test"
   },
   "dependencies": {
+    "matter-js": "0.20.0",
     "phaser": "4.2.1"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.61.1",
+    "vite": "8.1.4"
   },
   "engines": {
     "node": ">=20"
