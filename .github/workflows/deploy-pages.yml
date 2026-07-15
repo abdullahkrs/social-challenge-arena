@@ -48,7 +48,7 @@ jobs:
           test -n "$asset"
           test -f "dist/${asset#/social-challenge-arena/}"
 
-      - name: Configure Pages metadata
+      - name: Configure Pages
         uses: actions/configure-pages@v5
 
       - name: Upload Pages artifact
@@ -60,21 +60,13 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    permissions:
+      pages: write
+      id-token: write
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - name: Switch Pages source to GitHub Actions
-        env:
-          GH_TOKEN: ${{ github.token }}
-        shell: bash
-        run: |
-          set -euo pipefail
-          gh api --method PUT \
-            -H 'Accept: application/vnd.github+json' \
-            "repos/${GITHUB_REPOSITORY}/pages" \
-            -f build_type=workflow
-
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
