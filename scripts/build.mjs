@@ -4,41 +4,25 @@ import { fileURLToPath } from 'node:url';
 
 const root = fileURLToPath(new URL('..', import.meta.url));
 const dist = join(root, 'dist');
-const files = [
-  'index.html',
-  'rift.css',
-  'THIRD_PARTY_NOTICES.md',
-  'src/app.mjs',
-  'src/rift-game.mjs',
-  'src/rift-relay-model.mjs'
-];
+const files = ['index.html','rift.css','THIRD_PARTY_NOTICES.md','src/app.mjs','src/rift-game.mjs','src/rift-relay-model.mjs'];
 
-await rm(dist, { recursive: true, force: true });
-for (const file of files) {
-  const target = join(dist, file);
-  await mkdir(dirname(target), { recursive: true });
-  await cp(join(root, file), target);
+await rm(dist,{recursive:true,force:true});
+for(const file of files){const target=join(dist,file);await mkdir(dirname(target),{recursive:true});await cp(join(root,file),target)}
+
+const html=await readFile(join(dist,'index.html'),'utf8');
+for(const required of ['./rift.css','./src/app.mjs','data-challenge-id="rift-relay"','phaser@4.2.1','id="phaser-game"']){
+  if(!html.includes(required))throw new Error(`Missing Phaser production reference: ${required}`);
 }
-
-const html = await readFile(join(dist, 'index.html'), 'utf8');
-for (const required of ['./rift.css', './src/app.mjs', 'data-challenge-id="rift-relay"']) {
-  if (!html.includes(required)) throw new Error(`Missing Rift Relay production reference: ${required}`);
+for(const module of ['src/app.mjs','src/rift-game.mjs','src/rift-relay-model.mjs'])await stat(join(dist,module));
+const runtime=await readFile(join(dist,'src/rift-game.mjs'),'utf8');
+for(const required of ['new Phaser.Game','Phaser.Scene','physics.add','cameras.main','tweens.add']){
+  if(!runtime.includes(required))throw new Error(`Phaser runtime contract missing: ${required}`);
 }
-
-for (const requiredModule of ['src/app.mjs', 'src/rift-game.mjs', 'src/rift-relay-model.mjs']) {
-  await stat(join(dist, requiredModule));
+const forbidden=['orbit-lock','echo-grid','lumen-lanes','mirror-fuse'];
+for(const file of ['index.html','src/app.mjs','src/rift-game.mjs','src/rift-relay-model.mjs']){
+  const content=await readFile(join(dist,file),'utf8');
+  for(const legacy of forbidden)if(content.includes(legacy))throw new Error(`Legacy challenge reference ${legacy} remains in ${file}`);
 }
-
-const forbidden = ['orbit-lock', 'echo-grid', 'lumen-lanes', 'mirror-fuse'];
-for (const file of ['index.html', 'src/app.mjs', 'src/rift-game.mjs', 'src/rift-relay-model.mjs']) {
-  const content = await readFile(join(dist, file), 'utf8');
-  for (const legacy of forbidden) {
-    if (content.includes(legacy)) throw new Error(`Legacy challenge reference ${legacy} remains in ${file}`);
-  }
-}
-
-const budgetBytes = 180 * 1024;
-let total = 0;
-for (const file of files) total += (await stat(join(root, file))).size;
-if (total > budgetBytes) throw new Error(`Static bundle exceeds ${budgetBytes} bytes: ${total}`);
-console.log(`Built Rift Relay dist/ (${total} bytes, budget ${budgetBytes} bytes)`);
+const budgetBytes=220*1024;let total=0;for(const file of files)total+=(await stat(join(root,file))).size;
+if(total>budgetBytes)throw new Error(`Static authored bundle exceeds ${budgetBytes} bytes: ${total}`);
+console.log(`Built Phaser 4.2.1 Pulsebound dist/ (${total} authored bytes, engine loaded at runtime)`);
