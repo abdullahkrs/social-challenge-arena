@@ -12,15 +12,12 @@ permissions:
 
 concurrency:
   group: github-pages
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
-  build-and-deploy:
+  build:
     runs-on: ubuntu-latest
     timeout-minutes: 20
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -40,22 +37,43 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: Verify output
+      - name: Verify production bundle
         shell: bash
         run: |
+          set -euo pipefail
           test -f dist/index.html
           test -d dist/assets
           grep -q '/social-challenge-arena/assets/' dist/index.html
+          asset=$(grep -oE '/social-challenge-arena/assets/[^" ]+\.js' dist/index.html | head -n1)
+          test -n "$asset"
+          test -f "dist/${asset#/social-challenge-arena/}"
 
-      - name: Configure Pages
+      - name: Configure Pages metadata
         uses: actions/configure-pages@v5
-        with:
-          enablement: true
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Switch Pages source to GitHub Actions
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh api --method PUT \
+            -H 'Accept: application/vnd.github+json' \
+            "repos/${GITHUB_REPOSITORY}/pages" \
+            -f build_type=workflow
 
       - name: Deploy to GitHub Pages
         id: deployment
