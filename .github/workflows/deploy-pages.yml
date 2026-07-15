@@ -41,6 +41,7 @@ jobs:
         run: npm run build
 
       - name: Verify output
+        shell: bash
         run: |
           test -f dist/index.html
           test -d dist/assets
@@ -48,6 +49,8 @@ jobs:
 
       - name: Configure Pages
         uses: actions/configure-pages@v5
+        with:
+          enablement: true
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
