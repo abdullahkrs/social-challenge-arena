@@ -12,713 +12,282 @@ TAP version 13
 # Subtest: orbit plan is deterministic and bounded
 ok 1 - orbit plan is deterministic and bounded
   ---
-  duration_ms: 3.236334
+  duration_ms: 1.935281
   ...
 # Subtest: echo plan is deterministic, bounded, and avoids immediate repeats
 ok 2 - echo plan is deterministic, bounded, and avoids immediate repeats
   ---
-  duration_ms: 0.568465
+  duration_ms: 0.406182
   ...
 # Subtest: lumen route is deterministic, bounded, and avoids triple lane repeats
 ok 3 - lumen route is deterministic, bounded, and avoids triple lane repeats
   ---
-  duration_ms: 2.288537
+  duration_ms: 0.446229
   ...
 # Subtest: mirror route is deterministic with one exact reflected option per round
 ok 4 - mirror route is deterministic with one exact reflected option per round
   ---
-  duration_ms: 2.076369
+  duration_ms: 2.139013
   ...
 # Subtest: catalog exposes four materially different live challenges
 ok 5 - catalog exposes four materially different live challenges
   ---
-  duration_ms: 0.349274
+  duration_ms: 0.239801
   ...
 # Subtest: UTC date keys are canonical and independent of local offsets
 ok 6 - UTC date keys are canonical and independent of local offsets
   ---
-  duration_ms: 0.339616
+  duration_ms: 0.211395
   ...
 # Subtest: daily expansion preserves exact legacy assignments through July and starts on the documented boundary
 ok 7 - daily expansion preserves exact legacy assignments through July and starts on the documented boundary
   ---
-  duration_ms: 0.547116
+  duration_ms: 0.318769
   ...
 # Subtest: future daily fixtures deterministically select all four challenge IDs
 ok 8 - future daily fixtures deterministically select all four challenge IDs
   ---
-  duration_ms: 0.284443
+  duration_ms: 0.250005
   ...
 # Subtest: daily rollover refreshes only on a safe discovery return
 ok 9 - daily rollover refreshes only on a safe discovery return
   ---
-  duration_ms: 0.348011
+  duration_ms: 0.25834
   ...
 # Subtest: daily best accepts only the exact current route and bounded score
 ok 10 - daily best accepts only the exact current route and bounded score
   ---
-  duration_ms: 0.547005
+  duration_ms: 0.457279
   ...
 # Subtest: daily best updates only upward and keeps the exact route
 ok 11 - daily best updates only upward and keeps the exact route
   ---
-  duration_ms: 0.281537
+  duration_ms: 0.296608
   ...
 # Subtest: corrupt or stale local best is discarded and storage failure stays playable
 ok 12 - corrupt or stale local best is discarded and storage failure stays playable
   ---
-  duration_ms: 0.49143
+  duration_ms: 0.46692
   ...
 # Subtest: daily best persistence stores only date challenge seed and best
 ok 13 - daily best persistence stores only date challenge seed and best
   ---
-  duration_ms: 0.244098
+  duration_ms: 0.23189
   ...
 # Subtest: strict invite round-trips all challenges and keeps the legacy v1 shape
 ok 14 - strict invite round-trips all challenges and keeps the legacy v1 shape
   ---
-  duration_ms: 1.619223
+  duration_ms: 1.156019
   ...
 # Subtest: strict invite rejects extras unknown challenges malformed values and out-of-range score
 ok 15 - strict invite rejects extras unknown challenges malformed values and out-of-range score
   ---
-  duration_ms: 0.675064
+  duration_ms: 0.414408
   ...
 # Subtest: valid fourth-challenge invitation takes precedence and invalid links recover
 ok 16 - valid fourth-challenge invitation takes precedence and invalid links recover
   ---
-  duration_ms: 0.734245
+  duration_ms: 0.569046
   ...
 # Subtest: invite URL is language-independent and clears fragments
 ok 17 - invite URL is language-independent and clears fragments
   ---
-  duration_ms: 2.755883
+  duration_ms: 0.671568
   ...
 # Subtest: daily score shares as a strict non-expiring same-route invitation
 ok 18 - daily score shares as a strict non-expiring same-route invitation
   ---
-  duration_ms: 0.574497
+  duration_ms: 0.456315
   ...
 # Subtest: localized native and clipboard invitation payloads include challenge score CTA and strict URL
 ok 19 - localized native and clipboard invitation payloads include challenge score CTA and strict URL
   ---
-  duration_ms: 0.73085
+  duration_ms: 0.625187
   ...
 # Subtest: rematch links keep each challenge and deterministic route while using the new score
 ok 20 - rematch links keep each challenge and deterministic route while using the new score
   ---
-  duration_ms: 0.845825
+  duration_ms: 0.503322
   ...
 # Subtest: score comparison handles win loss and tie with non-color symbols
 ok 21 - score comparison handles win loss and tie with non-color symbols
   ---
-  duration_ms: 1.586262
+  duration_ms: 0.311587
   ...
 # Subtest: all four scoring models remain bounded and deterministic
 ok 22 - all four scoring models remain bounded and deterministic
   ---
-  duration_ms: 0.599803
+  duration_ms: 0.328179
   ...
 # Subtest: all required languages have matching keys and localized fourth-challenge states
 ok 23 - all required languages have matching keys and localized fourth-challenge states
   ---
-  duration_ms: 0.945301
+  duration_ms: 1.337643
   ...
 # Subtest: daily entry four cards and Mirror Fuse options are accessible in the real entry point
 ok 24 - daily entry four cards and Mirror Fuse options are accessible in the real entry point
   ---
-  duration_ms: 37.47749
+  duration_ms: 34.665884
   ...
 # Subtest: game keyboard attempts are consumed only from the focused canvas target
 ok 25 - game keyboard attempts are consumed only from the focused canvas target
   ---
-  duration_ms: 0.369973
+  duration_ms: 0.330236
   ...
 # Subtest: app owns one daily route preserves strict sharing and hosts all four games
 ok 26 - app owns one daily route preserves strict sharing and hosts all four games
   ---
-  duration_ms: 6.321322
+  duration_ms: 2.451991
   ...
 # Subtest: lumen lifecycle owns timers and reduced effects never changes route or deadlines
 ok 27 - lumen lifecycle owns timers and reduced effects never changes route or deadlines
   ---
-  duration_ms: 2.856781
+  duration_ms: 2.578123
   ...
 # Subtest: persisted back-forward cache restore returns an interrupted run without refreshing its daily route
 ok 28 - persisted back-forward cache restore returns an interrupted run without refreshing its daily route
   ---
-  duration_ms: 1.345591
+  duration_ms: 1.226029
   ...
 # Subtest: echo chunks are deterministic, bounded, and mechanically varied
 ok 29 - echo chunks are deterministic, bounded, and mechanically varied
   ---
-  duration_ms: 12.623817
+  duration_ms: 17.930277
   ...
 # Subtest: realistic echo run reaches all progression and tension families
 ok 30 - realistic echo run reaches all progression and tension families
   ---
-  duration_ms: 4.86852
+  duration_ms: 5.26288
   ...
 # Subtest: cross-seed variation changes route and rules, not only cosmetics
 ok 31 - cross-seed variation changes route and rules, not only cosmetics
   ---
-  duration_ms: 4.93801
+  duration_ms: 5.362876
   ...
 # Subtest: score rewards mastery while staying inside invitation bounds
 ok 32 - score rewards mastery while staying inside invitation bounds
   ---
-  duration_ms: 0.958205
+  duration_ms: 0.647832
   ...
 # Subtest: endless Lumen windows are reproducible and different seeds change decisions
 ok 33 - endless Lumen windows are reproducible and different seeds change decisions
   ---
-  duration_ms: 24.885272
+  duration_ms: 22.976443
   ...
 # Subtest: realistic endless play exposes four mechanics, zones, layers, and tension phases safely
 ok 34 - realistic endless play exposes four mechanics, zones, layers, and tension phases safely
   ---
-  duration_ms: 3.183473
+  duration_ms: 7.168342
   ...
 # Subtest: route-choice stages always offer two fair routes and one explicit risk route
 ok 35 - route-choice stages always offer two fair routes and one explicit risk route
   ---
-  duration_ms: 5.602396
+  duration_ms: 4.981566
   ...
 # Subtest: memory and mirror decisions change the required lane rather than only timing
 ok 36 - memory and mirror decisions change the required lane rather than only timing
   ---
-  duration_ms: 1.210248
+  duration_ms: 1.979319
   ...
 # Subtest: endless scoring rewards mastery without quickly saturating the strict score bound
 ok 37 - endless scoring rewards mastery without quickly saturating the strict score bound
   ---
-  duration_ms: 0.700432
+  duration_ms: 0.469924
   ...
 # Subtest: the runtime keeps only one bounded chunk and has no fixed completion branch
 ok 38 - the runtime keeps only one bounded chunk and has no fixed completion branch
   ---
-  duration_ms: 15.090208
+  duration_ms: 8.062945
   ...
 # Subtest: visual movement never reveals the correct lane before the player decides
 ok 39 - visual movement never reveals the correct lane before the player decides
   ---
-  duration_ms: 2.529479
+  duration_ms: 1.427006
   ...
 # Subtest: deliberate exit and accessible memory cues support the endless result journey
-not ok 40 - deliberate exit and accessible memory cues support the endless result journey
+ok 40 - deliberate exit and accessible memory cues support the endless result journey
   ---
-  duration_ms: 8.93967
-  location: '/home/runner/work/social-challenge-arena/social-challenge-arena/tests/lumen-endless.test.mjs:90:1'
-  failureType: 'testCodeFailure'
-  error: |-
-    The input did not match the regular expression /MutationObserver\(updateCatalogDuration\)/. Input:
-    
-    "import { normalizeLanguage, translate } from './i18n.mjs';\n" +
-      '\n' +
-      "const lumen = document.querySelector('#lumen-lanes');\n" +
-      `const gameScreen = document.querySelector('[data-screen="game"]');\n` +
-      "const zoneValue = lumen?.querySelector('[data-lumen-zone]');\n" +
-      "const distanceValue = lumen?.querySelector('[data-lumen-distance]');\n" +
-      "const ruleValues = lumen ? [...lumen.querySelectorAll('[data-lumen-rule]')] : [];\n" +
-      "const exitButton = lumen?.querySelector('[data-lumen-exit]');\n" +
-      "const laneButtons = lumen ? [...lumen.querySelectorAll('[data-lane]')] : [];\n" +
-      "const accessibleSequence = lumen?.querySelector('[data-lumen-accessible-sequence]');\n" +
-      "const resultDetail = document.querySelector('#result-detail');\n" +
-      "const resultSummary = document.querySelector('#result-summary');\n" +
-      '\n' +
-      'let activeStage = null;\n' +
-      'let activeSnapshot = null;\n' +
-      'let lastResult = null;\n' +
-      'let exitArmed = false;\n' +
-      "let memoryAnnouncement = 'none';\n" +
-      '\n' +
-      'function language() {\n' +
-      '  return normalizeLanguage(document.documentElement.lang);\n' +
-      '}\n' +
-      '\n' +
-      'function t(key, values = {}) {\n' +
-      '  return translate(language(), key, values);\n' +
-      '}\n' +
-      '\n' +
-      'const zoneKeys = {\n' +
-      "  prism: 'lumenZonePrism',\n" +
-      "  current: 'lumenZoneCurrent',\n" +
-      "  signal: 'lumenZoneSignal',\n" +
-      "  vault: 'lumenZoneVault'\n" +
-      '};\n' +
-      '\n' +
-      'const ruleKeys = {\n' +
-      "  direct: 'lumenRuleDirect',\n" +
-      "  mirror: 'lumenRuleMirror',\n" +
-      "  choice: 'lumenRuleChoice',\n" +
-      "  memory: 'lumenRuleMemory'\n" +
-      '};\n' +
-      '\n' +
-      '\n' +
-      'function laneName(index) {\n' +
-      "  return t(['laneLeft', 'laneCenter', 'laneRight'][index]);\n" +
-      '}\n' +
-      '\n' +
-      'function memoryKeys(stage = activeStage) {\n' +
-      '  return {\n' +
-      "    watchKey: stage?.memoryRule === 'first' ? 'lumenMemoryWatchFirst' : 'lumenMemoryWatchLast',\n" +
-      "    chooseKey: stage?.memoryRule === 'first' ? 'lumenMemoryChooseFirst' : 'lumenMemoryChooseLast'\n" +
-      '  };\n' +
-      '}\n' +
-      '\n' +
-      'function updateLaneLabels(stage = activeStage) {\n' +
-      '  laneButtons.forEach((button, index) => {\n' +
-      '    const notes = [];\n' +
-      "    if (stage?.mechanic === 'choice' && index === stage.blockedLane) notes.push(t('lumenLaneBlocked'));\n" +
-      "    if (stage?.mechanic === 'choice' && index === stage.riskLane) notes.push(t('lumenLaneRisk'));\n" +
-      "    button.setAttribute('aria-label', [laneName(index), ...notes].join('. '));\n" +
-      '  });\n' +
-      '}\n' +
-      '\n' +
-      'function updateMemoryActions(stage = activeStage) {\n' +
-      "  const repeatButton = lumen?.querySelector('[data-lumen-memory-repeat]');\n" +
-      "  const readyButton = lumen?.querySelector('[data-lumen-memory-ready]');\n" +
-      "  if (stage?.mechanic !== 'memory' || !Array.isArray(stage.sequence)) return;\n" +
-      '  const { watchKey, chooseKey } = memoryKeys(stage);\n' +
-      '  if (repeatButton) {\n' +
-      "    repeatButton.textContent = t('replay');\n" +
-      "    repeatButton.setAttribute('aria-label', `${t('replay')}: ${t(watchKey, { count: stage.sequence.length })}`);\n" +
-      '  }\n' +
-      '  if (readyButton) {\n' +
-      "    readyButton.textContent = t('ready');\n" +
-      "    readyButton.setAttribute('aria-label', `${t('ready')}: ${t(chooseKey)}`);\n" +
-      '  }\n' +
-      '}\n' +
-      '\n' +
-      'function updateAccessibleSequence(stage = activeStage) {\n' +
-      '  if (!accessibleSequence) return;\n' +
-      "  if (stage?.mechanic !== 'memory' || !Array.isArray(stage.sequence) || memoryAnnouncement === 'none') {\n" +
-      "    accessibleSequence.textContent = '';\n" +
-      '    return;\n' +
-      '  }\n' +
-      '  const { watchKey, chooseKey } = memoryKeys(stage);\n' +
-      "  if (memoryAnnouncement === 'choose') {\n" +
-      '    accessibleSequence.textContent = `${t(chooseKey)}.`;\n' +
-      '    return;\n' +
-      '  }\n' +
-      "  accessibleSequence.textContent = `${t(watchKey, { count: stage.sequence.length })}. ${stage.sequence.map(laneName).join(', ')}. ${t(chooseKey)}. ${t('ready')}.`;\n" +
-      '}\n' +
-      '\n' +
-      'function updateStage(stage = activeStage, snapshot = activeSnapshot) {\n' +
-      '  if (!stage || !lumen) return;\n' +
-      "  gameScreen?.setAttribute('data-lumen-active', 'true');\n" +
-      "  if (zoneValue) zoneValue.textContent = t(zoneKeys[stage.zone] || 'lumenZonePrism');\n" +
-      "  if (distanceValue) distanceValue.textContent = t('lumenGate', { value: stage.index + 1 });\n" +
-      "  ruleValues.forEach((element) => { element.textContent = t(ruleKeys[stage.mechanic] || 'lumenRuleDirect'); });\n" +
-      "  if (exitButton) exitButton.textContent = t(exitArmed ? 'lumenExitNow' : 'lumenEndRun');\n" +
-      '  updateLaneLabels(stage);\n' +
-      '  updateMemoryActions(stage);\n' +
-      '}\n' +
-      '\n' +
-      'function updateResult(result = lastResult) {\n' +
-      '  if (!result || !resultDetail) return;\n' +
-      '  resultDetail.hidden = false;\n' +
-      "  resultDetail.textContent = t('lumenResultDetail', {\n" +
-      '    gates: result.gates ?? result.round ?? 0,\n' +
-      '    combo: result.bestCombo ?? 0,\n' +
-      '    accuracy: result.accuracy ?? 0\n' +
-      '  });\n' +
-      "  if (resultSummary && result.reason === 'ended') resultSummary.textContent = t('lumenEnded');\n" +
-      '}\n' +
-      '\n' +
-      'function resetSharedHud() {\n' +
-      "  gameScreen?.removeAttribute('data-lumen-active');\n" +
-      "  resultDetail?.setAttribute('hidden', '');\n" +
-      '  activeStage = null;\n' +
-      '  activeSnapshot = null;\n' +
-      '  lastResult = null;\n' +
-      '  exitArmed = false;\n' +
-      "  memoryAnnouncement = 'none';\n" +
-      '  updateLaneLabels(null);\n' +
-      '  updateAccessibleSequence(null);\n' +
-      '}\n' +
-      '\n' +
-      'if (lumen) {\n' +
-      "  lumen.addEventListener('lumen:start', (event) => {\n" +
-      '    lastResult = null;\n' +
-      "    resultDetail?.setAttribute('hidden', '');\n" +
-      '    activeSnapshot = event.detail.snapshot;\n' +
-      '    exitArmed = false;\n' +
-      "    memoryAnnouncement = 'none';\n" +
-      '    updateAccessibleSequence(null);\n' +
-      "    gameScreen?.setAttribute('data-lumen-active', 'true');\n" +
-      "    if (exitButton) exitButton.textContent = t('lumenEndRun');\n" +
-      '  });\n' +
-      '\n' +
-      "  lumen.addEventListener('lumen:memory-clear', () => {\n" +
-      "    memoryAnnouncement = 'none';\n" +
-      '    updateAccessibleSequence(null);\n' +
-      '  });\n' +
-      '\n' +
-      "  lumen.addEventListener('lumen:stage', (event) => {\n" +
-      '    activeStage = event.detail.stage;\n' +
-      '    activeSnapshot = event.detail.snapshot;\n' +
-      "    memoryAnnouncement = 'none';\n" +
-      '    updateStage();\n' +
-      '    updateAccessibleSequence();\n' +
-      '  });\n' +
-      '\n' +
-      "  lumen.addEventListener('lumen:memory-ready', (event) => {\n" +
-      '    activeStage = event.detail.stage;\n' +
-      "    memoryAnnouncement = 'sequence';\n" +
-      '    updateMemoryActions();\n' +
-      '    updateAccessibleSequence();\n' +
-      '  });\n' +
-      '\n' +
-      "  lumen.addEventListener('lumen:memory-response', (event) => {\n" +
-      '    activeStage = event.detail.stage;\n' +
-      "    memoryAnnouncement = 'choose';\n" +
-      '    updateAccessibleSequence();\n' +
-      '  });\n' +
-      '\n' +
-      "  lumen.addEventListener('lumen:snapshot', (event) => {\n" +
-      '    activeSnapshot = event.detail.snapshot;\n' +
-      '  });\n' +
-      '\n' +
-      "  lumen.addEventListener('lumen:exit-armed', () => {\n" +
-      '    exitArmed = true;\n' +
-      '    updateStage();\n' +
-      '  });\n' +
-      '\n' +
-      "  lumen.addEventListener('lumen:exit-disarmed', () => {\n" +
-      '    exitArmed = false;\n' +
-      '    updateStage();\n' +
-      '  });\n' +
-      '\n' +
-      "  lumen.addEventListener('lumen:finish', (event) => {\n" +
-      '    lastResult = event.detail.result;\n' +
-      "    memoryAnnouncement = 'none';\n" +
-      '    updateAccessibleSequence(null);\n' +
-      '    queueMicrotask(() => updateResult());\n' +
-      '  });\n' +
-      '\n' +
-      '  new MutationObserver(() => {\n' +
-      `    if (lumen.hidden && document.querySelector('[data-screen="game"]')?.hidden === false) resetSharedHud();\n` +
-      "  }).observe(lumen, { attributes: true, attributeFilter: ['hidden'] });\n" +
-      '}\n' +
-      '\n' +
-      'new MutationObserver(() => {\n' +
-      '  if (activeStage) updateStage();\n' +
-      '  if (lastResult) updateResult();\n' +
-      '  if (!activeStage) updateLaneLabels(null);\n' +
-      '  updateAccessibleSequence();\n' +
-      "}).observe(document.documentElement, { attributes: true, attributeFilter: ['lang', 'dir'] });\n" +
-      '\n' +
-      'updateLaneLabels(null);\n' +
-      "if (exitButton) exitButton.textContent = t('lumenEndRun');\n"
-    
-  code: 'ERR_ASSERTION'
-  name: 'AssertionError'
-  expected:
-  actual: |-
-    import { normalizeLanguage, translate } from './i18n.mjs';
-    
-    const lumen = document.querySelector('#lumen-lanes');
-    const gameScreen = document.querySelector('[data-screen="game"]');
-    const zoneValue = lumen?.querySelector('[data-lumen-zone]');
-    const distanceValue = lumen?.querySelector('[data-lumen-distance]');
-    const ruleValues = lumen ? [...lumen.querySelectorAll('[data-lumen-rule]')] : [];
-    const exitButton = lumen?.querySelector('[data-lumen-exit]');
-    const laneButtons = lumen ? [...lumen.querySelectorAll('[data-lane]')] : [];
-    const accessibleSequence = lumen?.querySelector('[data-lumen-accessible-sequence]');
-    const resultDetail = document.querySelector('#result-detail');
-    const resultSummary = document.querySelector('#result-summary');
-    
-    let activeStage = null;
-    let activeSnapshot = null;
-    let lastResult = null;
-    let exitArmed = false;
-    let memoryAnnouncement = 'none';
-    
-    function language() {
-      return normalizeLanguage(document.documentElement.lang);
-    }
-    
-    function t(key, values = {}) {
-      return translate(language(), key, values);
-    }
-    
-    const zoneKeys = {
-      prism: 'lumenZonePrism',
-      current: 'lumenZoneCurrent',
-      signal: 'lumenZoneSignal',
-      vault: 'lumenZoneVault'
-    };
-    
-    const ruleKeys = {
-      direct: 'lumenRuleDirect',
-      mirror: 'lumenRuleMirror',
-      choice: 'lumenRuleChoice',
-      memory: 'lumenRuleMemory'
-    };
-    
-    
-    function laneName(index) {
-      return t(['laneLeft', 'laneCenter', 'laneRight'][index]);
-    }
-    
-    function memoryKeys(stage = activeStage) {
-      return {
-        watchKey: stage?.memoryRule === 'first' ? 'lumenMemoryWatchFirst' : 'lumenMemoryWatchLast',
-        chooseKey: stage?.memoryRule === 'first' ? 'lumenMemoryChooseFirst' : 'lumenMemoryChooseLast'
-      };
-    }
-    
-    function updateLaneLabels(stage = activeStage) {
-      laneButtons.forEach((button, index) => {
-        const notes = [];
-        if (stage?.mechanic === 'choice' && index === stage.blockedLane) notes.push(t('lumenLaneBlocked'));
-        if (stage?.mechanic === 'choice' && index === stage.riskLane) notes.push(t('lumenLaneRisk'));
-        button.setAttribute('aria-label', [laneName(index), ...notes].join('. '));
-      });
-    }
-    
-    function updateMemoryActions(stage = activeStage) {
-      const repeatButton = lumen?.querySelector('[data-lumen-memory-repeat]');
-      const readyButton = lumen?.querySelector('[data-lumen-memory-ready]');
-      if (stage?.mechanic !== 'memory' || !Array.isArray(stage.sequence)) return;
-      const { watchKey, chooseKey } = memoryKeys(stage);
-      if (repeatButton) {
-        repeatButton.textContent = t('replay');
-        repeatButton.setAttribute('aria-label', `${t('replay')}: ${t(watchKey, { count: stage.sequence.length })}`);
-      }
-      if (readyButton) {
-        readyButton.textContent = t('ready');
-        readyButton.setAttribute('aria-label', `${t('ready')}: ${t(chooseKey)}`);
-      }
-    }
-    
-    function updateAccessibleSequence(stage = activeStage) {
-      if (!accessibleSequence) return;
-      if (stage?.mechanic !== 'memory' || !Array.isArray(stage.sequence) || memoryAnnouncement === 'none') {
-        accessibleSequence.textContent = '';
-        return;
-      }
-      const { watchKey, chooseKey } = memoryKeys(stage);
-      if (memoryAnnouncement === 'choose') {
-        accessibleSequence.textContent = `${t(chooseKey)}.`;
-        return;
-      }
-      accessibleSequence.textContent = `${t(watchKey, { count: stage.sequence.length })}. ${stage.sequence.map(laneName).join(', ')}. ${t(chooseKey)}. ${t('ready')}.`;
-    }
-    
-    function updateStage(stage = activeStage, snapshot = activeSnapshot) {
-      if (!stage || !lumen) return;
-      gameScreen?.setAttribute('data-lumen-active', 'true');
-      if (zoneValue) zoneValue.textContent = t(zoneKeys[stage.zone] || 'lumenZonePrism');
-      if (distanceValue) distanceValue.textContent = t('lumenGate', { value: stage.index + 1 });
-      ruleValues.forEach((element) => { element.textContent = t(ruleKeys[stage.mechanic] || 'lumenRuleDirect'); });
-      if (exitButton) exitButton.textContent = t(exitArmed ? 'lumenExitNow' : 'lumenEndRun');
-      updateLaneLabels(stage);
-      updateMemoryActions(stage);
-    }
-    
-    function updateResult(result = lastResult) {
-      if (!result || !resultDetail) return;
-      resultDetail.hidden = false;
-      resultDetail.textContent = t('lumenResultDetail', {
-        gates: result.gates ?? result.round ?? 0,
-        combo: result.bestCombo ?? 0,
-        accuracy: result.accuracy ?? 0
-      });
-      if (resultSummary && result.reason === 'ended') resultSummary.textContent = t('lumenEnded');
-    }
-    
-    function resetSharedHud() {
-      gameScreen?.removeAttribute('data-lumen-active');
-      resultDetail?.setAttribute('hidden', '');
-      activeStage = null;
-      activeSnapshot = null;
-      lastResult = null;
-      exitArmed = false;
-      memoryAnnouncement = 'none';
-      updateLaneLabels(null);
-      updateAccessibleSequence(null);
-    }
-    
-    if (lumen) {
-      lumen.addEventListener('lumen:start', (event) => {
-        lastResult = null;
-        resultDetail?.setAttribute('hidden', '');
-        activeSnapshot = event.detail.snapshot;
-        exitArmed = false;
-        memoryAnnouncement = 'none';
-        updateAccessibleSequence(null);
-        gameScreen?.setAttribute('data-lumen-active', 'true');
-        if (exitButton) exitButton.textContent = t('lumenEndRun');
-      });
-    
-      lumen.addEventListener('lumen:memory-clear', () => {
-        memoryAnnouncement = 'none';
-        updateAccessibleSequence(null);
-      });
-    
-      lumen.addEventListener('lumen:stage', (event) => {
-        activeStage = event.detail.stage;
-        activeSnapshot = event.detail.snapshot;
-        memoryAnnouncement = 'none';
-        updateStage();
-        updateAccessibleSequence();
-      });
-    
-      lumen.addEventListener('lumen:memory-ready', (event) => {
-        activeStage = event.detail.stage;
-        memoryAnnouncement = 'sequence';
-        updateMemoryActions();
-        updateAccessibleSequence();
-      });
-    
-      lumen.addEventListener('lumen:memory-response', (event) => {
-        activeStage = event.detail.stage;
-        memoryAnnouncement = 'choose';
-        updateAccessibleSequence();
-      });
-    
-      lumen.addEventListener('lumen:snapshot', (event) => {
-        activeSnapshot = event.detail.snapshot;
-      });
-    
-      lumen.addEventListener('lumen:exit-armed', () => {
-        exitArmed = true;
-        updateStage();
-      });
-    
-      lumen.addEventListener('lumen:exit-disarmed', () => {
-        exitArmed = false;
-        updateStage();
-      });
-    
-      lumen.addEventListener('lumen:finish', (event) => {
-        lastResult = event.detail.result;
-        memoryAnnouncement = 'none';
-        updateAccessibleSequence(null);
-        queueMicrotask(() => updateResult());
-      });
-    
-      new MutationObserver(() => {
-        if (lumen.hidden && document.querySelector('[data-screen="game"]')?.hidden === false) resetSharedHud();
-      }).observe(lumen, { attributes: true, attributeFilter: ['hidden'] });
-    }
-    
-    new MutationObserver(() => {
-      if (activeStage) updateStage();
-      if (lastResult) updateResult();
-      if (!activeStage) updateLaneLabels(null);
-      updateAccessibleSequence();
-    }).observe(document.documentElement, { attributes: true, attributeFilter: ['lang', 'dir'] });
-    
-    updateLaneLabels(null);
-    if (exitButton) exitButton.textContent = t('lumenEndRun');
-    
-  operator: 'match'
-  stack: |-
-    TestContext.<anonymous> (file:///home/runner/work/social-challenge-arena/social-challenge-arena/tests/lumen-endless.test.mjs:99:10)
-    async Test.run (node:internal/test_runner/test:797:9)
-    async Test.processPendingSubtests (node:internal/test_runner/test:526:7)
+  duration_ms: 2.097718
   ...
 # Subtest: endless Lumen adds no remote runtime or copied asset dependency
 ok 41 - endless Lumen adds no remote runtime or copied asset dependency
   ---
-  duration_ms: 4.865815
+  duration_ms: 7.823372
   ...
 # Subtest: switching away from Lumen clears result state before later language updates
 ok 42 - switching away from Lumen clears result state before later language updates
   ---
-  duration_ms: 5.730966
+  duration_ms: 7.311612
   ...
 # Subtest: a terminal miss cannot be reclassified as a voluntary exit
 ok 43 - a terminal miss cannot be reclassified as a voluntary exit
   ---
-  duration_ms: 1.783932
+  duration_ms: 4.658998
   ...
 # Subtest: memory stages use one ordered announcement path and start the unchanged deadline only after Ready
 ok 44 - memory stages use one ordered announcement path and start the unchanged deadline only after Ready
   ---
-  duration_ms: 2.064969
+  duration_ms: 3.634064
   ...
 # Subtest: zero-millisecond Lumen reaction is preserved as valid fastest input
 ok 45 - zero-millisecond Lumen reaction is preserved as valid fastest input
   ---
-  duration_ms: 3.039995
+  duration_ms: 1.835221
   ...
 # Subtest: Mirror transformations preserve exact deterministic geometry
 ok 46 - Mirror transformations preserve exact deterministic geometry
   ---
-  duration_ms: 2.54076
+  duration_ms: 2.89475
   ...
 # Subtest: same seed reproduces the endless journey and different seeds change mechanics and boards
 ok 47 - same seed reproduces the endless journey and different seeds change mechanics and boards
   ---
-  duration_ms: 15.076111
+  duration_ms: 11.636322
   ...
 # Subtest: bounded chunks are safe, solvable, distinct, and never imply a fixed ending
 ok 48 - bounded chunks are safe, solvable, distinct, and never imply a fixed ending
   ---
-  duration_ms: 22.322719
+  duration_ms: 18.570261
   ...
 # Subtest: realistic play windows expose staged layers, multiple decisions, zones, and tension rhythm
 ok 49 - realistic play windows expose staged layers, multiple decisions, zones, and tension rhythm
   ---
-  duration_ms: 2.485057
+  duration_ms: 2.225328
   ...
 # Subtest: scoring rewards mastery, efficiency, focus, rules, and special phases within bounds
 ok 50 - scoring rewards mastery, efficiency, focus, rules, and special phases within bounds
   ---
-  duration_ms: 0.547386
+  duration_ms: 0.533266
   ...
 # Subtest: Mirror Fuse is endless in the catalog and its runtime owns lifecycle, exit, sound, and first-input timing
-not ok 51 - Mirror Fuse is endless in the catalog and its runtime owns lifecycle, exit, sound, and first-input timing
+ok 51 - Mirror Fuse is endless in the catalog and its runtime owns lifecycle, exit, sound, and first-input timing
   ---
-  duration_ms: 1.874181
-  location: '/home/runner/work/social-challenge-arena/social-challenge-arena/tests/mirror-game.test.mjs:109:1'
-  failureType: 'testCodeFailure'
-  error: |-
-    Expected values to be strictly equal:
-    
-    undefined !== 0
-    
-  code: 'ERR_ASSERTION'
-  name: 'AssertionError'
-  expected: 0
-  operator: 'strictEqual'
-  stack: |-
-    TestContext.<anonymous> (file:///home/runner/work/social-challenge-arena/social-challenge-arena/tests/mirror-game.test.mjs:112:10)
-    Test.runInAsyncScope (node:async_hooks:206:9)
-    Test.run (node:internal/test_runner/test:796:25)
-    Test.processPendingSubtests (node:internal/test_runner/test:526:18)
-    Test.postRun (node:internal/test_runner/test:889:19)
-    Test.run (node:internal/test_runner/test:835:12)
-    async Test.processPendingSubtests (node:internal/test_runner/test:526:7)
+  duration_ms: 9.371795
   ...
 # Subtest: terminal failure becomes authoritative before delayed feedback can accept deliberate exit
 ok 52 - terminal failure becomes authoritative before delayed feedback can accept deliberate exit
   ---
-  duration_ms: 10.781939
+  duration_ms: 1.976402
   ...
 # Subtest: stage transitions preserve one announcement owner and return keyboard focus to the board
 ok 53 - stage transitions preserve one announcement owner and return keyboard focus to the board
   ---
-  duration_ms: 1.212431
+  duration_ms: 1.126273
   ...
 # Subtest: Arabic, English, and Turkish provide complete endless Mirror copy and non-audio equivalents
 ok 54 - Arabic, English, and Turkish provide complete endless Mirror copy and non-audio equivalents
   ---
-  duration_ms: 0.617387
+  duration_ms: 0.764848
   ...
 # Subtest: responsive UI preserves explicit spatial LTR geometry, focus, non-color cues, and reduced effects
 ok 55 - responsive UI preserves explicit spatial LTR geometry, focus, non-color cues, and reduced effects
   ---
-  duration_ms: 3.116408
+  duration_ms: 2.51843
   ...
 # file:///home/runner/work/social-challenge-arena/social-challenge-arena/tests/onboarding-status.test.mjs:24
-#   assert.match(app, /function beginDailyRun([sS]*setScreen('instructions');
-#                     ^
-# SyntaxError: Invalid regular expression: missing /
+#   const dailyEnd = app.indexOf('
+#                                ^
+# SyntaxError: Invalid or unexpected token
 #     at compileSourceTextModule (node:internal/modules/esm/utils:346:16)
 #     at ModuleLoader.moduleStrategy (node:internal/modules/esm/translators:146:18)
 #     at \#translate (node:internal/modules/esm/loader:497:12)
@@ -728,7 +297,7 @@ ok 55 - responsive UI preserves explicit spatial LTR geometry, focus, non-color 
 # Subtest: /home/runner/work/social-challenge-arena/social-challenge-arena/tests/onboarding-status.test.mjs
 not ok 7 - /home/runner/work/social-challenge-arena/social-challenge-arena/tests/onboarding-status.test.mjs
   ---
-  duration_ms: 40.64379
+  duration_ms: 37.24501
   location: '/home/runner/work/social-challenge-arena/social-challenge-arena/tests/onboarding-status.test.mjs:1:1'
   failureType: 'testCodeFailure'
   exitCode: 1
@@ -739,124 +308,124 @@ not ok 7 - /home/runner/work/social-challenge-arena/social-challenge-arena/tests
 # Subtest: Orbit is integrated as an endless accessible platform journey
 ok 57 - Orbit is integrated as an endless accessible platform journey
   ---
-  duration_ms: 12.530575
+  duration_ms: 10.84801
   ...
 # Subtest: Orbit keyboard shortcuts stay inside the game shell
 ok 58 - Orbit keyboard shortcuts stay inside the game shell
   ---
-  duration_ms: 5.263681
+  duration_ms: 2.640612
   ...
 # Subtest: Orbit chunks are bounded, endless-ready, deterministic, and mechanically varied
 ok 59 - Orbit chunks are bounded, endless-ready, deterministic, and mechanically varied
   ---
-  duration_ms: 8.313094
+  duration_ms: 6.006949
   ...
 # Subtest: generated stages stay readable, finite, and contain reachable valid windows
 ok 60 - generated stages stay readable, finite, and contain reachable valid windows
   ---
-  duration_ms: 1565.179243
+  duration_ms: 1264.228952
   ...
 # Subtest: same elapsed input has frame-cadence-independent truth
 ok 61 - same elapsed input has frame-cadence-independent truth
   ---
-  duration_ms: 0.400741
+  duration_ms: 0.343861
   ...
 # Subtest: rules reject wrong orbits, distinguish risk, and keep score bounded
 ok 62 - rules reject wrong orbits, distinguish risk, and keep score bounded
   ---
-  duration_ms: 5.573208
+  duration_ms: 5.784061
   ...
 # Subtest: alignment checks preserve same-seed score parity
 ok 63 - alignment checks preserve same-seed score parity
   ---
-  duration_ms: 3.574076
+  duration_ms: 3.700658
   ...
 # Subtest: zero-attempt result detail stays truthful after deliberate exit
 ok 64 - zero-attempt result detail stays truthful after deliberate exit
   ---
-  duration_ms: 0.408094
+  duration_ms: 0.408103
   ...
 # Subtest: persisted discovery restore refreshes a rolled-over daily route using injected time only
 ok 65 - persisted discovery restore refreshes a rolled-over daily route using injected time only
   ---
-  duration_ms: 7.237058
+  duration_ms: 8.43026
   ...
 # Subtest: real Chromium keeps every localized solo and duel PNG inside the share bound
 ok 66 - real Chromium keeps every localized solo and duel PNG inside the share bound
   ---
-  duration_ms: 3023.349313
+  duration_ms: 9789.815328
   ...
 # Subtest: builds deterministic privacy-safe solo models for all challenge IDs
 ok 67 - builds deterministic privacy-safe solo models for all challenge IDs
   ---
-  duration_ms: 23.19309
+  duration_ms: 19.272779
   ...
 # Subtest: models invited win, loss, and tie without color-only meaning
 ok 68 - models invited win, loss, and tie without color-only meaning
   ---
-  duration_ms: 0.870631
+  duration_ms: 0.599177
   ...
 # Subtest: preserves Arabic RTL metadata and clamps bounded scores
 ok 69 - preserves Arabic RTL metadata and clamps bounded scores
   ---
-  duration_ms: 0.440896
+  duration_ms: 0.322249
   ...
 # Subtest: preserves text sharing while requiring explicit support for files
 ok 70 - preserves text sharing while requiring explicit support for files
   ---
-  duration_ms: 0.317865
+  duration_ms: 0.273692
   ...
 # Subtest: enforces generated file size bounds and cancellation semantics
 ok 71 - enforces generated file size bounds and cancellation semantics
   ---
-  duration_ms: 1.654991
+  duration_ms: 1.270518
   ...
 # Subtest: share-card status and artifact text keep Arabic, English, and Turkish parity
 ok 72 - share-card status and artifact text keep Arabic, English, and Turkish parity
   ---
-  duration_ms: 0.766186
+  duration_ms: 0.55045
   ...
 # Subtest: constructs a native file payload without mutating text share data
 ok 73 - constructs a native file payload without mutating text share data
   ---
-  duration_ms: 0.334497
+  duration_ms: 0.230515
   ...
 # Subtest: renders a bounded PNG file and releases its canvas deterministically
 ok 74 - renders a bounded PNG file and releases its canvas deterministically
   ---
-  duration_ms: 1.628571
+  duration_ms: 1.07396
   ...
 # Subtest: aborted or oversized rendering fails without producing a share file
 ok 75 - aborted or oversized rendering fails without producing a share file
   ---
-  duration_ms: 2.265076
+  duration_ms: 0.934467
   ...
 # Subtest: Font Awesome is local, selective, licensed, and included in the production build
 ok 76 - Font Awesome is local, selective, licensed, and included in the production build
   ---
-  duration_ms: 2.513148
+  duration_ms: 1.914533
   ...
 # Subtest: retained platform icons use explicit accessible Font Awesome treatments
 ok 77 - retained platform icons use explicit accessible Font Awesome treatments
   ---
-  duration_ms: 0.312986
+  duration_ms: 0.246788
   ...
 # Subtest: mobile reduced-effects control keeps a visible recognizable indicator
 ok 78 - mobile reduced-effects control keeps a visible recognizable indicator
   ---
-  duration_ms: 0.396393
+  duration_ms: 0.28038
   ...
 # Subtest: localized text actions do not expose Font Awesome pseudo-element glyphs
 ok 79 - localized text actions do not expose Font Awesome pseudo-element glyphs
   ---
-  duration_ms: 0.654216
+  duration_ms: 0.455744
   ...
 1..79
 # tests 79
 # suites 0
-# pass 76
-# fail 3
+# pass 78
+# fail 1
 # cancelled 0
 # skipped 0
 # todo 0
-# duration_ms 3419.256765
+# duration_ms 10134.684518
