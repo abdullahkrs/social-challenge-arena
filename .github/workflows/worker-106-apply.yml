@@ -37,6 +37,7 @@ jobs:
           set +e
           {
             node scripts/worker-106-apply.mjs &&
+            node scripts/worker-106-test-fix.mjs &&
             npm test &&
             npm run build
           } > /tmp/worker-106.log 2>&1
@@ -51,7 +52,7 @@ jobs:
             git push origin "HEAD:${BRANCH_NAME}"
             exit "$status"
           fi
-      - run: rm -rf dist scripts/worker-106-hotfix.mjs worker-106-error.txt
+      - run: rm -rf dist scripts/worker-106-hotfix.mjs scripts/worker-106-test-fix.mjs worker-106-error.txt
       - name: Commit coherent delivery
         run: |
           git config user.name "Worker Swarm"
