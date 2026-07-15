@@ -2,6 +2,8 @@
   "activeIssue": 114,
   "mode": "manual-reset",
   "branch": "manual/catalog-reset-flagship",
+  "flagshipId": "rift-relay",
+  "phase": "flagship-model-and-prototype",
   "legacyChallengeIds": [
     "orbit-lock",
     "echo-grid",
@@ -11,5 +13,16 @@
   "legacyAllowed": true,
   "agentsPaused": true,
   "status": "manual-in-progress",
-  "completionRule": "Set legacyAllowed to false only after all legacy challenges are removed and one replacement flagship passes tests, build, QA, and production visual review."
+  "completed": [
+    "manual branch established",
+    "flagship specification selected",
+    "deterministic procedural run model added"
+  ],
+  "next": [
+    "build bounded visual gameplay prototype",
+    "replace shipped catalog and runtime",
+    "remove legacy modules and tests",
+    "run test build and production review"
+  ],
+  "completionRule": "Set legacyAllowed to false only after all legacy challenges are removed and Rift Relay passes tests, build, QA, and production visual review."
 }
