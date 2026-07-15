@@ -68,8 +68,10 @@ function updateAccessibleCue(mode = cueVisible ? 'ready' : 'watch') {
 
 function updateResult(result = lastResult) {
   if (!result || !resultDetail) return;
+  const attempts = Math.max(0, Number(result.totalMoves) || 0);
+  const accuracy = attempts > 0 ? (result.accuracy ?? 0) : 0;
   resultDetail.hidden = false;
-  resultDetail.textContent = t('echoResultDetail', { trails: result.gates ?? result.round ?? 0, combo: result.bestCombo ?? 0, accuracy: result.accuracy ?? 0 });
+  resultDetail.textContent = t('echoResultDetail', { trails: result.gates ?? result.round ?? 0, combo: result.bestCombo ?? 0, accuracy });
   if (resultSummary && result.reason === 'ended') resultSummary.textContent = t('echoEnded');
 }
 
