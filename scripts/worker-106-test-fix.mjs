@@ -64,7 +64,9 @@ test('shared platform renders truthful endless catalog and normalized progress d
   assert.ok(app.includes("t(challenge.statusKey || 'endless')"));
   assert.ok(app.includes('function renderProgress(snapshot = state.progressSnapshot)'));
   assert.ok(!app.includes("t('seconds'"));
-  assert.ok(!/1\/12|round-value|data-i18n="round"/.test(html));
+  assert.ok(!html.includes('1/12'));
+  assert.ok(!html.includes('round-value'));
+  assert.ok(!html.includes('data-i18n="round"'));
   assert.ok(html.includes('id="progress-label"'));
   assert.ok(html.includes('id="progress-value">1'));
   assert.ok(!catalogSource.includes('durationSeconds'));
