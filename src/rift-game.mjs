@@ -5,6 +5,13 @@ import { generateRiftZone, scoreRiftAction } from './rift-relay-model.mjs';
 const { Engine, Bodies, Body, Composite, Events } = Matter;
 const SWIPE = 34;
 
+const PALETTES = [
+  { sky: 0x5ec8f4, haze: 0xbcecff, mountain: 0x6aa59c, forest: 0x24745d, ground: 0x38653b, accent: 0xffd54f },
+  { sky: 0x5076c7, haze: 0xaed9ff, mountain: 0x5c6f9c, forest: 0x31568a, ground: 0x284f72, accent: 0x7de8ff },
+  { sky: 0x513e75, haze: 0xa98ed1, mountain: 0x514365, forest: 0x274553, ground: 0x243b43, accent: 0xd5a7ff },
+  { sky: 0xf08c72, haze: 0xffd6a1, mountain: 0x9a596c, forest: 0x704052, ground: 0x563448, accent: 0xffcf66 }
+];
+
 export class RiftRelayGame {
   constructor({ container, reducedMotion = false, onUpdate = () => {}, onAnnounce = () => {}, onFinish = () => {} }) {
     this.container = container;
@@ -53,31 +60,83 @@ export class RiftRelayGame {
 
       makeTextures() {
         const g = this.add.graphics();
-        g.fillStyle(0xffffff).fillRoundedRect(0, 0, 54, 66, 16).fillStyle(0x0b2842).fillCircle(27, 24, 9);
-        g.generateTexture('runner', 54, 66).clear();
-        g.fillStyle(0xffffff).fillRoundedRect(0, 0, 54, 34, 14).fillStyle(0x0b2842).fillRect(10, 12, 34, 8);
-        g.generateTexture('runner-slide', 54, 34).clear();
-        g.fillStyle(0xff617c).fillRoundedRect(0, 0, 70, 78, 12);
-        g.generateTexture('hazard', 70, 78).clear();
-        g.fillStyle(0xffce5c).fillRoundedRect(0, 0, 70, 78, 12);
-        g.generateTexture('gate', 70, 78).clear();
-        g.fillStyle(0x68d8ff).fillRect(0, 0, 96, 18);
-        g.generateTexture('platform', 96, 18).destroy();
+
+        g.fillStyle(0x2d6cdf).fillCircle(28, 30, 24);
+        g.fillStyle(0xffffff).fillCircle(36, 23, 10);
+        g.fillStyle(0x10233e).fillCircle(39, 23, 4);
+        g.fillStyle(0xffd45c).fillTriangle(8, 33, 0, 39, 8, 44);
+        g.fillStyle(0xf4f8ff).fillEllipse(28, 51, 26, 14);
+        g.generateTexture('runner', 58, 66).clear();
+
+        g.fillStyle(0x2d6cdf).fillEllipse(30, 18, 50, 28);
+        g.fillStyle(0xffffff).fillCircle(42, 14, 8);
+        g.fillStyle(0x10233e).fillCircle(44, 14, 3);
+        g.fillStyle(0xffd45c).fillTriangle(6, 18, 0, 23, 6, 28);
+        g.generateTexture('runner-slide', 60, 36).clear();
+
+        g.fillStyle(0x7a4c2c).fillRoundedRect(5, 18, 60, 58, 12);
+        g.fillStyle(0xa96d3d).fillEllipse(35, 20, 64, 24);
+        g.lineStyle(4, 0x5a351f).strokeEllipse(35, 20, 44, 14);
+        g.fillStyle(0x86cf4f).fillCircle(11, 10, 8).fillCircle(24, 8, 9).fillCircle(38, 10, 8).fillCircle(52, 8, 9).fillCircle(63, 11, 8);
+        g.generateTexture('hazard', 70, 80).clear();
+
+        g.fillStyle(0xffd65a).fillRoundedRect(5, 4, 60, 72, 18);
+        g.fillStyle(0xff9f43).fillRoundedRect(12, 11, 46, 58, 14);
+        g.lineStyle(4, 0xffffff, 0.65).strokeRoundedRect(12, 11, 46, 58, 14);
+        g.generateTexture('gate', 70, 80).clear();
+
+        g.fillStyle(0x3d6d3e).fillRect(0, 8, 128, 24);
+        g.fillStyle(0x75c94f).fillRect(0, 0, 128, 11);
+        for (let x = 5; x < 128; x += 13) g.fillStyle(x % 2 ? 0x91df5e : 0x5ead3e).fillTriangle(x, 9, x + 6, 0, x + 12, 9);
+        g.generateTexture('platform', 128, 32).clear();
+
+        g.fillStyle(0x8ab8b0).fillTriangle(0, 100, 70, 10, 140, 100);
+        g.fillStyle(0xbfe4dd).fillTriangle(40, 100, 102, 34, 164, 100);
+        g.generateTexture('mountains', 164, 100).clear();
+
+        g.fillStyle(0x285f45).fillCircle(35, 38, 30).fillCircle(65, 28, 35).fillCircle(92, 42, 28);
+        g.fillStyle(0x1e4c38).fillCircle(55, 55, 34).fillCircle(88, 58, 31);
+        g.fillStyle(0x795032).fillRect(61, 56, 16, 52);
+        g.generateTexture('tree-line', 128, 112).clear();
+
+        g.fillStyle(0xffffff, 0.8).fillCircle(24, 22, 18).fillCircle(47, 15, 23).fillCircle(73, 24, 18).fillEllipse(48, 30, 80, 28);
+        g.generateTexture('cloud', 96, 48).clear();
+
+        g.fillStyle(0x94edff, 0.9).fillRect(10, 0, 34, 112);
+        g.fillStyle(0xffffff, 0.7).fillRect(17, 0, 7, 112).fillRect(31, 0, 5, 112);
+        g.fillStyle(0xbaf5ff, 0.55).fillCircle(13, 108, 11).fillCircle(27, 112, 13).fillCircle(42, 108, 10);
+        g.generateTexture('waterfall', 54, 122).clear();
+
+        g.fillStyle(0xb8ef6a).fillEllipse(8, 4, 16, 8);
+        g.generateTexture('leaf', 16, 8).clear();
+
+        g.fillStyle(0xffffff).fillCircle(6, 6, 6);
+        g.generateTexture('spark', 12, 12).destroy();
       }
 
       makeWorld() {
-        this.sky = this.add.rectangle(0, 0, 100, 100, 0x10233e).setOrigin(0);
-        this.back = this.add.tileSprite(0, 0, 100, 100, 'platform').setOrigin(0).setTint(0x245c86).setAlpha(0.18);
-        this.mid = this.add.tileSprite(0, 0, 100, 100, 'platform').setOrigin(0).setTint(0x3f94b8).setAlpha(0.16);
-        this.ground = this.add.rectangle(0, 0, 100, 34, 0x18394d).setOrigin(0, 1);
-        this.upper = this.add.rectangle(0, 0, 100, 20, 0x2b6680).setOrigin(0, 1).setAlpha(0.9);
-        this.fx = this.add.particles(0, 0, 'platform', { speed: { min: 40, max: 160 }, lifespan: 320, scale: { start: 0.16, end: 0 }, quantity: 0, emitting: false });
+        this.sky = this.add.rectangle(0, 0, 100, 100, PALETTES[0].sky).setOrigin(0).setDepth(-20);
+        this.sun = this.add.circle(0, 0, 52, 0xffe788, 0.9).setDepth(-19);
+        this.clouds = this.add.tileSprite(0, 0, 100, 100, 'cloud').setOrigin(0).setAlpha(0.5).setDepth(-18);
+        this.mountains = this.add.tileSprite(0, 0, 100, 100, 'mountains').setOrigin(0).setDepth(-16);
+        this.forest = this.add.tileSprite(0, 0, 100, 100, 'tree-line').setOrigin(0).setDepth(-12);
+        this.waterfall = this.add.tileSprite(0, 0, 54, 122, 'waterfall').setOrigin(0).setAlpha(0.95).setDepth(-11);
+        this.ground = this.add.tileSprite(0, 0, 100, 32, 'platform').setOrigin(0, 1).setDepth(3);
+        this.upper = this.add.tileSprite(0, 0, 100, 32, 'platform').setOrigin(0, 1).setDepth(3).setAlpha(0.96);
+        this.leaves = this.add.particles(0, 0, 'leaf', {
+          x: { min: 0, max: 1000 }, y: -20, speedX: { min: -45, max: -15 }, speedY: { min: 20, max: 65 },
+          rotate: { min: 0, max: 360 }, lifespan: { min: 3500, max: 6500 }, frequency: callbacks.reducedMotion ? -1 : 500,
+          scale: { min: 0.5, max: 1.1 }, quantity: 1
+        }).setDepth(6);
+        this.fx = this.add.particles(0, 0, 'spark', { speed: { min: 40, max: 170 }, lifespan: 380, scale: { start: 0.8, end: 0 }, quantity: 0, emitting: false }).setDepth(12);
       }
 
       makePlayer() {
+        this.playerShadow = this.add.ellipse(0, 0, 52, 15, 0x102119, 0.35).setDepth(7);
         this.player = this.add.sprite(0, 0, 'runner').setDepth(10);
         this.playerBody = Bodies.rectangle(0, 0, 38, 58, { label: 'player', friction: 0, frictionAir: 0.015, restitution: 0 });
         Composite.add(this.world, this.playerBody);
+        if (!callbacks.reducedMotion) this.tweens.add({ targets: this.player, scaleY: 0.96, scaleX: 1.04, duration: 260, yoyo: true, repeat: -1, ease: 'Sine.inOut' });
       }
 
       layout(size) {
@@ -87,12 +146,16 @@ export class RiftRelayGame {
         this.h = h;
         this.cameras.main.setViewport(0, 0, w, h);
         this.sky.setSize(w, h);
-        this.back.setSize(w, h);
-        this.mid.setSize(w, h);
-        this.ground.setPosition(0, h - 26).setSize(w, 34);
-        this.upper.setPosition(0, h * 0.54).setSize(w, 20);
+        this.sun.setPosition(w * 0.78, h * 0.18).setRadius(Math.max(34, Math.min(58, w * 0.07)));
+        this.clouds.setSize(w, h * 0.38).setPosition(0, h * 0.04);
+        this.mountains.setSize(w, h * 0.46).setPosition(0, h * 0.23);
+        this.forest.setSize(w, h * 0.55).setPosition(0, h * 0.35);
+        this.waterfall.setPosition(w * 0.73, h * 0.3).setSize(54, h * 0.48);
+        this.ground.setPosition(0, h - 26).setSize(w, 32);
+        this.upper.setPosition(0, h * 0.54).setSize(w, 32);
         this.floorY = h - 92;
         this.upperY = h * 0.54 - 42;
+        this.leaves.setParticleZone?.({ type: 'random', source: new Phaser.Geom.Rectangle(0, -20, w, 10) });
         if (this.playerBody) {
           Body.setPosition(this.playerBody, { x: Math.max(70, w * 0.18), y: this.route ? this.upperY : this.floorY });
           Body.setVelocity(this.playerBody, { x: 0, y: 0 });
@@ -121,7 +184,7 @@ export class RiftRelayGame {
         const target = this.route ? this.upperY : this.floorY;
         if (Math.abs(this.playerBody.position.y - target) > 18) return;
         Body.setVelocity(this.playerBody, { x: 0, y: this.route ? -10.5 : -12 });
-        this.tweens.add({ targets: this.player, angle: 8, duration: 120, yoyo: true });
+        this.tweens.add({ targets: this.player, angle: 10, duration: 120, yoyo: true });
       }
 
       switchRoute(route) {
@@ -129,30 +192,35 @@ export class RiftRelayGame {
         this.route = route;
         Body.setPosition(this.playerBody, { x: this.playerBody.position.x, y: route ? this.upperY : this.floorY });
         Body.setVelocity(this.playerBody, { x: 0, y: 0 });
+        this.fx.emitParticleAt(this.player.x, this.player.y, 8);
       }
 
       slideOrDrop() {
         if (this.route) return this.switchRoute(0);
         if (this.sliding || this.finished) return;
         this.sliding = true;
-        this.player.setTexture('runner-slide').setDisplaySize(54, 34);
+        this.player.setTexture('runner-slide').setDisplaySize(60, 36);
         this.time.delayedCall(500, () => {
           if (!this.player.active) return;
           this.sliding = false;
-          this.player.setTexture('runner').setDisplaySize(54, 66);
+          this.player.setTexture('runner').setDisplaySize(58, 66);
         });
       }
 
       loadStage() {
         this.zone = generateRiftZone(this.seed, this.stage);
-        const names = ['MEADOW', 'SKYWORKS', 'ECHO CAVES', 'MIRAGE CITY', 'STORM CORE', 'MASTER VAULT', 'REST GARDEN'];
-        const colors = [0x102f3c, 0x17345d, 0x30244f, 0x4c293f, 0x4b1c28, 0x163c3e, 0x194331];
-        this.sky.setFillStyle(colors[this.stage % colors.length]);
+        const names = ['FOREST FALLS', 'SKY GARDENS', 'ECHO CAVES', 'SUNSET RIDGE'];
+        const palette = PALETTES[this.stage % PALETTES.length];
+        this.sky.setFillStyle(palette.sky);
+        this.mountains.setTint(palette.mountain);
+        this.forest.setTint(palette.forest);
+        this.ground.setTint(palette.ground);
+        this.upper.setTint(palette.ground);
         this.speed = Math.min(640, 270 + this.zone.difficulty.speed * 90 + this.stage * 10);
         callbacks.container.querySelector('[data-rift-zone]').textContent = `${names[this.stage % names.length]} · ${this.stage + 1}`;
-        callbacks.container.querySelector('[data-rift-rule]').textContent = ['TAP TO JUMP', 'JUMP + CHOOSE ROUTE', 'MATCH THE SYMBOL', 'IGNORE THE DECOY', 'MEMORIZE THE PULSE', 'COMBINE ALL RULES', 'RECOVER AND BREATHE'][this.stage % 7];
+        callbacks.container.querySelector('[data-rift-rule]').textContent = ['TAP: JUMP', 'SWIPE UP: UPPER PATH', 'FOLLOW THE GOLD GATE', 'SWIPE DOWN: SLIDE'][this.stage % 4];
         this.nextSpawnAt = 0;
-        this.cameras.main.flash(callbacks.reducedMotion ? 0 : 150, 80, 210, 255, false);
+        this.cameras.main.flash(callbacks.reducedMotion ? 0 : 150, 255, 235, 145, false);
       }
 
       spawnSegment() {
@@ -165,7 +233,7 @@ export class RiftRelayGame {
         body.plugin = { sprite, route, gate, requiresJump: segment.requiresJump, requiresSlide: segment.requiresSlide, risk: segment.risk, resolved: false, segment };
         Composite.add(this.world, body);
         this.hazards.push(body);
-        if (gate) body.plugin.symbol = this.add.text(sprite.x, sprite.y, ['◆', '▲', '●', '■'][segment.rule.cue % 4], { fontFamily: 'system-ui', fontSize: '30px', fontStyle: 'bold', color: '#101722' }).setOrigin(0.5).setDepth(9);
+        if (gate) body.plugin.symbol = this.add.text(sprite.x, sprite.y, ['◆', '▲', '●', '■'][segment.rule.cue % 4], { fontFamily: 'system-ui', fontSize: '30px', fontStyle: 'bold', color: '#5c3b00' }).setOrigin(0.5).setDepth(9);
         this.segment += 1;
       }
 
@@ -205,8 +273,12 @@ export class RiftRelayGame {
         if (this.finished) return;
         Engine.update(this.engine, Math.min(delta, 33));
         this.distance += delta * 0.03;
-        this.back.tilePositionX += delta * this.speed * 0.00012;
-        this.mid.tilePositionX += delta * this.speed * 0.00027;
+        this.clouds.tilePositionX += delta * this.speed * 0.000025;
+        this.mountains.tilePositionX += delta * this.speed * 0.00008;
+        this.forest.tilePositionX += delta * this.speed * 0.00019;
+        this.ground.tilePositionX += delta * this.speed * 0.001;
+        this.upper.tilePositionX += delta * this.speed * 0.001;
+        this.waterfall.tilePositionY -= delta * 0.12;
         const target = this.route ? this.upperY : this.floorY;
         if (this.playerBody.position.y > target) {
           Body.setPosition(this.playerBody, { x: this.playerBody.position.x, y: target });
@@ -214,6 +286,7 @@ export class RiftRelayGame {
         }
         Body.setPosition(this.playerBody, { x: Math.max(70, this.w * 0.18), y: this.playerBody.position.y });
         this.player.setPosition(this.playerBody.position.x, this.playerBody.position.y);
+        this.playerShadow.setPosition(this.playerBody.position.x, target + 31).setScale(Math.max(0.45, 1 - Math.abs(this.playerBody.position.y - target) / 120), 1);
         if (time >= this.nextSpawnAt) {
           this.spawnSegment();
           this.nextSpawnAt = time + Math.max(650, this.zone.difficulty.windowMs * 0.72);
@@ -256,7 +329,7 @@ export class RiftRelayGame {
     this.game = new Phaser.Game({
       type: Phaser.AUTO,
       parent: host,
-      backgroundColor: '#091321',
+      backgroundColor: '#5ec8f4',
       scale: { mode: Phaser.Scale.RESIZE, autoCenter: Phaser.Scale.CENTER_BOTH, width: '100%', height: '100%' },
       render: { antialias: true, pixelArt: false, roundPixels: false },
       scene: PulseboundScene,
