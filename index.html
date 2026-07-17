@@ -8,13 +8,21 @@
   <title>Forest Dash</title>
   <link rel="stylesheet" href="./rift.css">
   <link rel="stylesheet" href="./visual.css">
+  <script type="importmap">
+    {
+      "imports": {
+        "phaser": "https://esm.sh/phaser@4.2.1",
+        "matter-js": "https://esm.sh/matter-js@0.20.0"
+      }
+    }
+  </script>
 </head>
 <body>
 <div class="shell" id="app">
   <header class="topbar"><div class="brand" data-copy="appName">Social Challenge Arena</div><div class="toolbar"><select id="language-select" aria-label="Language"><option value="ar">العربية</option><option value="en">English</option><option value="tr">Türkçe</option></select><button id="motion-toggle" type="button" aria-pressed="false" data-copy="effects">Effects</button></div></header>
   <main>
     <section class="screen" data-screen="discovery"><div class="hero"><p class="eyebrow" data-copy="eyebrow">45-second skill challenge</p><h1 data-copy="hero">Dash through the forest. Dodge. Collect. Win.</h1><p data-copy="intro">A fast three-lane arcade challenge with clear obstacles and the same seeded run for friends.</p></div><article class="challenge-card" data-challenge-id="forest-dash"><div><p class="eyebrow" data-copy="flagship">Flagship challenge</p><h2 data-copy="name">Forest Dash</h2><p data-copy="tagline">Switch lanes, jump over obstacles and collect stars.</p></div><button class="btn primary" id="open-button" type="button" data-copy="play">Play</button></article></section>
-    <section class="screen" data-screen="instructions" hidden><div class="instruction-panel"><div class="hero"><p class="eyebrow" data-copy="name">Forest Dash</p><h1 data-copy="instructionTitle">Three moves. One clear goal.</h1><p data-copy="howTo">Survive for 45 seconds, collect stars and protect your three chances.</p></div><div class="instruction-grid" aria-label="Controls"><div class="instruction-card"><span class="gesture-icon tap" aria-hidden="true"></span><strong>Tap to jump</strong></div><div class="instruction-card"><span class="gesture-icon up" aria-hidden="true"></span><strong>Swipe up to move one lane higher</strong></div><div class="instruction-card"><span class="gesture-icon down" aria-hidden="true"></span><strong>Swipe down to move lower; swipe again at the edge to slide</strong></div></div><div class="goal-strip"><span class="goal-dot" aria-hidden="true"></span><strong>Avoid rocks and tree stumps. Collect yellow stars. Highest score wins.</strong></div><p id="invite-target" class="comparison" hidden></p><div class="actions"><button class="btn primary" id="start-button" type="button" data-copy="start">Start run</button><button class="btn" id="back-button" type="button" data-copy="back">Back</button></div></div></section>
+    <section class="screen" data-screen="instructions" hidden><div class="instruction-panel"><div class="hero"><p class="eyebrow" data-copy="name">Forest Dash</p><h1 data-copy="instructionTitle">Three moves. One clear goal.</h1><p data-copy="howTo">Survive for 45 seconds, collect stars and protect your three chances.</p></div><div class="instruction-grid" aria-label="Controls"><div class="instruction-card"><span class="gesture-icon tap" aria-hidden="true"></span><strong>Tap to jump</strong></div><div class="instruction-card"><span class="gesture-icon up" aria-hidden="true"></span><strong>Swipe up to move one lane higher</strong></div><div class="instruction-card"><span class="gesture-icon down" aria-hidden="true"></span><strong>Swipe down to move lower; swipe again at the edge to slide</strong></div></div><div class="goal-strip"><span class="goal-dot" aria-hidden="true"></span><strong>Avoid rocks and tree stumps. Collect yellow stars. Highest score wins.</strong></div><p id="app-error" class="comparison" hidden role="alert"></p><p id="invite-target" class="comparison" hidden></p><div class="actions"><button class="btn primary" id="start-button" type="button" data-copy="start">Start run</button><button class="btn" id="back-button" type="button" data-copy="back">Back</button></div></div></section>
     <section class="screen stage-shell" data-screen="game" hidden><div class="hud" aria-label="Game status"><div><span data-copy="score">Score</span><strong id="score-value">0</strong></div><div><span data-copy="zone">Phase</span><strong id="zone-value">1</strong></div><div><span data-copy="lives">Chances</span><strong id="lives-value">3</strong></div><div><span data-copy="streak">Streak</span><strong id="combo-value">0</strong></div></div><div id="rift-arena" class="rift-arena" tabindex="0" role="application" aria-label="Forest Dash game arena. Tap to jump and swipe vertically to change lanes." aria-keyshortcuts="ArrowUp ArrowDown Space Escape"><div id="phaser-game" aria-hidden="true"></div><div class="rift-head"><span data-rift-zone>FOREST DASH · 45 SEC</span><strong data-rift-rule>COLLECT STARS</strong></div><button class="rift-exit" type="button" data-rift-exit data-copy="exit">Exit</button><div class="gesture-hint" data-copy="gestureHint" aria-hidden="true">TAP JUMP · SWIPE CHANGE LANE · EDGE SWIPE SLIDE</div></div><p id="game-status" class="sr-only" aria-live="assertive"></p></section>
     <section class="screen result" data-screen="result" hidden><p class="eyebrow" data-copy="result">Your result</p><div class="score" id="result-score">0</div><p id="result-summary"></p><div id="comparison" class="comparison" hidden></div><div class="actions"><button class="btn primary" id="share-button" type="button" data-copy="share">Challenge a friend</button><button class="btn" id="replay-button" type="button" data-copy="replay">Replay</button><button class="btn" id="new-button" type="button" data-copy="newRoute">New run</button><button class="btn" id="home-button" type="button" data-copy="home">Home</button></div></section>
   </main>
@@ -25,10 +33,48 @@
     document.querySelectorAll('[data-screen]').forEach((screen) => { screen.hidden = screen.dataset.screen !== name; });
     window.scrollTo({ top: 0, behavior: 'instant' });
   };
+  const error = document.getElementById('app-error');
+  const start = document.getElementById('start-button');
+  let pendingStart = false;
+
   document.getElementById('open-button')?.addEventListener('click', () => show('instructions'));
   document.getElementById('back-button')?.addEventListener('click', () => show('discovery'));
+
+  start?.addEventListener('click', (event) => {
+    if (window.__SCA_APP__?.isReady) return;
+    event.preventDefault();
+    pendingStart = true;
+    start.disabled = true;
+    start.textContent = document.documentElement.lang === 'ar' ? 'جارٍ تحميل اللعبة…' : 'Loading game…';
+    if (error) error.hidden = true;
+  }, true);
+
+  window.addEventListener('sca:ready', () => {
+    start.disabled = false;
+    if (pendingStart) {
+      pendingStart = false;
+      window.__SCA_APP__.begin();
+    }
+  });
+
+  window.__SCA_BOOT_FAIL__ = (message) => {
+    pendingStart = false;
+    start.disabled = false;
+    start.textContent = document.documentElement.lang === 'ar' ? 'إعادة المحاولة' : 'Retry';
+    if (error) {
+      error.hidden = false;
+      error.textContent = document.documentElement.lang === 'ar'
+        ? `تعذر تحميل اللعبة: ${message}`
+        : `Game failed to load: ${message}`;
+    }
+  };
 })();
 </script>
-<script type="module" src="./src/app.mjs"></script>
+<script type="module">
+  import('./src/app.mjs').catch((error) => {
+    console.error('Application boot failed', error);
+    window.__SCA_BOOT_FAIL__?.(error?.message || 'Unknown error');
+  });
+</script>
 </body>
 </html>
